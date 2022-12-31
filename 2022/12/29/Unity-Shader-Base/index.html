@@ -19,15 +19,15 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.14.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js"></script>
 
-    <meta name="description" content="Unity Shader Basics">
+    <meta name="description" content="记录关于Unity Shader的一些基础知识">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Unity Shader - Base">
+<meta property="og:title" content="Unity Shader Base">
 <meta property="og:url" content="http://example.com/2022/12/29/Unity-Shader-Base/index.html">
 <meta property="og:site_name" content="MingZI-7&#39;s Blog">
-<meta property="og:description" content="Unity Shader Basics">
+<meta property="og:description" content="记录关于Unity Shader的一些基础知识">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2022-12-29T14:22:28.000Z">
-<meta property="article:modified_time" content="2022-12-29T14:30:39.548Z">
+<meta property="article:modified_time" content="2022-12-31T08:43:57.943Z">
 <meta property="article:author" content="mingzi-7">
 <meta property="article:tag" content="Unity Shader">
 <meta name="twitter:card" content="summary">
@@ -37,10 +37,10 @@
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"http://example.com/2022/12/29/Unity-Shader-Base/","path":"2022/12/29/Unity-Shader-Base/","title":"Unity Shader - Base"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"http://example.com/2022/12/29/Unity-Shader-Base/","path":"2022/12/29/Unity-Shader-Base/","title":"Unity Shader Base"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>Unity Shader - Base | MingZI-7's Blog</title>
+<title>Unity Shader Base | MingZI-7's Blog</title>
   
 
 
@@ -114,7 +114,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Unity-Shader-Basics"><span class="nav-number">1.</span> <span class="nav-text">Unity Shader Basics</span></a></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%AD%E4%B9%89-Semantics"><span class="nav-number">1.</span> <span class="nav-text">语义 Semantics</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E7%A1%80%E8%AF%AD%E4%B9%89"><span class="nav-number">1.1.</span> <span class="nav-text">基础语义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B3%BB%E7%BB%9F%E6%95%B0%E5%80%BC%E8%AF%AD%E4%B9%89-system-value-semantics"><span class="nav-number">1.2.</span> <span class="nav-text">系统数值语义 system-value semantics</span></a></li></ol></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -134,12 +134,14 @@
         </a>
       </div>
       <div class="site-state-item site-state-categories">
+          <a href="/categories/">
         <span class="site-state-item-count">4</span>
-        <span class="site-state-item-name">categories</span>
+        <span class="site-state-item-name">categories</span></a>
       </div>
       <div class="site-state-item site-state-tags">
+          <a href="/tags/">
         <span class="site-state-item-count">4</span>
-        <span class="site-state-item-name">tags</span>
+        <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
 </div>
@@ -186,12 +188,12 @@
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="Unity Shader - Base | MingZI-7's Blog">
-      <meta itemprop="description" content="">
+      <meta itemprop="name" content="Unity Shader Base | MingZI-7's Blog">
+      <meta itemprop="description" content="记录关于Unity Shader的一些基础知识">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          Unity Shader - Base
+          Unity Shader Base
         </h1>
 
         <div class="post-meta-container">
@@ -201,9 +203,15 @@
         <i class="far fa-calendar"></i>
       </span>
       <span class="post-meta-item-text">Posted on</span>
-      
 
-      <time title="Created: 2022-12-29 22:22:28 / Modified: 22:30:39" itemprop="dateCreated datePublished" datetime="2022-12-29T22:22:28+08:00">2022-12-29</time>
+      <time title="Created: 2022-12-29 22:22:28" itemprop="dateCreated datePublished" datetime="2022-12-29T22:22:28+08:00">2022-12-29</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2022-12-31 16:43:57" itemprop="dateModified" datetime="2022-12-31T16:43:57+08:00">2022-12-31</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -211,13 +219,14 @@
       </span>
       <span class="post-meta-item-text">In</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/Game-Development/" itemprop="url" rel="index"><span itemprop="name">Game Development</span></a>
+          <a href="/categories/Shader/" itemprop="url" rel="index"><span itemprop="name">Shader</span></a>
         </span>
     </span>
 
   
 </div>
 
+            <div class="post-description">记录关于Unity Shader的一些基础知识</div>
         </div>
       </header>
 
@@ -225,7 +234,16 @@
     
     
     <div class="post-body" itemprop="articleBody">
-        <h1 id="Unity-Shader-Basics"><a href="#Unity-Shader-Basics" class="headerlink" title="Unity Shader Basics"></a>Unity Shader Basics</h1>
+        <h2 id="语义-Semantics"><a href="#语义-Semantics" class="headerlink" title="语义 Semantics"></a>语义 Semantics</h2><h3 id="基础语义"><a href="#基础语义" class="headerlink" title="基础语义"></a>基础语义</h3><p>Unity ShaderLab 的语义实际上就是 Cg&#x2F;HLSL 的语义，<a target="_blank" rel="noopener" href="https://learn.microsoft.com/zh-cn/windows/win32/direct3dhlsl/dx-graphics-hlsl-semantics?redirectedfrom=MSDN">微软官方DirectX的文档</a>中可以找到关于语义的详细说明界面。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">appdata</span> &#123;</span><br><span class="line">	float4 vertex : POSITION;</span><br><span class="line">	float3 normal : NORMAL;</span><br><span class="line">	float2 uv : TEXCOORD0;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>上述代码中的<code>POSITION</code> <code>NORMAL</code>等，就是语义。实际上，语义就是赋给Shader输入和输入的字符段，这个字符段表达了这个参数的含义，用于传达有关参数预期使用的信息。通俗一些讲，这些语义可以让Shader知道从哪里获取数据，并把数据输出到哪里。</p>
+<p>Unity中，为了方便对模型数据的传输，对一些语义进行了特别的含义规定。例如，在顶点着色器的输入结构体a2v用<code>TEXCOORD0</code>来描述texcoord，Unity会时别<code>TEXCOORD0</code>语义，以吧模型的第一组纹理 坐标填充到texcoord中。</p>
+<p>但需要注意的是，即使语义的名称一样，如果出现的位置不同，含义也不同。例如，<code>TEXCOORD0</code>既可以描述顶点着色器的输入结构体a2v，也可以描述输入结构体v2f。但是，在a2v中， <code>TEXCOORD0</code>有特别的含义，即把模型的第一组纹理坐标存储在该变量中，而在v2f中，<code>TEXCOORD0</code>修饰的变量含义就可以由我们自己来决定。</p>
+<h3 id="系统数值语义-system-value-semantics"><a href="#系统数值语义-system-value-semantics" class="headerlink" title="系统数值语义 system-value semantics"></a>系统数值语义 system-value semantics</h3><p>在DirectX10之后，有一种新的语义类型，就是系统数值语义(system-value semantics)。这类语义以SV开头，SV代表的含义就是系统数值(system-value)。</p>
+<p>这些语义在渲染流水线中有特殊的含义。例如，<code>SV_POSITION</code>语义修饰顶点着色器的输出变量pos，那么就表示pos包含了可用于光栅化的变换后的顶点坐标(即齐次裁剪空间中的坐标)。这些语义描述的变量是不可以随便赋值的，因为流水线需要使用它们来完成特定的目的，渲染引擎把使用<code>SV_POSITION</code>修饰的变量经过光栅化后显示在屏幕上。</p>
+<p>Unity并没有支持cg&#x2F;HLSL提供的所有语义，可通过Unity官方文档查看<a target="_blank" rel="noopener" href="https://docs.unity3d.com/Manual/SL-ShaderSemantics.html">Shader semantics</a></p>
+
     </div>
 
     
