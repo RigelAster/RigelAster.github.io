@@ -238,7 +238,7 @@
 <p>首先github仓库提供的SSH链接不可以直接用来clone，会链接超时。应该做如下改变：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">原本：git@github.com:userName/projectName.git</span><br><span class="line">变为：hostA:userName/projectName.git</span><br></pre></td></tr></table></figure>
 
-<p>这是由于SSH验证时，会取config里面找设置，如果没有对应Host设置，便会自动尝试默认key名称，直到找到key文件，否则链接超时。上面config里面没有Host github.com，.ssh中也没有默认名称的key文件id_rsa等，所以默认无法通过验证，可以使用 ssh -Tv <a href="mailto:&#x67;&#x69;&#116;&#x40;&#103;&#x69;&#x74;&#x68;&#117;&#x62;&#x2e;&#x63;&#x6f;&#x6d;">&#x67;&#x69;&#116;&#x40;&#103;&#x69;&#x74;&#x68;&#117;&#x62;&#x2e;&#x63;&#x6f;&#x6d;</a> 命令来查看验证的具体过程.</p>
+<p>这是由于SSH验证时，会取config里面找设置，如果没有对应Host设置，便会自动尝试默认key名称，直到找到key文件，否则链接超时。上面config里面没有Host github.com，.ssh中也没有默认名称的key文件id_rsa等，所以默认无法通过验证，可以使用 ssh -Tv <a href="mailto:&#x67;&#x69;&#116;&#x40;&#103;&#105;&#x74;&#104;&#117;&#98;&#46;&#99;&#x6f;&#109;">&#x67;&#x69;&#116;&#x40;&#103;&#105;&#x74;&#104;&#117;&#98;&#46;&#99;&#x6f;&#109;</a> 命令来查看验证的具体过程.</p>
 
     </div>
 
