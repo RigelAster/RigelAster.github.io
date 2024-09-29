@@ -27,28 +27,12 @@
 <meta property="og:site_name" content="Rigel&#39;s Blog">
 <meta property="og:description" content="本文为焦散现象模拟上篇">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="https://pica.zhimg.com/80/v2-919c4c829fbe428dcd6de7cc5b23d89c_720w.png?source=d16d100b">
-<meta property="og:image" content="https://picx.zhimg.com/80/v2-4d97894b4a44124b70ec0e3383464743_720w.jpeg?source=d16d100b">
-<meta property="og:image" content="https://pic1.zhimg.com/80/v2-c3a418defd9ff05890f63c4c35e728ad_720w.gif?source=d16d100b">
-<meta property="og:image" content="https://picx.zhimg.com/80/v2-3febe0569d3ed30671ab1533021afbd8_720w.png?source=d16d100b">
-<meta property="og:image" content="https://picx.zhimg.com/80/v2-a60e3744fe0782a14507aa3f0da598b3_720w.png?source=d16d100b">
-<meta property="og:image" content="https://picx.zhimg.com/80/v2-91cbfdc96ecff4844ff50a6e47dd33b2_720w.png?source=d16d100b">
-<meta property="og:image" content="https://pic1.zhimg.com/80/v2-48b38a83d5750265c33a5bc336450486_720w.png?source=d16d100b">
-<meta property="og:image" content="https://pica.zhimg.com/80/v2-7cbd609706dfc88b467647c6b125bdd1_720w.png?source=d16d100b">
-<meta property="og:image" content="https://pica.zhimg.com/80/v2-f5b12e4c1b75f56e0c5c1835d2ff33b4_720w.png?source=d16d100b">
-<meta property="og:image" content="https://picx.zhimg.com/80/v2-9c7e9764130281b8ce9a7574115a4305_720w.gif?source=d16d100b">
-<meta property="og:image" content="https://picx.zhimg.com/80/v2-fd3799d8650b22dfa28e663f50f86d97_720w.png?source=d16d100b">
-<meta property="og:image" content="https://picx.zhimg.com/80/v2-6be67324b272181f876e593b67901406_720w.gif?source=d16d100b">
-<meta property="og:image" content="https://pic1.zhimg.com/80/v2-864e3d7e316a36ea3029ea99aacf1454_720w.png?source=d16d100b">
-<meta property="og:image" content="https://pic1.zhimg.com/80/v2-2bec6f3f85e9919ee65c18646c18f827_720w.png?source=d16d100b">
-<meta property="og:image" content="https://pica.zhimg.com/80/v2-3d195392a9fea2046a02e0b719f46530_720w.gif?source=d16d100b">
 <meta property="article:published_time" content="2022-12-23T10:48:07.000Z">
 <meta property="article:modified_time" content="2022-12-23T11:02:40.975Z">
 <meta property="article:author" content="Rigel Aster">
 <meta property="article:tag" content="Unity Shader">
 <meta property="article:tag" content="Caustics">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://pica.zhimg.com/80/v2-919c4c829fbe428dcd6de7cc5b23d89c_720w.png?source=d16d100b">
 
 
 <link rel="canonical" href="https://rigelaster.github.io/2022/12/23/%E5%AD%A6%E4%B9%A0%E9%9A%8F%E7%AC%94-Believable-Caustics-1/">
@@ -130,7 +114,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%95%E4%B8%BA%E7%84%A6%E6%95%A3%E6%95%88%E6%9E%9C-Caustics"><span class="nav-number">2.</span> <span class="nav-text">何为焦散效果 Caustics</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%88%E6%9E%9C%E6%A8%A1%E6%8B%9F"><span class="nav-number">3.</span> <span class="nav-text">效果模拟</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#In-Unity"><span class="nav-number">4.</span> <span class="nav-text">In Unity</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AASurface-Shader"><span class="nav-number">4.1.</span> <span class="nav-text">创建一个Surface Shader</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%87%87%E6%A0%B7-Templing-Texture"><span class="nav-number">4.2.</span> <span class="nav-text">采样 Templing Texture</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%A9Caustics%E5%8A%A8%E8%B5%B7%E6%9D%A5"><span class="nav-number">4.3.</span> <span class="nav-text">让Caustics动起来</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%9A%E6%AC%A1%E9%87%87%E6%A0%B7-Multiple-Sampling"><span class="nav-number">4.4.</span> <span class="nav-text">多次采样 Multiple Sampling</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RGB-split"><span class="nav-number">4.5.</span> <span class="nav-text">RGB split</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">5.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%95%E4%B8%BA%E7%84%A6%E6%95%A3%E6%95%88%E6%9E%9C-caustics"><span class="nav-number">2.</span> <span class="nav-text">何为焦散效果 Caustics</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%88%E6%9E%9C%E6%A8%A1%E6%8B%9F"><span class="nav-number">3.</span> <span class="nav-text">效果模拟</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#in-unity"><span class="nav-number">4.</span> <span class="nav-text">In Unity</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AAsurface-shader"><span class="nav-number">4.1.</span> <span class="nav-text">创建一个Surface Shader</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%87%87%E6%A0%B7-templing-texture"><span class="nav-number">4.2.</span> <span class="nav-text">采样 Templing Texture</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%A9caustics%E5%8A%A8%E8%B5%B7%E6%9D%A5"><span class="nav-number">4.3.</span> <span class="nav-text">让Caustics动起来</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%9A%E6%AC%A1%E9%87%87%E6%A0%B7-multiple-sampling"><span class="nav-number">4.4.</span> <span class="nav-text">多次采样 Multiple Sampling</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#rgb-split"><span class="nav-number">4.5.</span> <span class="nav-text">RGB split</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">5.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -145,7 +129,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">13</span>
+          <span class="site-state-item-count">14</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -156,7 +140,7 @@
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-count">8</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
@@ -246,53 +230,158 @@
     
     
     
-    <div class="post-body" itemprop="articleBody"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>  注：此为学习其他资料时的个人笔记，文章多为引用</p>
-<p>  制作出较为真实的焦散效果是游戏开发者&#x2F;计算机图形学相关领域从业者的必经之路。</p>
-<p><img src="https://pica.zhimg.com/80/v2-919c4c829fbe428dcd6de7cc5b23d89c_720w.png?source=d16d100b" alt="img"></p>
+    <div class="post-body" itemprop="articleBody"><h2 id="前言">前言</h2>
+<p>注：此为学习其他资料时的个人笔记，文章多为引用</p>
+<p>制作出较为真实的焦散效果是游戏开发者/计算机图形学相关领域从业者的必经之路。</p>
+<figure>
+<img
+src="https://pica.zhimg.com/80/v2-919c4c829fbe428dcd6de7cc5b23d89c_720w.png?source=d16d100b"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
 <p>Twitter上一位游戏相关从业者（上图）曾经发推向大家描述过如何制作焦散效果，本文便以此为基础进行展开。</p>
-<h2 id="何为焦散效果-Caustics"><a href="#何为焦散效果-Caustics" class="headerlink" title="何为焦散效果 Caustics"></a>何为焦散效果 Caustics</h2><p>可能你会对“焦散”这个词感到陌生，但它绝对存在在你的日常生活中。“焦散”是由光的折射产生的一种光学现象，你很可能会在洗手时观察到这种现象。透过不平整的水面光便会因为折射产生聚集的现象，当面积足够大、光线足够亮时这种现象会很明显。</p>
-<p><img src="https://picx.zhimg.com/80/v2-4d97894b4a44124b70ec0e3383464743_720w.jpeg?source=d16d100b" alt="img"></p>
+<h2 id="何为焦散效果-caustics">何为焦散效果 Caustics</h2>
+<p>可能你会对“焦散”这个词感到陌生，但它绝对存在在你的日常生活中。“焦散”是由光的折射产生的一种光学现象，你很可能会在洗手时观察到这种现象。透过不平整的水面光便会因为折射产生聚集的现象，当面积足够大、光线足够亮时这种现象会很明显。</p>
+<figure>
+<img
+src="https://picx.zhimg.com/80/v2-4d97894b4a44124b70ec0e3383464743_720w.jpeg?source=d16d100b"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
 <p>光透过水面产生焦散现象</p>
-<p>（顺便一提，闫老师并不赞同将 Caustics 译为“焦散”，因为这种现象更多体现的是光的聚集，更应该被称为“聚焦”。在此我们便不多做讨论，称为“焦散”）</p>
-<h2 id="效果模拟"><a href="#效果模拟" class="headerlink" title="效果模拟"></a>效果模拟</h2><p>焦散非常有具有辨识度的一点便是，它会不停的移动，动态赋予了焦散效果灵魂。通过物理原理来重现焦散现象是非常昂贵的，因为需要模拟巨量的光线。因此,现在在游戏领域多使用tex来实现焦散效果。</p>
-<p><img src="https://pic1.zhimg.com/80/v2-c3a418defd9ff05890f63c4c35e728ad_720w.gif?source=d16d100b" alt="img"></p>
+<p>（顺便一提，闫老师并不赞同将 Caustics
+译为“焦散”，因为这种现象更多体现的是光的聚集，更应该被称为“聚焦”。在此我们便不多做讨论，称为“焦散”）</p>
+<h2 id="效果模拟">效果模拟</h2>
+<p>焦散非常有具有辨识度的一点便是，它会不停的移动，动态赋予了焦散效果灵魂。通过物理原理来重现焦散现象是非常昂贵的，因为需要模拟巨量的光线。因此,现在在游戏领域多使用tex来实现焦散效果。</p>
+<figure>
+<img
+src="https://pic1.zhimg.com/80/v2-c3a418defd9ff05890f63c4c35e728ad_720w.gif?source=d16d100b"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
 <p>caustics_texture</p>
 <p><em>flogelze</em>提出通过一下几点来制作一个可信的焦散现象：</p>
 <ul>
-<li>Impressing the caustics pattern on a model surfaces twice, each time using different sizes and speeds</li>
+<li>Impressing the caustics pattern on a model surfaces twice, each time
+using different sizes and speeds</li>
 <li>Blending the two patterns using the <em>min</em> operator</li>
 <li>Splitting the RGB channels during the sampling.</li>
 </ul>
-<h2 id="In-Unity"><a href="#In-Unity" class="headerlink" title="In Unity"></a>In Unity</h2><p>尽量简洁的描述每一步的实现 然后展示当前shader效果</p>
-<h3 id="创建一个Surface-Shader"><a href="#创建一个Surface-Shader" class="headerlink" title="创建一个Surface Shader"></a>创建一个Surface Shader</h3><p>因为会使用到场景中的灯光，所以最好的选择是创建一个surface shader，使用起来比较方便。使用默认的shader 创建一个材质，赋予给物体即可。</p>
-<p><img src="https://picx.zhimg.com/80/v2-3febe0569d3ed30671ab1533021afbd8_720w.png?source=d16d100b" alt="img"></p>
+<h2 id="in-unity">In Unity</h2>
+<p>尽量简洁的描述每一步的实现 然后展示当前shader效果</p>
+<h3 id="创建一个surface-shader">创建一个Surface Shader</h3>
+<p>因为会使用到场景中的灯光，所以最好的选择是创建一个surface
+shader，使用起来比较方便。使用默认的shader
+创建一个材质，赋予给物体即可。</p>
+<figure>
+<img
+src="https://picx.zhimg.com/80/v2-3febe0569d3ed30671ab1533021afbd8_720w.png?source=d16d100b"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
 <p>默认shader</p>
-<h3 id="采样-Templing-Texture"><a href="#采样-Templing-Texture" class="headerlink" title="采样 Templing Texture"></a>采样 Templing Texture</h3><p>这部分使用到的焦散采样图即为上文提及的采样图，首先需要声明shader properties 及相关变量：</p>
-<p><img src="https://picx.zhimg.com/80/v2-a60e3744fe0782a14507aa3f0da598b3_720w.png?source=d16d100b" alt="img"></p>
-<p><img src="https://picx.zhimg.com/80/v2-91cbfdc96ecff4844ff50a6e47dd33b2_720w.png?source=d16d100b" alt="img"></p>
-<p>  <em>_CausitcsTex_ST</em> 是与 <em>_CausticsTex</em> 配套的缩放和偏移存储变量，使用了unity默认的命名方式，即xxx_ST。随后便是表面着色器的主要函数 *surf() ,*它决定了每一个像素如何被绘制到屏幕上，像素的最终颜色取决于变量o的值。o 是 SurfaceOutputStandard 类型的，unity把一系列决定像素颜色的字段都封装进了这个类型。现在我们只关注 Albedo 字段，它大致对应于物体在白光照射下的颜色。</p>
-<p>  在一个新创建的表面着色器中，Albedo 值来自于默认的 _MainTex。因为焦散效果是作用于原有物体效果之上的，于是直接采用简单的相加。</p>
-<p><img src="https://pic1.zhimg.com/80/v2-48b38a83d5750265c33a5bc336450486_720w.png?source=d16d100b" alt="img"></p>
-<p><img src="https://pica.zhimg.com/80/v2-7cbd609706dfc88b467647c6b125bdd1_720w.png?source=d16d100b" alt="img"></p>
+<h3 id="采样-templing-texture">采样 Templing Texture</h3>
+<p>这部分使用到的焦散采样图即为上文提及的采样图，首先需要声明shader
+properties 及相关变量：</p>
+<figure>
+<img
+src="https://picx.zhimg.com/80/v2-a60e3744fe0782a14507aa3f0da598b3_720w.png?source=d16d100b"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<figure>
+<img
+src="https://picx.zhimg.com/80/v2-91cbfdc96ecff4844ff50a6e47dd33b2_720w.png?source=d16d100b"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<p>*_CausitcsTex_ST* 是与 *_CausticsTex*
+配套的缩放和偏移存储变量，使用了unity默认的命名方式，即xxx_ST。随后便是表面着色器的主要函数
+<em>surf()
+,</em>它决定了每一个像素如何被绘制到屏幕上，像素的最终颜色取决于变量o的值。o
+是 SurfaceOutputStandard
+类型的，unity把一系列决定像素颜色的字段都封装进了这个类型。现在我们只关注
+Albedo 字段，它大致对应于物体在白光照射下的颜色。</p>
+<p>在一个新创建的表面着色器中，Albedo 值来自于默认的
+_MainTex。因为焦散效果是作用于原有物体效果之上的，于是直接采用简单的相加。</p>
+<figure>
+<img
+src="https://pic1.zhimg.com/80/v2-48b38a83d5750265c33a5bc336450486_720w.png?source=d16d100b"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<figure>
+<img
+src="https://pica.zhimg.com/80/v2-7cbd609706dfc88b467647c6b125bdd1_720w.png?source=d16d100b"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
 <p>caustics sampling</p>
-<h3 id="让Caustics动起来"><a href="#让Caustics动起来" class="headerlink" title="让Caustics动起来"></a>让Caustics动起来</h3><p>  上面也提到过，焦散现象的一个非常标志性的特征，就是它会动。在shader中制作动画效果便会用到unity提供的接口 <em>_Time</em> ，使用它可以得到游戏当前的运行时间。</p>
-<p><img src="https://pica.zhimg.com/80/v2-f5b12e4c1b75f56e0c5c1835d2ff33b4_720w.png?source=d16d100b" alt="img"></p>
-<p>上面便是一种非常简单的让焦散动起来的方法，创建 <em>_CausticsSpeed (Vector)</em> 属性来控制移动速度， 字段 <em>_Time.y</em> 可以获得游戏运行时间（单位：秒）。</p>
-<p><img src="https://picx.zhimg.com/80/v2-9c7e9764130281b8ce9a7574115a4305_720w.gif?source=d16d100b" alt="img"></p>
-<p>animated caustics </p>
-<h3 id="多次采样-Multiple-Sampling"><a href="#多次采样-Multiple-Sampling" class="headerlink" title="多次采样 Multiple Sampling"></a>多次采样 Multiple Sampling</h3><p>  为什么需要多次采样？因为多次采样得到的效果更加自然。只需要将上面的过程重复两次即可。</p>
-<p><img src="https://picx.zhimg.com/80/v2-fd3799d8650b22dfa28e663f50f86d97_720w.png?source=d16d100b" alt="img"></p>
-<p><img src="https://picx.zhimg.com/80/v2-6be67324b272181f876e593b67901406_720w.gif?source=d16d100b" alt="img"></p>
+<h3 id="让caustics动起来">让Caustics动起来</h3>
+<p>上面也提到过，焦散现象的一个非常标志性的特征，就是它会动。在shader中制作动画效果便会用到unity提供的接口
+*_Time* ，使用它可以得到游戏当前的运行时间。</p>
+<figure>
+<img
+src="https://pica.zhimg.com/80/v2-f5b12e4c1b75f56e0c5c1835d2ff33b4_720w.png?source=d16d100b"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<p>上面便是一种非常简单的让焦散动起来的方法，创建 *_CausticsSpeed
+(Vector)* 属性来控制移动速度， 字段 *_Time.y*
+可以获得游戏运行时间（单位：秒）。</p>
+<figure>
+<img
+src="https://picx.zhimg.com/80/v2-9c7e9764130281b8ce9a7574115a4305_720w.gif?source=d16d100b"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<p>animated caustics</p>
+<h3 id="多次采样-multiple-sampling">多次采样 Multiple Sampling</h3>
+<p>为什么需要多次采样？因为多次采样得到的效果更加自然。只需要将上面的过程重复两次即可。</p>
+<figure>
+<img
+src="https://picx.zhimg.com/80/v2-fd3799d8650b22dfa28e663f50f86d97_720w.png?source=d16d100b"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<figure>
+<img
+src="https://picx.zhimg.com/80/v2-6be67324b272181f876e593b67901406_720w.gif?source=d16d100b"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
 <p>multiple sampling</p>
-<h3 id="RGB-split"><a href="#RGB-split" class="headerlink" title="RGB split"></a>RGB split</h3><p>  两次采样以后焦散效果已经不错了，但是，还可以让它的效果更进一步。不同波长的波在介质中的折射率不同，这意味光线会被分裂为不同的颜色，在物体表面上会形成更漂亮的彩色。</p>
-<p>  为了制作彩色的焦散效果，我们可以分别对 cautics texture 的rgb三通道以细微的差距分别采样。</p>
-<p>  增加另外一个属性 <em>_SplitRGB</em> 控制色彩分离的程度，然后可以将前面的重复操作封装起来，使代码更加美观。</p>
-<p><img src="https://pic1.zhimg.com/80/v2-864e3d7e316a36ea3029ea99aacf1454_720w.png?source=d16d100b" alt="img"></p>
-<p><img src="https://pic1.zhimg.com/80/v2-2bec6f3f85e9919ee65c18646c18f827_720w.png?source=d16d100b" alt="img"></p>
-<p><img src="https://pica.zhimg.com/80/v2-3d195392a9fea2046a02e0b719f46530_720w.gif?source=d16d100b" alt="img"></p>
-<p> rgb split</p>
-<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a target="_blank" rel="noopener" href="https://www.alanzucconi.com/2019/09/13/believable-caustics-reflections/">https://www.alanzucconi.com/2019/09/13/believable-caustics-reflections/Believable Caustics Reflections - Alan</a></p>
-<p><a target="_blank" rel="noopener" href="https://twitter.com/flogelz/status/1165251296720576512?ref_src=twsrc%5Etfw%7Ctwcamp%5Etweetembed%7Ctwterm%5E1165251296720576512%7Ctwgr%5E%7Ctwcon%5Es1_&ref_url=https://www.alanzucconi.com/2019/09/13/believable-caustics-reflections/">https://twitter.com/flogelz/status</a></p>
+<h3 id="rgb-split">RGB split</h3>
+<p>两次采样以后焦散效果已经不错了，但是，还可以让它的效果更进一步。不同波长的波在介质中的折射率不同，这意味光线会被分裂为不同的颜色，在物体表面上会形成更漂亮的彩色。</p>
+<p>为了制作彩色的焦散效果，我们可以分别对 cautics texture
+的rgb三通道以细微的差距分别采样。</p>
+<p>增加另外一个属性 *_SplitRGB*
+控制色彩分离的程度，然后可以将前面的重复操作封装起来，使代码更加美观。</p>
+<figure>
+<img
+src="https://pic1.zhimg.com/80/v2-864e3d7e316a36ea3029ea99aacf1454_720w.png?source=d16d100b"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<figure>
+<img
+src="https://pic1.zhimg.com/80/v2-2bec6f3f85e9919ee65c18646c18f827_720w.png?source=d16d100b"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<figure>
+<img
+src="https://pica.zhimg.com/80/v2-3d195392a9fea2046a02e0b719f46530_720w.gif?source=d16d100b"
+alt="img" />
+<figcaption aria-hidden="true">img</figcaption>
+</figure>
+<p>rgb split</p>
+<h2 id="参考资料">参考资料</h2>
+<p><a
+target="_blank" rel="noopener" href="https://www.alanzucconi.com/2019/09/13/believable-caustics-reflections/">https://www.alanzucconi.com/2019/09/13/believable-caustics-reflections/Believable
+Caustics Reflections - Alan</a></p>
+<p><a
+target="_blank" rel="noopener" href="https://twitter.com/flogelz/status/1165251296720576512?ref_src=twsrc%5Etfw%7Ctwcamp%5Etweetembed%7Ctwterm%5E1165251296720576512%7Ctwgr%5E%7Ctwcon%5Es1_&amp;ref_url=https%3A%2F%2Fwww.alanzucconi.com%2F2019%2F09%2F13%2Fbelievable-caustics-reflections%2F">https://twitter.com/flogelz/status</a></p>
 
     </div>
 
@@ -380,6 +469,12 @@
   
 
 
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
 
 
 
