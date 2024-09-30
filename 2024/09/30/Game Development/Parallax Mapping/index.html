@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha256-5eIC48iZUHmSlSUz9XtjRyK2mzQkHScZY1WdMaoz74E=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"rigelaster.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.21.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"always","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="视差贴图，需要先理解法线贴图的原理">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LearnOpenGL - Parallax Mapping">
+<meta property="og:url" content="https://rigelaster.github.io/2024/09/30/Game%20Development/Parallax%20Mapping/index.html">
+<meta property="og:site_name" content="Rigel&#39;s Blog">
+<meta property="og:description" content="视差贴图，需要先理解法线贴图的原理">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://rigelaster.github.io/images/LearnOpenGL/2-1.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/LearnOpenGL/2-2.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/LearnOpenGL/2-3.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/LearnOpenGL/2-4.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/LearnOpenGL/2-5.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/LearnOpenGL/2-6.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/LearnOpenGL/2-7.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/LearnOpenGL/2-8.png">
+<meta property="article:published_time" content="2024-09-30T06:40:10.000Z">
+<meta property="article:modified_time" content="2024-09-30T10:16:00.876Z">
+<meta property="article:author" content="Rigel Aster">
+<meta property="article:tag" content="LearnOpenGL">
+<meta property="article:tag" content="Game Development">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://rigelaster.github.io/images/LearnOpenGL/2-1.png">
+
+
+<link rel="canonical" href="https://rigelaster.github.io/2024/09/30/Game%20Development/Parallax%20Mapping/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"https://rigelaster.github.io/2024/09/30/Game%20Development/Parallax%20Mapping/","path":"2024/09/30/Game Development/Parallax Mapping/","title":"LearnOpenGL - Parallax Mapping"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>LearnOpenGL - Parallax Mapping | Rigel's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Rigel's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8A%80%E6%9C%AF%E6%9D%A5%E6%BA%90"><span class="nav-number">1.</span> <span class="nav-text">技术来源</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86"><span class="nav-number">2.</span> <span class="nav-text">实现原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B7%E4%BD%93%E5%AE%9E%E7%8E%B0"><span class="nav-number">3.</span> <span class="nav-text">具体实现</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#parallax-mapping"><span class="nav-number">3.1.</span> <span class="nav-text">Parallax mapping</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#steep-parallax-mapping"><span class="nav-number">3.2.</span> <span class="nav-text">Steep Parallax Mapping</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#parallax-occlusion-mapping"><span class="nav-number">3.3.</span> <span class="nav-text">Parallax Occlusion Mapping</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Rigel Aster"
+      src="/uploads/avatar.png">
+  <p class="site-author-name" itemprop="name">Rigel Aster</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">16</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://www.zhihu.com/people/ming-zi-13-35" title="Zhihu → https:&#x2F;&#x2F;www.zhihu.com&#x2F;people&#x2F;ming-zi-13-35" rel="noopener me" target="_blank"><i class="fab fa-zhihu fa-fw"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:remingzi7@gmail.com" title="E-Mail → mailto:remingzi7@gmail.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://github.com/MingZI-7" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;MingZI-7" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i></a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://rigelaster.github.io/2024/09/30/Game%20Development/Parallax%20Mapping/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar.png">
+      <meta itemprop="name" content="Rigel Aster">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Rigel's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="LearnOpenGL - Parallax Mapping | Rigel's Blog">
+      <meta itemprop="description" content="视差贴图，需要先理解法线贴图的原理">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          LearnOpenGL - Parallax Mapping
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+      
+
+      <time title="Created: 2024-09-30 14:40:10 / Modified: 18:16:00" itemprop="dateCreated datePublished" datetime="2024-09-30T14:40:10+08:00">2024-09-30</time>
+    </span>
+
+  
+</div>
+
+            <div class="post-description">视差贴图，需要先理解法线贴图的原理</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h3 id="技术来源">技术来源</h3>
+<p><strong>Parallax mapping</strong> 与 Normal mapping
+相似，但是原理不同。Normal
+mapping通过影响光照等其他因素来给予模型细节和深度感，Parallax mapping
+则通过另外一种方式模拟更真实的深度感，两者结合可以产生难以置信的逼真效果。</p>
+<p>Parallax mapping 与 <strong>displacement
+mapping</strong>技术群联系密切。displacement
+mapping基于存储在贴图中的几何信息偏移顶点，使用一张被称为<strong>height
+map</strong>的贴图存储高度信息。一面砖墙的高度图如下：</p>
+<p><img src="/images/LearnOpenGL/2-1.png" /></p>
+<p>其模拟效果依赖于顶点数目，想要的得出较好的渲染效果需要模型具有大量的顶点。而Parallax
+mapping便可以不依赖于顶点数量，通过<strong>偏移采样uv</strong>的trick来模拟深度。</p>
+<h3 id="实现原理">实现原理</h3>
+<p>Parallax mapping 基于<strong>视线方向（view
+direcion)</strong>和<strong>高度图（height
+map）</strong>来改变纹理坐标，使物体的一部分看起来比另一部分更高或更低。为了方便理解，下面是一张砖墙的表面示意图：</p>
+<p><img src="/images/LearnOpenGL/2-2.png" /></p>
+<p>图中红线是高度图中的值，代表了砖墙的几何表面；$ V $是视线方向，view
+direcion;</p>
+<p>图中这种情况，对于渲染点<span
+class="math inline">\(A\)</span>，由于模型几何信息的缺失，如果以高度图的值表示真实墙面几何，那么实际上看到的应该是点<span
+class="math inline">\(B\)</span>。<strong>Parallax
+mapping的目标就是，将点<span
+class="math inline">\(A\)</span>的纹理坐标通过某一种方法偏移到点<span
+class="math inline">\(B\)</span>的纹理坐标处。</strong>当我们在渲染点<span
+class="math inline">\(A\)</span>时使用点<span
+class="math inline">\(B\)</span>处的纹理坐标对其他贴图进行采样，就相当于看到了点<span
+class="math inline">\(B\)</span>。</p>
+<p>Parallax mapping 具体做的事情就是，将向量<span
+class="math inline">\(V\)</span>以点<span
+class="math inline">\(A\)</span>处的高度值<span
+class="math inline">\(H(A)\)</span>为长度进行缩放。下示例图展示了缩放后的向量<span
+class="math inline">\(P\)</span>：</p>
+<p><img src="/images/LearnOpenGL/2-3.png" /></p>
+<p>在得到向量<span
+class="math inline">\(P\)</span>后，使用其投影在模型表面上的坐标值作为纹理偏移offset。这里就又用到了切线空间，切线空间的tangent和bitangent和模型纹理坐标方向相同，所以只需要将<span
+class="math inline">\(P\)</span>转换到切线空间即可，其x，y坐标就是纹理坐标的偏移量offset。</p>
+<p>当然，Parallax
+mapping并不是完美的，在大多数情况下其模拟效果都不错。但是，当高度发生剧烈变化时，实际交点<span
+class="math inline">\(B\)</span>和计算得出的交点有所差距，如下示例图：</p>
+<p><img src="/images/LearnOpenGL/2-4.png" /></p>
+<h3 id="具体实现">具体实现</h3>
+<h4 id="parallax-mapping">Parallax mapping</h4>
+<p>具体请参考LearnOpenGL：https://learnopengl.com/Advanced-Lighting/Parallax-Mapping，这里仅列出部分内容。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">vec2 <span class="title">ParallaxMapping</span><span class="params">(vec2 texCoords, vec3 viewDir)</span></span></span><br><span class="line"><span class="function"></span>&#123; </span><br><span class="line">    <span class="type">float</span> height =  <span class="built_in">texture</span>(depthMap, texCoords).r;    </span><br><span class="line">    vec2 p = viewDir.xy / viewDir.z * (height * height_scale);</span><br><span class="line">    <span class="keyword">return</span> texCoords - p;    </span><br><span class="line">&#125; </span><br></pre></td></tr></table></figure>
+<p>这个函数便是纹理坐标偏移的核心函数，很简单的一个函数。先通过原始纹理坐标texCoords取到height值，然后用它计算向量<span
+class="math inline">\(P\)</span>。这段代码值得一提的一点就是，<strong>viewDir除以了z值</strong>。我们知道viewDir是一个单位化的向量，其z值位于[0,1]。当视线viewDir接近平行于表面时，z更接近于0，除法会返回一个比垂直于表面时更大向量<span
+class="math inline">\(P\)</span>，即获得了更大的纹理坐标偏移offset。</p>
+<p>在具体应用中，除以viewDir.z可能会产生不理想的结果，所以有时会将等式的除法移除。这种做法被称为<strong>Parallax
+Mapping with Offset
+Limiting</strong>，具体要不要使用除法就要看实际情况了。</p>
+<p>Parallax
+mapping比较明显的artifact通常出现在边缘，因为此时纹理坐标经过偏移值之后已经超出[0,
+1]范围，其具体表现因贴图的wrapping
+model设置不同而有所差异。解决这个artifact比较好的方法是将超出范围的fragment舍弃掉：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">texCoords = <span class="built_in">ParallaxMapping</span>(fs_in.TexCoords,  viewDir);</span><br><span class="line"><span class="keyword">if</span>(texCoords.x &gt; <span class="number">1.0</span> || texCoords.y &gt; <span class="number">1.0</span> || texCoords.x &lt; <span class="number">0.0</span> || texCoords.y &lt; <span class="number">0.0</span>)</span><br><span class="line">    discard;</span><br></pre></td></tr></table></figure>
+<p><strong>Parallax
+mapping最好的应用情景还是渲染平面</strong>。当然其在特定角度下和高度变化剧烈时可能会出现模拟不正确的情况，但整体而言模拟效果还是比较好的。</p>
+<p><img src="/images/LearnOpenGL/2-5.png" /></p>
+<h4 id="steep-parallax-mapping">Steep Parallax Mapping</h4>
+<p>Steep Parallax Mapping
+是普通视察贴图技术的改进版，两个的基本原理还是一样的，但是Steep Parallax
+Mapping使用了多次采样来更准确的确定 向量<span
+class="math inline">\(P\)</span> 和 点<span
+class="math inline">\(B\)</span>，采样的此数越多，模拟的越准确。请看如下图示：</p>
+<p><img src="/images/LearnOpenGL/2-6.png" /></p>
+<p>Steep Parallax Mapping
+的做法是将整个深度分为很多个<strong>layers</strong>，每个layers之前间隔相同。对于每个layer，都会沿着向量<span
+class="math inline">\(P\)</span>的方向偏移纹理坐标并采样深度图，直到采样的深度小于当前layer的深度。上图中，直到D(3)
+= 0.37时，其深度小于layer的深度，因此我们可以推断此时向量<span
+class="math inline">\(P\)</span>最接近于模型的实际表面，可在此时偏移纹理坐标。下面看下相关代码：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">vec2 <span class="title">ParallaxMapping</span><span class="params">(vec2 texCoords, vec3 viewDir)</span></span></span><br><span class="line"><span class="function"></span>&#123; </span><br><span class="line">    <span class="comment">// number of depth layers</span></span><br><span class="line">    <span class="comment">// const float numLayers = 10;</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment">// taking less samples when lookning straight at a surface and more samples when looking at an angle</span></span><br><span class="line">    <span class="type">const</span> <span class="type">float</span> minLayers = <span class="number">8.0</span>;</span><br><span class="line">	<span class="type">const</span> <span class="type">float</span> maxLayers = <span class="number">32.0</span>;</span><br><span class="line">	<span class="type">float</span> numLayers = <span class="built_in">mix</span>(maxLayers, minLayers, <span class="built_in">max</span>(<span class="built_in">dot</span>(<span class="built_in">vec3</span>(<span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">1.0</span>), viewDir), <span class="number">0.0</span>));</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// calculate the size of each layer</span></span><br><span class="line">    <span class="type">float</span> layerDepth = <span class="number">1.0</span> / numLayers;</span><br><span class="line">    <span class="comment">// depth of current layer</span></span><br><span class="line">    <span class="type">float</span> currentLayerDepth = <span class="number">0.0</span>;</span><br><span class="line">    <span class="comment">// the amount to shift the texture coordinates per layer (from vector P)</span></span><br><span class="line">    vec2 P = viewDir.xy * height_scale; </span><br><span class="line">    vec2 deltaTexCoords = P / numLayers;</span><br><span class="line">  </span><br><span class="line">    <span class="comment">// get initial values</span></span><br><span class="line">	vec2  currentTexCoords     = texCoords;</span><br><span class="line">	<span class="type">float</span> currentDepthMapValue = <span class="built_in">texture</span>(depthMap, currentTexCoords).r;</span><br><span class="line">  </span><br><span class="line">	<span class="keyword">while</span>(currentLayerDepth &lt; currentDepthMapValue)</span><br><span class="line">	&#123;</span><br><span class="line">    	<span class="comment">// shift texture coordinates along direction of P</span></span><br><span class="line">    	currentTexCoords -= deltaTexCoords;</span><br><span class="line">    	<span class="comment">// get depthmap value at current texture coordinates</span></span><br><span class="line">    	currentDepthMapValue = <span class="built_in">texture</span>(depthMap, currentTexCoords).r;  </span><br><span class="line">    	<span class="comment">// get depth of next layer</span></span><br><span class="line">    	currentLayerDepth += layerDepth;  </span><br><span class="line">	&#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> currentTexCoords;</span><br><span class="line">&#125; </span><br></pre></td></tr></table></figure>
+<p>但是这种类步进式的采用通常会<strong>产生分层</strong>的问题，如下图：</p>
+<p><img src="/images/LearnOpenGL/2-7.png" /></p>
+<p>解决分层问题最暴力的方法就是增大采样次数，但这样会产生性能问题。有两种比较流行的方式可以缓解此问题，<strong>Relief
+Parallax Mapping</strong> 和 Parallax Occlusion Mapping。其中Relief
+Parallax Mapping可以产生更精确的效果，但会比 Parallax Occlusion Mapping
+性能消耗高。Parallax Occlusion Mapping 可以更efficient地模拟出和Relief
+Parallax Mapping近乎相同的结果，所以通常会选择它来用作解决方案。</p>
+<h4 id="parallax-occlusion-mapping">Parallax Occlusion Mapping</h4>
+<p>相比于 Steep Parallax Mapping，Parallax Occlusion Mapping
+会使用collision发生前后的layer深度做<strong>线性插值interpolate</strong>。线性插值的权重取自<strong>layer深度和对应height
+map深度的差值</strong>，请看下图：</p>
+<p><img src="/images/LearnOpenGL/2-8.png" /></p>
+<p>两种技术非常相似，Parallax Occlusion Mapping 更像是 Steep Parallax
+Mapping
+后面增加了一个线性插值的步骤。所以代码只需在之前的基础上增加如下几行：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">[...] <span class="comment">// steep parallax mapping code here</span></span><br><span class="line">  </span><br><span class="line"><span class="comment">// get texture coordinates before collision (reverse operations)</span></span><br><span class="line">vec2 prevTexCoords = currentTexCoords + deltaTexCoords;</span><br><span class="line"></span><br><span class="line"><span class="comment">// get depth after and before collision for linear interpolation</span></span><br><span class="line"><span class="type">float</span> afterDepth  = currentDepthMapValue - currentLayerDepth;</span><br><span class="line"><span class="type">float</span> beforeDepth = <span class="built_in">texture</span>(depthMap, prevTexCoords).r - currentLayerDepth + layerDepth;</span><br><span class="line"> </span><br><span class="line"><span class="comment">// interpolation of texture coordinates</span></span><br><span class="line"><span class="type">float</span> weight = afterDepth / (afterDepth - beforeDepth);</span><br><span class="line">vec2 finalTexCoords = prevTexCoords * weight + currentTexCoords * (<span class="number">1.0</span> - weight);</span><br><span class="line"></span><br><span class="line"><span class="keyword">return</span> finalTexCoords; </span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/LearnOpenGL/" rel="tag"># LearnOpenGL</a>
+              <a href="/tags/Game-Development/" rel="tag"># Game Development</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2024/09/30/%E9%9A%8F%E7%AC%94/%E3%80%8A%E8%B6%85%E5%87%A1%E5%8A%A8%E7%89%A9%E5%A5%87%E8%A7%82%E3%80%8B%E9%9A%8F%E7%AC%94%E4%B8%80/" rel="prev" title="《超凡动物奇观》随笔">
+                  <i class="fa fa-angle-left"></i> 《超凡动物奇观》随笔
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Rigel Aster</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+
+</body>
+</html>
