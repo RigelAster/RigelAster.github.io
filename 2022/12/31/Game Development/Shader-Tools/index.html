@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha256-5eIC48iZUHmSlSUz9XtjRyK2mzQkHScZY1WdMaoz74E=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"rigelaster.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.21.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"always","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="本篇用于记录平时作业中遇到或者使用过的图形工具等其他方面的内容">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Shader杂记">
+<meta property="og:url" content="https://rigelaster.github.io/2022/12/31/Game%20Development/Shader-Tools/index.html">
+<meta property="og:site_name" content="Rigel&#39;s Blog">
+<meta property="og:description" content="本篇用于记录平时作业中遇到或者使用过的图形工具等其他方面的内容">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2022-12-31T03:43:39.000Z">
+<meta property="article:modified_time" content="2024-10-02T14:53:57.980Z">
+<meta property="article:author" content="Rigel Aster">
+<meta property="article:tag" content="Unity Shader">
+<meta property="article:tag" content="Game Development">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://rigelaster.github.io/2022/12/31/Game%20Development/Shader-Tools/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"https://rigelaster.github.io/2022/12/31/Game%20Development/Shader-Tools/","path":"2022/12/31/Game Development/Shader-Tools/","title":"Shader杂记"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Shader杂记 | Rigel's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Rigel's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#cg-standard-library"><span class="nav-number">1.</span> <span class="nav-text">Cg Standard Library</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#step"><span class="nav-number">1.0.1.</span> <span class="nav-text">step</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#parameters"><span class="nav-number">1.0.1.1.</span> <span class="nav-text">Parameters</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#description"><span class="nav-number">1.0.1.2.</span> <span class="nav-text">Description</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#smoothstep"><span class="nav-number">1.0.2.</span> <span class="nav-text">smoothstep</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#parameters-1"><span class="nav-number">1.0.2.1.</span> <span class="nav-text">Parameters</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#decription"><span class="nav-number">1.0.2.2.</span> <span class="nav-text">Decription</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ddx-ddy"><span class="nav-number">1.0.3.</span> <span class="nav-text">ddx ddy</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#parameters-2"><span class="nav-number">1.0.3.1.</span> <span class="nav-text">Parameters</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#description-1"><span class="nav-number">1.0.3.2.</span> <span class="nav-text">Description</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#unity-built-in-shader-include-files"><span class="nav-number">2.</span> <span class="nav-text">Unity Built-in shader
+include files</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#unitycg.cginc"><span class="nav-number">2.1.</span> <span class="nav-text">UnityCG.cginc</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#data-structures"><span class="nav-number">2.1.1.</span> <span class="nav-text">Data structures</span></a></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Rigel Aster"
+      src="/uploads/avatar.png">
+  <p class="site-author-name" itemprop="name">Rigel Aster</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">22</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">14</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://www.zhihu.com/people/ming-zi-13-35" title="Zhihu → https:&#x2F;&#x2F;www.zhihu.com&#x2F;people&#x2F;ming-zi-13-35" rel="noopener me" target="_blank"><i class="fab fa-zhihu fa-fw"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:remingzi7@gmail.com" title="E-Mail → mailto:remingzi7@gmail.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://github.com/MingZI-7" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;MingZI-7" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i></a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://rigelaster.github.io/2022/12/31/Game%20Development/Shader-Tools/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar.png">
+      <meta itemprop="name" content="Rigel Aster">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Rigel's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Shader杂记 | Rigel's Blog">
+      <meta itemprop="description" content="本篇用于记录平时作业中遇到或者使用过的图形工具等其他方面的内容">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Shader杂记
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2022-12-31 11:43:39" itemprop="dateCreated datePublished" datetime="2022-12-31T11:43:39+08:00">2022-12-31</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2024-10-02 22:53:57" itemprop="dateModified" datetime="2024-10-02T22:53:57+08:00">2024-10-02</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/ink/" itemprop="url" rel="index"><span itemprop="name">ink</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+            <div class="post-description">本篇用于记录平时作业中遇到或者使用过的图形工具等其他方面的内容</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="cg-standard-library">Cg Standard Library</h2>
+<p>因为Unity的ShaderLab中包含了cg，所以cg标准库中的函数可以直接在Unity
+Shader中使用</p>
+<p>网址 <a
+target="_blank" rel="noopener" href="https://developer.download.nvidia.cn/cg/index_stdlib.html">NVIDIA
+Developer Cg Standard Library</a></p>
+<h4 id="step">step</h4>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">float</span> <span class="title">step</span><span class="params">(<span class="type">float</span> a, <span class="type">float</span> x)</span></span>;</span><br><span class="line"><span class="comment">// float1, float2, float3, float4, </span></span><br><span class="line"><span class="comment">// half, fixed</span></span><br></pre></td></tr></table></figure>
+<h5 id="parameters">Parameters</h5>
+<p><code>a</code> Scalar or vector reference value</p>
+<p><code>x</code> Scalar or vector</p>
+<h5 id="description">Description</h5>
+<p>return <u>one</u> for each component of <code>x</code> that is
+greater than or equal to the corresponding component in the reference
+vector <code>a</code>, and <u>zero</u> otherwise</p>
+<h4 id="smoothstep">smoothstep</h4>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">float</span> <span class="title">smoothstep</span><span class="params">(<span class="type">float</span> a, <span class="type">float</span> b, <span class="type">float</span> x)</span></span>;</span><br><span class="line"><span class="comment">// float1 float2 float3 float4</span></span><br><span class="line"><span class="comment">// half fixed</span></span><br></pre></td></tr></table></figure>
+<h5 id="parameters-1">Parameters</h5>
+<p><code>a</code> Scalar or vector minimum reference value</p>
+<p><code>b</code> Scalar or vector minimum reference value</p>
+<p><code>x</code> Scalar or vector</p>
+<h5 id="decription">Decription</h5>
+<p>Interpolates smoothly from <u>0</u> to <u>1</u> based on
+<code>x</code> compared to <code>a</code> and <code>b</code></p>
+<pre><code>1. Returns 0 if &lt;u&gt;x &lt; a &lt; b&lt;/u&gt; or &lt;u&gt;x &gt; a &gt; b&lt;/u&gt;
+1. Returns 1 if &lt;u&gt;x &lt; b &lt; a&lt;/u&gt; or &lt;u&gt;x &gt; b &gt; a&lt;/u&gt;
+1. Returns a value in the range[0,1] for the domain [a,b]</code></pre>
+<p>The slope of smoothstep(a, b, a) and smoothstep(a, b, b) is zero.</p>
+<p>For vectors, the return vector contains the smooth interpolation of
+each element of the vector x</p>
+<h4 id="ddx-ddy">ddx ddy</h4>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">float</span> <span class="title">ddx</span><span class="params">(<span class="type">float</span> a)</span></span>;</span><br><span class="line"><span class="comment">// float1 float2 float3 float4</span></span><br><span class="line"><span class="comment">// half, fixed</span></span><br></pre></td></tr></table></figure>
+<h5 id="parameters-2">Parameters</h5>
+<p><code>a</code> Vector or scalar of which to approximate the partial
+derivative with respect to window-space X.</p>
+<h5 id="description-1">Description</h5>
+<p>Returns approximate partial derivative of <em>a</em> with respect to
+the window-space (horizontal) <em>x</em> coordinate.For vectors, the
+returned vector contains the approximate partial derivative of each
+element of the input vector.</p>
+<p>这个函数单看文档有些难以理解，贴一个方便理解的博客：https://blog.csdn.net/yinhun2012/article/details/109393911</p>
+<h2 id="unity-built-in-shader-include-files">Unity Built-in shader
+include files</h2>
+<p>Unity提供了很多内置的工具函数来让编写Shader变得更加简化和容易。这些工具函数都被声明在<code>.cginc</code>文件中，可以在这里查看Unity内置的文件：
+<a
+target="_blank" rel="noopener" href="https://docs.unity3d.com/Manual/SL-BuiltinIncludes.html">Built-in
+shader include files</a></p>
+<p><code>.cginc</code>是可以被Shader引用的文件，Unity内置如下文件：</p>
+<ul>
+<li>HLSLSupport.cginc - ( <u>automatically included</u> ) Helper macros
+and definitions for cross-platform shader compilation</li>
+<li>UnityShaderVariables.cginc - ( <u>automatically included</u> )
+Commonly used global variables.</li>
+<li>UnityCG.cginc - commonly used helper function</li>
+<li>AutoLight.cginc - lighting &amp; shadowing functionality, e.g.
+surface shaders use this file internally</li>
+<li>Lighting.cginc - standard surface shader(automatically included by
+surface shader) lighting models</li>
+<li>TerrainEngine.cginc - helper functions for Terrain &amp; Vegetation
+shaders</li>
+</ul>
+<h3 id="unitycg.cginc">UnityCG.cginc</h3>
+<p>官方文档：<a
+target="_blank" rel="noopener" href="https://docs.unity3d.com/Manual/SL-BuiltinFunctions.html">Functions
+declared in UnityCG.cginc</a></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 将点坐标从object space转换到camera&#x27;s clip space</span></span><br><span class="line"><span class="comment">// 同 mul(UNITY_MATRIX_MVP, float4(pos, 1.0))</span></span><br><span class="line"><span class="comment">// 一般在vertex shader中使用</span></span><br><span class="line"><span class="function">float4 <span class="title">UnityObjectToClipPos</span><span class="params">(float3 pos)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 将点坐标从object space转换到view space/camera space</span></span><br><span class="line"><span class="comment">// 同 mul(UNITY_MATRIX_MV, float4(pos, 1.0)).xyz</span></span><br><span class="line"><span class="comment">// 一般在vertex shader中使用</span></span><br><span class="line"><span class="function">float3 <span class="title">UnityObjectToViewPos</span><span class="params">(float3 pos)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>UnityCG.cginc文件还提供了 Screen-space helper
+functions，这些函数可以帮助我们计算出屏幕空间坐标，方便对screen-space
+texture进行采样。其返回<code>float4</code>，方便后续采样时做齐次除法(xy/w)。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 将裁剪空间的坐标转换为可采样screenspace-mapped texture的纹理坐标</span></span><br><span class="line"><span class="function">float4 <span class="title">ComputeScreenPos</span><span class="params">(float4 clipPos)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 将裁剪空间坐标转换为可采样GrabPass texture的纹理坐标</span></span><br><span class="line"><span class="function">float4 <span class="title">ComputeGrabScreenPos</span><span class="params">(float4 clipPos)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>除此之外，Unity还提供了用于前向渲染的有关灯光相关的工具函数，请查阅官方文档。</p>
+<h4 id="data-structures">Data structures</h4>
+<p>UnityCG.cginc还封装了一些包含着色器语义结构体，可以直接使用而不用自主声明，直接用于顶点着色器的数据输入：</p>
+<ul>
+<li><code>appdata_base</code>: position, normal and one texture
+coordinate</li>
+<li><code>appdata_tan</code>: position, tangent, normal and one texture
+coordinate</li>
+<li><code>appdata_full</code>:position, tangent, normal, four texture
+coordinates and color</li>
+<li><code>appdata_img</code>: position, one texture coordinate</li>
+</ul>
+<p>虽然Unity提供了封装的语义，但是一般我们还是会通过语义自主声明顶点着色器的输入数据。两者的使用案例如下：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// #使用内置结构体</span></span><br><span class="line"><span class="function">v2f <span class="title">vert</span><span class="params">(appdata_base v)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    v2f o;</span><br><span class="line">    o.pos = <span class="built_in">UnityObjectToClipPos</span>(v.vertex);</span><br><span class="line">    o.color.xyz = v.normal * <span class="number">0.5</span> + <span class="number">0.5</span>;</span><br><span class="line">    o.color.w = <span class="number">1.0</span>;</span><br><span class="line">    <span class="keyword">return</span> o;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 自定义结构体</span></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">appdata</span>&#123;</span><br><span class="line">    float4 vertex : POSITION;</span><br><span class="line">    float3 normal : NORMAL;</span><br><span class="line">    float2 uv : TEXCOORD0;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function">v2f <span class="title">vert</span><span class="params">(appdate v)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="comment">// ...  </span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>其中，<code>POSITION</code>等字段被称作语义，其相关内容请看文章《Unity
+Shader Base》。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Unity-Shader/" rel="tag"># Unity Shader</a>
+              <a href="/tags/Game-Development/" rel="tag"># Game Development</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2022/12/23/Game%20Development/Believable-Caustics-2/" rel="prev" title="案例复现 -- Believable Caustics 2">
+                  <i class="fa fa-angle-left"></i> 案例复现 -- Believable Caustics 2
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2023/02/24/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/%E3%80%8A3D%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80%E3%80%8B%E2%80%94%E2%80%94%2010.1%20%E5%9B%BE%E5%BD%A2%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/" rel="next" title="《3D数学基础》 —— 10.1 图形工作原理">
+                  《3D数学基础》 —— 10.1 图形工作原理 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Rigel Aster</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+
+</body>
+</html>

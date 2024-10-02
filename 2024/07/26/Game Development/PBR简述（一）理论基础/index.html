@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha256-5eIC48iZUHmSlSUz9XtjRyK2mzQkHScZY1WdMaoz74E=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"rigelaster.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.21.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"always","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="基于物理的渲染（Physically Based Rendering)，简称为PBR，在一定程度上基于现实世界物理原则进行渲染，相比于Phong或者Blinn-Phong光照更真实。PBR因其优秀的视觉效果，被广泛应用于各大游戏引擎中。目前有两种较为主流的工作流，金属&#x2F;粗糙度工作流（Metal&#x2F;Roughness Workflow）和高光&#x2F;光泽度工作流（Specular&#x2F;Glossiness Wo">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PBR简述（一）理论基础">
+<meta property="og:url" content="https://rigelaster.github.io/2024/07/26/Game%20Development/PBR%E7%AE%80%E8%BF%B0%EF%BC%88%E4%B8%80%EF%BC%89%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/index.html">
+<meta property="og:site_name" content="Rigel&#39;s Blog">
+<meta property="og:description" content="基于物理的渲染（Physically Based Rendering)，简称为PBR，在一定程度上基于现实世界物理原则进行渲染，相比于Phong或者Blinn-Phong光照更真实。PBR因其优秀的视觉效果，被广泛应用于各大游戏引擎中。目前有两种较为主流的工作流，金属&#x2F;粗糙度工作流（Metal&#x2F;Roughness Workflow）和高光&#x2F;光泽度工作流（Specular&#x2F;Glossiness Wo">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://rigelaster.github.io/images/PBR/PBRGuide-1.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/PBR/PBRGuide-2.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/PBR/FresnelFactor-1.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/PBR/PBRGuide-3.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/PBR/learnopengl-1.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/PBR/learnopengl-2.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/PBR/wiki-1.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/PBR/learnopengl-3.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/PBR/learnopengl-3.png">
+<meta property="article:published_time" content="2024-07-26T15:28:25.000Z">
+<meta property="article:modified_time" content="2024-10-02T16:27:12.498Z">
+<meta property="article:author" content="Rigel Aster">
+<meta property="article:tag" content="Graphic">
+<meta property="article:tag" content="PBR">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://rigelaster.github.io/images/PBR/PBRGuide-1.png">
+
+
+<link rel="canonical" href="https://rigelaster.github.io/2024/07/26/Game%20Development/PBR%E7%AE%80%E8%BF%B0%EF%BC%88%E4%B8%80%EF%BC%89%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"https://rigelaster.github.io/2024/07/26/Game%20Development/PBR%E7%AE%80%E8%BF%B0%EF%BC%88%E4%B8%80%EF%BC%89%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/","path":"2024/07/26/Game Development/PBR简述（一）理论基础/","title":"PBR简述（一）理论基础"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>PBR简述（一）理论基础 | Rigel's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Rigel's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BE%AE%E9%9D%A2%E5%85%83%E7%90%86%E8%AE%BA-microfacet-theory"><span class="nav-number">1.</span> <span class="nav-text">微面元理论 Microfacet
+Theory</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%83%BD%E9%87%8F%E5%AE%88%E6%81%92-conservation-of-energy"><span class="nav-number">2.</span> <span class="nav-text">能量守恒 Conservation
+of Energy</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%89%E7%BA%BF-light-rays"><span class="nav-number">3.</span> <span class="nav-text">光线 Light Rays</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%8F%B2%E6%B6%85%E5%B0%94%E6%96%B9%E7%A8%8B-fresnel-equation"><span class="nav-number">4.</span> <span class="nav-text">菲涅尔方程 Fresnel Equation</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BE%90%E5%B0%84%E5%BA%A6%E9%87%8F%E5%AD%A6-radiometry"><span class="nav-number">5.</span> <span class="nav-text">辐射度量学 Radiometry</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#brdf"><span class="nav-number">6.</span> <span class="nav-text">BRDF</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B3%95%E7%BA%BF%E5%88%86%E5%B8%83%E5%87%BD%E6%95%B0-normal-distribution-function"><span class="nav-number">7.</span> <span class="nav-text">法线分布函数 Normal
+distribution function</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%A0%E4%BD%95%E5%87%BD%E6%95%B0-geometry-function"><span class="nav-number">8.</span> <span class="nav-text">几何函数 Geometry function</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#cook-torrance%E5%8F%8D%E5%B0%84%E7%8E%87%E6%96%B9%E7%A8%8B"><span class="nav-number">9.</span> <span class="nav-text">Cook-Torrance反射率方程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B0%8F%E7%BB%93"><span class="nav-number">10.</span> <span class="nav-text">小结</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E7%8C%AE"><span class="nav-number">11.</span> <span class="nav-text">参考文献</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Rigel Aster"
+      src="/uploads/avatar.png">
+  <p class="site-author-name" itemprop="name">Rigel Aster</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">22</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">14</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://www.zhihu.com/people/ming-zi-13-35" title="Zhihu → https:&#x2F;&#x2F;www.zhihu.com&#x2F;people&#x2F;ming-zi-13-35" rel="noopener me" target="_blank"><i class="fab fa-zhihu fa-fw"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:remingzi7@gmail.com" title="E-Mail → mailto:remingzi7@gmail.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://github.com/MingZI-7" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;MingZI-7" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i></a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://rigelaster.github.io/2024/07/26/Game%20Development/PBR%E7%AE%80%E8%BF%B0%EF%BC%88%E4%B8%80%EF%BC%89%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar.png">
+      <meta itemprop="name" content="Rigel Aster">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Rigel's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="PBR简述（一）理论基础 | Rigel's Blog">
+      <meta itemprop="description" content="基于物理的渲染（Physically Based Rendering)，简称为PBR，在一定程度上基于现实世界物理原则进行渲染，相比于Phong或者Blinn-Phong光照更真实。PBR因其优秀的视觉效果，被广泛应用于各大游戏引擎中。目前有两种较为主流的工作流，金属/粗糙度工作流（Metal/Roughness Workflow）和高光/光泽度工作流（Specular/Glossiness Workflow），这两个工作流只会在下文中被简单提及，具体内容会在下篇文章进行讨论，本文着重介绍PBR理论基础。">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          PBR简述（一）理论基础
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2024-07-26 23:28:25" itemprop="dateCreated datePublished" datetime="2024-07-26T23:28:25+08:00">2024-07-26</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2024-10-03 00:27:12" itemprop="dateModified" datetime="2024-10-03T00:27:12+08:00">2024-10-03</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Real-time-Rendering/" itemprop="url" rel="index"><span itemprop="name">Real-time Rendering</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+            <div class="post-description">基于物理的渲染（Physically Based Rendering)，简称为PBR，在一定程度上基于现实世界物理原则进行渲染，相比于Phong或者Blinn-Phong光照更真实。PBR因其优秀的视觉效果，被广泛应用于各大游戏引擎中。目前有两种较为主流的工作流，金属/粗糙度工作流（Metal/Roughness Workflow）和高光/光泽度工作流（Specular/Glossiness Workflow），这两个工作流只会在下文中被简单提及，具体内容会在下篇文章进行讨论，本文着重介绍PBR理论基础。</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>本文中所引用的图示均标识出处，参考文章将在文末给出。</p>
+<p><strong>基于物理的渲染（Physically Based
+Rendering)，</strong>简称为PBR，在一定程度上基于现实世界物理原则进行渲染，相比于Phong或者Blinn-Phong光照更真实。PBR因其优秀的视觉效果，被广泛应用于各大游戏引擎中。目前有两种较为主流的工作流，<strong>金属/粗糙度工作流（Metal/Roughness
+Workflow）</strong>和<strong>高光/光泽度工作流（Specular/Glossiness
+Workflow）</strong>，这两个工作流只会在下文中被简单提及，具体内容会在下篇文章进行讨论，本文着重介绍PBR理论基础。</p>
+<p>看一个光照模型是不是PBR一般会看它满不满足下面三个条件：</p>
+<ol type="1">
+<li><strong>基于微面元表面模型（microfacet suface model）</strong></li>
+<li><strong>能量守恒</strong></li>
+<li><strong>应用基于物理的双向反射分布函数（Bidirectional reflective
+distribution function, BRDF）</strong></li>
+</ol>
+<p>当然上面只是一个判断标准，就是界定了一个模糊的PBR范围，本文叙述的是普遍性的PBR实现方案。渲染其实是解渲染方程（Rendering
+Equation）,PBR描述的就是渲染方程的一个特例。在看渲染方程之前，我们先了解PBR遵守的理论模型。</p>
+<h3 id="微面元理论-microfacet-theory"><strong>微面元理论 Microfacet
+Theory</strong></h3>
+<p>微面元理论是PBR基础，其认为在微观尺度上，任何平面都可以被称为<strong>微面元</strong>的微小镜面描述。微小镜面排列的混乱程度会影响光线的行为，表现上即为：微小镜面排列越混乱，入射光的反射光线更趋向于向不同方向发散（Scatter），产生的镜面反射范围更大；反之，微小镜面排列越整齐，入射光的反射光线更更趋向于同一方向，镜面反射范围更小更锐利。</p>
+<p>表面不规则（Surface
+Irregularities）程度在不同PBR流程中使用不同的名词进行描述，例如粗糙度（Roughness）、平滑度（Smoothness）和光泽度（Glossiness）。无论名词如何，都是在描述物体表面的同一性质，即物体微面元的几何细节。</p>
+<p>PBR中的BRDF也是基于微面元理论的，具体内容将在公式部分展开。</p>
+<figure>
+<img src="/images/PBR/PBRGuide-1.png"
+alt="引自《The PBR Guide - Part1》" />
+<figcaption aria-hidden="true">引自《The PBR Guide -
+Part1》</figcaption>
+</figure>
+<h3 id="能量守恒-conservation-of-energy"><strong>能量守恒 Conservation
+of Energy</strong></h3>
+<p>能量守恒是很容易理解的理论，我们多多少少都会接触相关知识。PBR中的能量守恒指，不考虑自发光的情况下，物体辐射的能量永远不能超过物体接收的能量。</p>
+<h3 id="光线-light-rays"><strong>光线 Light Rays</strong></h3>
+<p>从物理层面对渲染进行建模不可避免的要研究光线的行为。光线在均匀介质中沿直线传输，并在不同介质的交界处发生反射和折射。本文对光线行为的分析均遵循”光线从真空射向不透明介质“这一前提，即分析不透明物体表面附近光线的行为。当光束射向不透明物体表面时，光线会产生以下行为：</p>
+<figure>
+<img src="/images/PBR/PBRGuide-2.png"
+alt="引自《The PBR Guide - Part1》" />
+<figcaption aria-hidden="true">引自《The PBR Guide -
+Part1》</figcaption>
+</figure>
+<ul>
+<li>部分光束被物体表面<strong>反射</strong>，反射方向遵循反射定律；</li>
+<li>剩余光束<strong>折射</strong>进入物体内部；</li>
+</ul>
+<p>两种行为都会吸收光线的部分能量，不同物体会吸收特定波长的光线从而使物体呈现不同颜色。对于折射部分我们需要更深入展开，因为其行为较为复杂。</p>
+<p>通常情况下我们渲染的物体都是非均匀的介质，光线在其内部并非沿直线传播，会发生散射现象。在物体内部进行多次散射之后，光线或被物体吸收，或再次离开物体。离开物体的光线对物体表面的影响需要根据物体的性质决定：</p>
+<ul>
+<li>对于高吸收、低散射的物体，光线经过多次散射之后就会吸收掉，那些离开物体的只能是经过少次散射的光线，此时我们认为其离开物体的位置与进入物体的位置之间的距离可以忽略不记。</li>
+<li>对于高散射、低吸收的物体，例如牛奶、皮肤等，光线即使经过较多次散射也不会被吸收，所以离开物体的位置与进入物体的位置距离较远，不可以忽略不计，在渲染时应当考虑其对表面的影响。这类物体的渲染通常会使用用到<strong>次表面反射技术</strong>，并不在本文的讨论范围之内。</li>
+</ul>
+<p>在渲染中，被物体表面直接反射的光通常具有相同的方向，被称为<strong>高光反射（Specular
+Reflection）</strong>，折射进入物体内部又因散射离开物体的光的方向是随机的，被称为<strong>漫反射（Diffuse
+Reflection）</strong>。</p>
+<p>特殊的，金属（Metallic，或称导体，Conductor）表面会将光线折射部分全部吸收，只留下反射部分，非金属（Non-Metallic，或称介电质，Dielectricsl）表面则不会。</p>
+<h3 id="菲涅尔方程-fresnel-equation">菲涅尔方程 Fresnel Equation</h3>
+<p>菲涅尔效应简单来说就是，物体表面反射光的程度取决于观察角度。这种现象在生活中很常见，例如，越是以平行水面的方向观察水面，看到的反射光线越多。</p>
+<figure>
+<img src="/images/PBR/FresnelFactor-1.png"
+alt="引自《Fresnel Factor》" />
+<figcaption aria-hidden="true">引自《Fresnel Factor》</figcaption>
+</figure>
+<p>这里提到菲涅尔效应是因为其描述了观察角度对物体表面反射光线程度的影响，而菲涅尔方程可以帮助计算出光线被反射部分所占比例，如上文所述，根据能量守恒就能知道光线折射部分所占比例。完整的菲涅尔方程除了和两种介质的折射率<span
+class="math inline">\(n_1\)</span> 、<span
+class="math inline">\(n_2\)</span> 、入射角<span
+class="math inline">\(\theta_i\)</span>有关，还与入射光的偏振有关，具体如下:</p>
+<p><strong>s偏振</strong> <span class="math inline">\(R_s=\left[
+\frac{n_1cos\theta_i - n_2\sqrt{1-\left( \frac{n_1}{n_2}sin\theta_i
+\right)^2}}{n_1cos\theta_i + n_2\sqrt{1-\left(
+\frac{n_1}{n_2}sin\theta_i \right)^2}} \right]^2\)</span></p>
+<p><strong>p偏振</strong> <span class="math inline">\(R_p=\left[
+\frac{n_1\sqrt{1-\left( \frac{n_1}{n_2}sin\theta_i
+\right)^2}-n_2cos\theta_i}{n_1\sqrt{1-\left( \frac{n_1}{n_2}sin\theta_i
+\right)^2}+n_2cos\theta_i} \right]^2\)</span></p>
+<p>入射光无偏振时，反射比取两者的平均值：<span class="math inline">\(R =
+\frac{R_s + R_p}{2}\)</span> 。</p>
+<p>菲涅尔方程无容置疑的有些复杂，于是实时渲染中使用<strong>Fresnel-Schlick近似</strong>：
+<span class="math display">\[
+F_{Schlick}(h,v,F_0)=F_0+(1-F_0)(1-cos\theta_i)^5
+\]</span> 近似方程中的 <span class="math inline">\(F_0\)</span>
+是物体表面的基础反射率（base
+reflectivity），表示光线垂直地（与法线夹角为0）射在平面上时高光反射的比例，可由折射率IOR计算得出。</p>
+<figure>
+<img src="/images/PBR/PBRGuide-3.png"
+alt="引自《The PBR Guide - Part1》" />
+<figcaption aria-hidden="true">引自《The PBR Guide -
+Part1》</figcaption>
+</figure>
+<p>但是对于金属（导体）表面，其折射率IOR为复数，通过折射率计算的 <span
+class="math inline">\(F_0\)</span>
+略微复杂。于是提前测算出各种类物体表面的基础反射率 <span
+class="math inline">\(F_0\)</span> ,常见物体的基础反射率见下表：</p>
+<figure>
+<img src="/images/PBR/learnopengl-1.png"
+alt="引自《learnopengl-PBR》" />
+<figcaption aria-hidden="true">引自《learnopengl-PBR》</figcaption>
+</figure>
+<p>通过表格中的数据可以观察到一个有趣的现象，非金属表面的基础反射率都不高于0.17，而金属表面的基础反射率更高一些，在0.5-1.0范围内。此外，非金属表面反射率不会随波长变化，而金属表面的反射率会对波长产生剧烈反应。因此用RGB表示基础反射率
+<span class="math inline">\(F_0\)</span>
+时，金属会带有色彩。<strong>根据上文中光线部分内容我们可以认为，金属表面的颜色是由高光反射造成的，非金属表面的颜色是由漫反射造成的。</strong></p>
+<p>金属。在金属工作流中，非金属表面的基础反射率
+被默认固定为常见非金属表面基础反射率的<strong>平均值0.04</strong>，过去的经验表明此默认值在大多数情况下都可以得到可信的物理效果。而金属表面的基础反射率
+<span class="math inline">\(F_0\)</span>
+则需要额外的输入，使用其作为金属表面的颜色。此方面更详细的内容会在下篇文章说明。</p>
+<p><strong>注：</strong>理论上来说，一个表面的金属度应该是二元的：要么是金属要么不是金属，不能两者皆是。但是，大多数的渲染管线都允许在0.0至1.0之间线性的调配金属度。这主要是由于材质纹理精度不足以描述一个拥有诸如细沙/沙状粒子/刮痕的金属表面。通过对这些小的类非金属粒子/刮痕调整金属度值，我们可以获得非常好看的视觉效果。</p>
+<h3 id="辐射度量学-radiometry">辐射度量学 Radiometry</h3>
+<p>上文我们了解了光线在物体表面的行为，要将其应用于渲染中就需要对光线进行定量分析，了解渲染领域“光线”的物理含义。这就需要涉足一些辐射度量学的内容，其中的定义初看有些难以理解，本文也不确定可不可以清楚得对其进行阐述。于是建议大家观看<a
+target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1X7411F744/?p=15&amp;spm_id_from=333.1007.top_right_bar_window_history.content.click&amp;vd_source=a6d4de83b46a19b70d53fc1e9adb6574">闫令琪老师的讲义</a>中对辐射度量学的讲解，下文也只是对相关内容做概括性总结，英文对于名词的定义更加清晰，所以多会引用英文原文进行解释。</p>
+<p><strong>辐射能量（Radiant energy）</strong></p>
+<p>Radiant energy is the energy of electromagnetic radiation. It is
+measured in units of joules, and denoted by the symbol:</p>
+<p><span class="math inline">\(Q[J = Joule]\)</span></p>
+<p>辐射能量就是指能量源辐射出来的电磁能量，单位为焦耳。</p>
+<p><strong>辐射通量（Radiant flux，power）</strong></p>
+<p>Radiant flux(power) is the energy emitted, reflected, transmitted or
+received, per unit time.</p>
+<p><span class="math inline">\(\Phi\equiv
+\frac{dQ}{dt}[W=Watt][lm=lumen]^*\)</span></p>
+<p>辐射通量是单位时间内辐射的能量，单位为瓦特，可以简单理解为光源输出能量的功率。光是不同波长的能量集合，不同波长的光具有不同的能量，而每种波长与特定的颜色相关。在渲染中会使用三原色编码RGB作为辐射通量的简化表示。</p>
+<p><strong>辐强度（Radiant intensity）</strong></p>
+<p>The radiant(luminous) intensity is the power <strong>per unit solid
+angle</strong> emitted by a point light source.</p>
+<p><span class="math inline">\(I(\omega)\equiv \frac{d\Phi}{d\omega}
+[\frac{W}{sr}][\frac{lm}{sr}=cd=candela]\)</span></p>
+<p>辐强度表示在单位球面上光源向单位立体角投射的辐射通量，</p>
+<p><strong>辐照度（Irradiance）</strong></p>
+<p>The irradiance is the power <strong>per</strong>
+(perpendicular/projected) <strong>unit area</strong> incident on a
+surface point.</p>
+<p><span class="math inline">\(E(x)\equiv
+\frac{d\Phi(x)}{dA}[\frac{W}{m^2}][\frac{lm}{m^2}=lux]\)</span></p>
+<p>辐照度是单位照射面积接收到的辐射通量。既然提到表面的单位面积，于是这里就存在表面法线方向和光照方向的问题。更严谨一点的说法是，单位照射面积在光线方向上接收到收到的辐射通量，一般公式后方会再乘以
+。</p>
+<figure>
+<img src="/images/PBR/learnopengl-2.png"
+alt="引自《learnopengl-PBR》" />
+<figcaption aria-hidden="true">引自《learnopengl-PBR》</figcaption>
+</figure>
+<p><strong>辐亮度（Radiance）</strong></p>
+<p>The radiance (luminance) is the power emitted, reflected, transmitted
+or received by a surface, <strong>per unit solid angle</strong>,
+<strong>per unit area</strong> (perpendicular area) <span
+class="math display">\[
+L(p,\omega) \equiv \frac{d^2\Phi(p, \omega)}{d\omega dAcos\theta}\\
+[\frac{W}{sr \cdot m^2}][\frac{cd}{m^2}=\frac{lm}{sr \cdot m^2}=nit]
+\]</span> 辐亮度是指每单位立体角、每单位垂直面积接受到的辐射通量。</p>
+<p>在渲染中<strong>Irradiance</strong>和<strong>Radiance</strong>是经常提到的概念，通俗一些讲Irradiance是单位面积
+<span class="math inline">\(dA\)</span>
+在其所处上半球收到的所有能量和，而Radiance特指单位面积 <span
+class="math inline">\(dA\)</span> 在单位立体角 <span
+class="math inline">\(d\omega\)</span> 上收到的能量。</p>
+<p>更通俗一点的类比就是，Irradiance是着色片段fragment在其所处上半球各个方向收到的光照强度和，Radiance是该着色片段fragment在某特定方向
+<span class="math inline">\(\omega\)</span> 接收到的光照强度。</p>
+<p>渲染中涉及到的辐射度量学内容基本就上述这些，引入他们是为了更好的理解在渲染领域至关重要的渲染方程，消化完此部分内容后就直接进入PBR的公式部分。</p>
+<p>PBR使用了渲染方程（Rendering Equation）的一个特化版本： <span
+class="math display">\[
+L_o(p,\omega_o)=L_e(p,\omega_o)+\int_\Omega
+f_r(p,\omega_i,\omega_o)L_i(p,\omega_i)n\cdot\omega_id\omega_i
+\]</span></p>
+<ul>
+<li><span class="math inline">\(p\)</span>是物体表面片元</li>
+<li><span
+class="math inline">\(L_o(p,\omega_o)\)</span>是物体表面片元p所反射朝向
+<span class="math inline">\(\omega_o\)</span>
+的辐亮度，o代表outgoing</li>
+<li><span
+class="math inline">\(L_e(p,\omega_o)\)</span>是物体表面片元p朝向 <span
+class="math inline">\(\omega_o\)</span> 发出的辐亮度，e代表emission</li>
+<li><span
+class="math inline">\(f_r(p,\omega_i,\omega_o)\)</span>是物体在片元p处的BRDF</li>
+<li><span class="math inline">\(L_i(p,\omega_i)\)</span>物体表面片元p从
+<span class="math inline">\(\omega_i\)</span>
+接收到的辐亮度，i代表incoming</li>
+<li><span class="math inline">\(n\cdot\omega_i\)</span>物体片元p处法线与
+<span class="math inline">\(\omega_i\)</span> 的点积</li>
+<li><span
+class="math inline">\(\Omega\)</span>是物体表面片元p所在的上半球</li>
+</ul>
+<p>渲染方程描述的是物体表面某一片元 <span
+class="math inline">\(p\)</span> 向 <span
+class="math inline">\(\omega_o\)</span> 辐射出的最终能量值，包括其自身向
+<span class="math inline">\(\omega_o\)</span> 辐射的能量 <span
+class="math inline">\(L_e(p,\omega_o)\)</span> 和向 <span
+class="math inline">\(\omega_o\)</span> 反射的其他光源辐射的能量 <span
+class="math inline">\(\int_\Omega
+f_r(p,\omega_i,\omega_o)L_i(p,\omega_i)n\cdot\omega_id\omega_i\)</span>
+。自身辐射的能量不必多说，PBR的主要研究内容是剩下的反射部分。</p>
+<p>有了第一部分理论部分的铺垫，不难理解片元 <span
+class="math inline">\(p\)</span>
+能反射的能量都来源于其从上半球接收的能量Irradiance，公式中的积分就是对上半球的积分。将能量离散化为从各个方向接收到能量的和之后，从特定方向
+<span class="math inline">\(\omega_i\)</span>
+接收到的能量就是radiance：<span
+class="math inline">\(L_i(p,\omega_i)n\cdot\omega_i\)</span>
+。物体表面并不会将接受到的辐射能量全部反射出去，其反射能量的比例根据表面性质决定。<span
+class="math inline">\(f_r(p,\omega_i,\omega_o)\)</span>
+描述的就是表面的反射性质，其即是双向反射分布函数BRDF。</p>
+<h3 id="brdf"><strong>BRDF</strong></h3>
+<p>在文首曾提到PBR使用的是基于物理的BRDF，这个基于物理也就是基于微面元模型。它接受入射（光）方向
+<span class="math inline">\(\omega_i\)</span> ，出射（观察）方向 <span
+class="math inline">\(\omega_o\)</span> ，平面法线 <span
+class="math inline">\(n\)</span> 以及一个用来表示微面元性质的参数 <span
+class="math inline">\(\alpha\)</span>
+作为函数的输入参数。BRDF可以近似求出从 接受光线对从
+辐射出的光线的贡献程度。目前已经有多种BRDF被用于实时或离线渲染，在实施渲染中使用最广泛的是Cook-Torrance
+BRDF，其公式如下：<br />
+<span class="math display">\[
+f_r = k_df_{lambert}+k_sf_{cook−torrance}\\ f_{lambert}=\frac{c}{\pi}\\
+f_{cook-torrance}=\frac{DFG}{4(w_o \cdot n)(w_i \cdot n)}
+\]</span> Cook-Torrance
+BRDF将对接受的光线分为两部分处理，即第一段理论部分提到的反射部分和折射部分。
+<span class="math inline">\(k_d\)</span> 是漫反射能量所占比率，<span
+class="math inline">\(k_s\)</span>是高光反射部分比率。 <span
+class="math inline">\(k_s\)</span> 可由菲涅尔方程得出，根据能量守恒得
+<span class="math inline">\(k_d = 1-k_s\)</span> 。</p>
+<p>对于漫反射部分，Cook-Torrance
+BRDF认为光线经过物体表面散射之后向各个方向均有光线出射，微面元性质
+不会影响漫反射强度。漫反射强度只与菲涅尔现象（观察角度）有关，所以 <span
+class="math inline">\(f_{lambert}\)</span> 只与漫反射颜色有关。</p>
+<p>对于镜面反射，其影响因素就比较多。 <span
+class="math inline">\(f_{cook-torrance}\)</span>
+分子包含了三个函数，此外分母还有一个标准化因子（本文不对标准化因子进行讨论）。分子中的三个函数如下：</p>
+<ul>
+<li><strong>法线分布函数（Normal distribution
+function）D</strong>：估算在受到表面粗糙度的影响下，微小镜面朝向方向与半程向量一致的的数量；</li>
+<li><strong>菲涅尔方程（Fresnel
+equation）F</strong>：在不同表面角下高光反射的占比；</li>
+<li><strong>几何函数（Geometry
+function）G</strong>：描述微面元自成阴影的属性；</li>
+</ul>
+<p>菲涅尔方程的部分已经在上文理论部分进行讨论，这里我们直接使用<strong>Fresnel-Schlick近似</strong>：
+<span class="math display">\[
+F_{Schlick}(h,v,F_0)=F_0+(1-F_0)(1-cos\theta_i)^5
+\]</span> 可以看到 中已经包含了F，而
+，所以为避免重复，上述BRDF方程带入后应为： <span class="math display">\[
+f_r = k_d \frac{c}{\pi} + \frac{DFG}{4(w_o \cdot n)(w_i \cdot n)}
+\]</span></p>
+<h3 id="法线分布函数-normal-distribution-function">法线分布函数 Normal
+distribution function</h3>
+<p>进行发现分布函数说明之前，先清楚一个概念，<strong>半程向量</strong>
+<span class="math inline">\(h\)</span>
+<strong>。</strong>半程向量在渲染中经常使用，其是指光源方向与视角方向的夹角
+<span class="math inline">\(h=\frac{L+V}{\left|| L+V \right||}\)</span>
+，如下图所示：</p>
+<figure>
+<img src="/images/PBR/wiki-1.png" alt="halfway vector - wiki" />
+<figcaption aria-hidden="true">halfway vector - wiki</figcaption>
+</figure>
+<p>于是可以知道，从 <span class="math inline">\(\omega_i\)</span>
+入射的光能够被反射到 <span class="math inline">\(\omega_o\)</span>
+需要表面法向量 <span class="math inline">\(n\)</span> 和半程向量 <span
+class="math inline">\(h\)</span>方向一致。而法线分布函数D就是对于某一微面元，从统计学上近似表示这些微小镜面法向量与半程向量方向一致的比率。常用的法线分布函数是Trowbridge-Reitz
+GGX: <span class="math display">\[
+NDF_{GGXTR}(n,h,\alpha) = \frac{\alpha^2}{ \pi ( (n \cdot h)^2  (\alpha
+^ 2 - 1) + 1)^2 }
+\]</span> <img src="/images/PBR/learnopengl-3.png"
+alt="引自《learnopengl-PBR》" /></p>
+<p>此函数可以模拟出上图效果，当表面粗糙度较低（也可以说表面比较光滑）时，与半程向量取向一致的微小镜面会集中在很小的范围内，微面元可以将大部分能量反射；当表面粗糙度较高时，微小镜面的方向会更加随机，与半程向量去向一致的微小镜面就会分布在较大的范围内，微面元只可以反射部分能量。</p>
+<h3 id="几何函数-geometry-function">几何函数 Geometry function</h3>
+<p>在微面元理论中，微小镜面是随机排列的，这就可能导致自遮挡现象的出现（如下图），几何函数就是从统计学上近似微小镜面间相互遮挡的比率。</p>
+<figure>
+<img src="/images/PBR/learnopengl-3.png"
+alt="引自《learnopengl-PBR》" />
+<figcaption aria-hidden="true">引自《learnopengl-PBR》</figcaption>
+</figure>
+<p>与NDF类似，微面元的几何细节也会影响自遮挡性质，所以 <span
+class="math inline">\(\alpha\)</span>
+也会作为参数输入。GGX和Schlick-Beckmann近似的结合体几何函数如下：</p>
+<p><span class="math display">\[G_{SchlickGGX}(n,v,k)=\frac{n\cdot v}{
+(n \cdot v)(1-k)+k }\]</span></p>
+<p>这里的 <span class="math inline">\(k\)</span> 是 <span
+class="math inline">\(\alpha\)</span>
+的重映射（Remapping），这里先不细究，只需要知道几何函数与微面元的几何性质
+<span class="math inline">\(\alpha\)</span> 有关即可。</p>
+<p>到这里，我们已经对PBR的渲染方程每一部分都有了了解，它完整描述了一个基于物理的渲染模型。当然这还不够，下面一部分主要讨论了方程在实际渲染中的一些细节。</p>
+<h3 id="cook-torrance反射率方程">Cook-Torrance反射率方程</h3>
+<p>让我们把使用的近似方程都带入到PBR渲染方程中，它现在应该是这个样子：
+<span class="math display">\[
+L_o(p,\omega_o)=L_e(p,\omega_o)+\int_\Omega  (k_d \frac{c}{\pi} +
+\frac{DFG}{4(w_o \cdot n)(w_i \cdot n)})
+L_i(p,\omega_i)n\cdot\omega_id\omega_i
+\]</span>
+将此方程应用到渲染中还需要解决最棘手的积分问题，我们需要考虑半球各个方向上射来的光线。幸运的是渲染中的光源数量是有限的，对于一个特定光源和特定片元fragment，只需要考虑从光源射向片元这一特定方向
+<span class="math inline">\(\omega\)</span>
+的光线对于片元的贡献。随着光源的增加，只需将每栈灯对片元的贡献做和便可得到整体贡献。</p>
+<p>但是只考虑光源方向光线，而忽略半球上的其他方向射来的光线势必会使最终渲染结果大打折扣。于是实时渲染中将半球上的光线分为<strong>直接光照（direct）</strong>和<strong>间接光照（indirect）</strong>两部分，光源的光属于直接光照，其他部分属于间接光照。</p>
+<p>间接光照就会考虑在直接光照中忽略的积分部分，这就是间接光照的领域了，例如IBL技术。上文几何函数中提到的
+重映射在直接光和IBL中就有不同取值： <span class="math display">\[
+k_{IBL}=\frac{\alpha ^2}{2}
+\]</span>
+对间接关照的讨论是另一个大模块了。目前可以简单认为，片元最终强度就是通过PBR方程计算出的光源直接光强度与间接光强度的和。</p>
+<h3 id="小结">小结</h3>
+<p>本文对PBR涉及到的理论和渲染方程做了简要的说明，而未涉及到其具体实现，希望能帮你在一定层面上理解PBR。下篇文章会着重介绍两个工作流——金属工作流与高光工作流。</p>
+<h3 id="参考文献">参考文献</h3>
+<p>推荐阅读原版，中文版的翻译可能会有遗漏和错误导致阅读不顺畅。</p>
+<p><a
+target="_blank" rel="noopener" href="https://learnopengl.com/PBR/Theory">learnopengl-pbr原文</a></p>
+<p><a
+target="_blank" rel="noopener" href="https://learnopengl-cn.github.io/07%20PBR/01%20Theory/">learnopengl-pbr中文版</a></p>
+<p><a
+target="_blank" rel="noopener" href="https://creativecloud.adobe.com/cc/learn/substance-3d-designer/web/the-pbr-guide-part-1?locale=en">The
+PBR Guide Part1原文</a></p>
+<p><a target="_blank" rel="noopener" href="https://cloud.tencent.com/developer/article/1571926">The PBR
+Guide Part1中文版</a></p>
+<p><a
+target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1X7411F744/?p=15&amp;spm_id_from=333.1007.top_right_bar_window_history.content.click&amp;vd_source=a6d4de83b46a19b70d53fc1e9adb6574">GAMES101-现代计算机图形学入门-闫令琪_哔哩哔哩_bilibili</a></p>
+<p><a
+target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/158025828">张亚坤：彻底看懂PBR/BRDF方程</a></p>
+<p><a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Fresnel_equations">wiki
+Fresnel_equations</a></p>
+<p><a
+target="_blank" rel="noopener" href="https://lettier.github.io/3d-game-shaders-for-beginners/fresnel-factor.html">图片来源
+Fresnel Factor</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Graphic/" rel="tag"># Graphic</a>
+              <a href="/tags/PBR/" rel="tag"># PBR</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2024/05/15/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/%E5%B1%B1%E6%B5%B7%E7%BB%8F%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%EF%BC%88%E4%B8%89%EF%BC%89/" rel="prev" title="山海经读书笔记（三）">
+                  <i class="fa fa-angle-left"></i> 山海经读书笔记（三）
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2024/09/26/Game%20Development/Real-time%20Hair%20Rendering/" rel="next" title="">
+                   <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Rigel Aster</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+
+</body>
+</html>

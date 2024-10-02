@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha256-5eIC48iZUHmSlSUz9XtjRyK2mzQkHScZY1WdMaoz74E=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"rigelaster.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.21.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"always","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="使用Unity的 compute shader 绘制分形图案，算是学习使用compute shader">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Compute Shader 绘制 Mandelbrot Fractal 图案">
+<meta property="og:url" content="https://rigelaster.github.io/2021/12/08/Game%20Development/Compute%20Shader%20%E7%BB%98%E5%88%B6%20Mandelbrot%20Fractal%20%E5%9B%BE%E6%A1%88/index.html">
+<meta property="og:site_name" content="Rigel&#39;s Blog">
+<meta property="og:description" content="使用Unity的 compute shader 绘制分形图案，算是学习使用compute shader">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://rigelaster.github.io/images/Unity/compute-shader-1.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/Unity/fractal-1.png">
+<meta property="article:published_time" content="2021-12-08T14:56:25.000Z">
+<meta property="article:modified_time" content="2024-10-02T15:11:12.306Z">
+<meta property="article:author" content="Rigel Aster">
+<meta property="article:tag" content="Unity">
+<meta property="article:tag" content="Shader">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://rigelaster.github.io/images/Unity/compute-shader-1.png">
+
+
+<link rel="canonical" href="https://rigelaster.github.io/2021/12/08/Game%20Development/Compute%20Shader%20%E7%BB%98%E5%88%B6%20Mandelbrot%20Fractal%20%E5%9B%BE%E6%A1%88/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"https://rigelaster.github.io/2021/12/08/Game%20Development/Compute%20Shader%20%E7%BB%98%E5%88%B6%20Mandelbrot%20Fractal%20%E5%9B%BE%E6%A1%88/","path":"2021/12/08/Game Development/Compute Shader 绘制 Mandelbrot Fractal 图案/","title":"Compute Shader 绘制 Mandelbrot Fractal 图案"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Compute Shader 绘制 Mandelbrot Fractal 图案 | Rigel's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Rigel's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#unity-compute-shader-%E5%9F%BA%E7%A1%80"><span class="nav-number">2.</span> <span class="nav-text">unity compute shader 基础</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mandelbrot-fractal"><span class="nav-number">3.</span> <span class="nav-text">Mandelbrot Fractal</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#compute-shader-c"><span class="nav-number">4.</span> <span class="nav-text">Compute Shader &amp; C</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%89%A7%E8%A1%8C%E7%BB%93%E6%9E%9C"><span class="nav-number">5.</span> <span class="nav-text">执行结果</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">6.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Rigel Aster"
+      src="/uploads/avatar.png">
+  <p class="site-author-name" itemprop="name">Rigel Aster</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">22</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">14</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://www.zhihu.com/people/ming-zi-13-35" title="Zhihu → https:&#x2F;&#x2F;www.zhihu.com&#x2F;people&#x2F;ming-zi-13-35" rel="noopener me" target="_blank"><i class="fab fa-zhihu fa-fw"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:remingzi7@gmail.com" title="E-Mail → mailto:remingzi7@gmail.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://github.com/MingZI-7" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;MingZI-7" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i></a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://rigelaster.github.io/2021/12/08/Game%20Development/Compute%20Shader%20%E7%BB%98%E5%88%B6%20Mandelbrot%20Fractal%20%E5%9B%BE%E6%A1%88/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar.png">
+      <meta itemprop="name" content="Rigel Aster">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Rigel's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Compute Shader 绘制 Mandelbrot Fractal 图案 | Rigel's Blog">
+      <meta itemprop="description" content="使用Unity的 compute shader 绘制分形图案，算是学习使用compute shader">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Compute Shader 绘制 Mandelbrot Fractal 图案
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2021-12-08 22:56:25" itemprop="dateCreated datePublished" datetime="2021-12-08T22:56:25+08:00">2021-12-08</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2024-10-02 23:11:12" itemprop="dateModified" datetime="2024-10-02T23:11:12+08:00">2024-10-02</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Unity/" itemprop="url" rel="index"><span itemprop="name">Unity</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+            <div class="post-description">使用Unity的 compute shader 绘制分形图案，算是学习使用compute shader</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="前言">前言</h2>
+<p>文章仅针对unity compute
+shader，通过案例来学习其基本用法。由于知识浅薄，仅提供一些表层的知识，如发现错误，请指出，万分感谢。</p>
+<p>参考案例来自reddit中的一篇文章，参考资料的第一个链接可以看原文，源码也可以在他的文章中找到链接。</p>
+<p>文章重点在于compute shader 的使用，因此Mandelbrot Fractal
+只做简单介绍。</p>
+<h2 id="unity-compute-shader-基础">unity compute shader 基础</h2>
+<p>根据unity的官方文档，compute shader
+与其他shader一样，属于项目的资源文件（asset
+files），以.compute为文件扩展名。一般情况下使用HLSL语言编写（其他情况请参考官方文档），在unity中需要与C#脚本配合使用。</p>
+<p>在unity中通过右键菜单 <em>Create-&gt;Shader-&gt;Compute Shader</em>
+来创建出.compute文件，被创建的文件中自带以下代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">// Each #kernel tells which function to compile; you can have many kernels</span><br><span class="line">#pragma kernel CSMain</span><br><span class="line"></span><br><span class="line">// Create a RenderTexture with enableRandomWrite flag and set it</span><br><span class="line">// with cs.SetTexture</span><br><span class="line">RWTexture2D&lt;float4&gt; Result;</span><br><span class="line"></span><br><span class="line">[numthreads(8,8,1)]</span><br><span class="line">void CSMain (uint3 id : SV_DispatchThreadID)</span><br><span class="line">&#123;</span><br><span class="line">    // TODO: insert actual code here!</span><br><span class="line"></span><br><span class="line">    Result[id.xy] = float4(id.x &amp; id.y, (id.x &amp; 15)/15.0, (id.y &amp; 15)/15.0, 0.0);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>我们来逐行对代码进行分析：</p>
+<p><strong>#pragma kernel CSMain</strong></p>
+<p>一个compute shader文件必须包含至少一个 compute kernel
+,可以使用“#pragma kernel xxxx”指令来增添多个 compute
+kernel。需要注意的是，此编译指令后面不能跟注释代码“//xxx”，这样会造成编译错误。该指令表示
+CSMain 函数是一个GPU入口，可以在C#脚本中进行调用。</p>
+<p><strong>RWTexture2D<float4> Result;</strong></p>
+<p>这句代码声明了一个用来保存计算结果的结构，可以把它理解为一个纹理，RW表明它可读可写，float是其包含的数据类型，主要用于与C#脚本进行数据传输。我们还可以在此处声明其他变量，像是int
+float这种用于计算。</p>
+<p><strong>[numthreads(8,8,1)]</strong></p>
+<p>如字面意思，每组线程包含的线程数目，需要和C#脚本中的*_shader.Dispatch(kernelIndex,8,8,1)*联系理解。numthreads(X,Y,Z)中的三个参数分别代表每个线程组（thread
+group）在xyz对应维度上的大小，这种定义线程数目的方式可以在逻辑上很容易用[x,y]或[x,y,z]来访问其中独立的线程。</p>
+<p>可设置的线程数目最大值却决于你使用的comput shader
+version，如下表：</p>
+<table>
+<thead>
+<tr>
+<th>Compute Shader</th>
+<th>Maximum Z</th>
+<th>Maximum Threads(X<em>Y</em>Z)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>cs_4_x</td>
+<td>1</td>
+<td>768</td>
+</tr>
+<tr>
+<td>cs_5_0</td>
+<td>64</td>
+<td>1024</td>
+</tr>
+</tbody>
+</table>
+<p>至于<em>numthreads()</em> 和 <em>Dispatch()</em>
+之间的联系，可以通过MSDN上的一张图来很快的理解。</p>
+<p><img src="/images/Unity/compute-shader-1.png" /></p>
+<p><strong>void CSMain(uint3 id : SV_DispatchThreadID) &amp;&amp;&amp;
+Result[id.xy]=float4(id.x &amp; id.y,(id.x &amp;15)/15.0,(id.y
+&amp;15)/15.0,0.0);</strong></p>
+<p>这就是compute shader 中的一个核函数的实现了，与“<em>#pragma kernel
+CSMain</em>”相对应。其参数uint3
+id，就可以用上图来理解啦。就是在一次Dispatch()中某个线程的id，可以使用它来定位我们要输出renderTexture的某个pixel。这也就是后面那句“Result[id.xy]=xxxx”的含义了，等号右边即我们在GPU中处理得到的结果，用id的xy维度的数值（此案例中z维度为1）来确定此次计算的结果保存在Result中的哪个位置。</p>
+<h2 id="mandelbrot-fractal">Mandelbrot Fractal</h2>
+<p>Mandelbrot
+Fractal，即曼德勃罗分形，利用GPU并行的特性可以快速绘制。</p>
+<p>Mandelbrot Fractal的图案由以下几个规则（粗略列一下）决定：</p>
+<p>① 使用迭代公式：<span class="math inline">\(Z_{n+1} = Z_{n}^{2} +
+C\)</span> ，其中 C = a+bi；</p>
+<p>② 从 0 开始进行迭代；</p>
+<p>③ 迭代结果在区间（-2，2）；</p>
+<p>④
+在复坐标系下绘制满足上述条件C所代表的复数，颜色决定其收敛的快慢；</p>
+<h2 id="compute-shader-c">Compute Shader &amp; C</h2>
+<p>于是，我们可以在Compute Shader 中写出如下代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">#pragma kernel pixelCalc</span><br><span class="line"></span><br><span class="line">RWTexture2D&lt;float4&gt; textureOut;				</span><br><span class="line">RWStructuredBuffer&lt;double&gt; rect;			// 绘制范围</span><br><span class="line">RWStructuredBuffer&lt;float4&gt; colors;			// 绘制颜色</span><br><span class="line"></span><br><span class="line">[numthreads(32,32,1)]						</span><br><span class="line">void pixelCalc (uint3 id : SV_DispatchThreadID)&#123;</span><br><span class="line">	float k = 0.0009765625;				// 1 / 1024</span><br><span class="line">	double dx, dy;</span><br><span class="line">	double p, q;						</span><br><span class="line">	double x, y, xnew, ynew, d = 0;		</span><br><span class="line">	uint iteration = 0;				    // 迭代次数</span><br><span class="line">	dx = rect[2] - rect[0];</span><br><span class="line">	dy = rect[3] - rect[1];</span><br><span class="line">	p = rect[0] + ((int)id.x) * k * dx;	// 区域映射，把[-512,512) 映射到 [-2,2) 来计算</span><br><span class="line">	q = rect[1] + ((int)id.y) * k * dy;</span><br><span class="line">	x = p;</span><br><span class="line">	y = q;</span><br><span class="line">	while (iteration &lt; 255 &amp;&amp; d &lt; 4)&#123;		// 迭代最多255次，对应255种颜色	</span><br><span class="line">		xnew = x * x - y * y + p;   // a^2 - b^2 + b </span><br><span class="line">		ynew = 2 * x * y + q;       // 2ab + b</span><br><span class="line">		x = xnew;</span><br><span class="line">		y = ynew;</span><br><span class="line">		d = x * x + y * y;</span><br><span class="line">		iteration++;</span><br><span class="line">	&#125;</span><br><span class="line">	textureOut[id.xy] = colors[iteration];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>cshader代码中，与C#发生交互的部分就是那3行声明的变量。下面详细说明，cshader与c#如何配合使用。</p>
+<p><strong>C# 方面：</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">//  需要声明的变量</span><br><span class="line">ComputeShader _shader            // 对Compute Shader 进行控制</span><br><span class="line">RenderTexture outputTexture      // 接受 GPU 中的计算结果</span><br><span class="line">ComputeBuffer colorsBuffer       // 向 GPU 缓存中传输数据</span><br><span class="line"></span><br><span class="line">// 初始化 textrue</span><br><span class="line">outputTexture = new RenderTexture(1024, 1024, 32);</span><br><span class="line">outputTexture.enableRandomWrite = true; </span><br><span class="line">outputTexture.Create();</span><br><span class="line"></span><br><span class="line">// 向 buffer 中写入数据</span><br><span class="line">colorsBuffer = new ComputeBuffer(colorArray.Length, 4 * 4);</span><br><span class="line">colorsBuffer.SetData(colorArray);</span><br><span class="line"></span><br><span class="line">// 初始化 shader ，并获取或设置shader中的变量</span><br><span class="line">_shader = Resources.Load&lt;ComputeShader&gt;(&quot;csFractal&quot;);</span><br><span class="line">kiCalc = _shader.FindKernel(&quot;pixelCalc&quot;);</span><br><span class="line">_shader.SetBuffer(kiCalc, &quot;colors&quot;, colorsBuffer);</span><br><span class="line">_shader.SetTexture(kiCalc, &quot;textureOut&quot;, outputTexture);</span><br><span class="line"></span><br><span class="line">// 在c#脚本中调用 compute shader</span><br><span class="line">_shader.Dispatch(kiCalc, 32, 32, 1);</span><br></pre></td></tr></table></figure>
+<p>上述并不是完整的代码，只是贴出来方便说明。</p>
+<p><strong>ComputeBuffer</strong> 是在使用compute
+shader使非常重要的类，官方文档中如此说明：</p>
+<blockquote>
+<p>GPU data buffer, mostly for use with compute shaders. <a
+target="_blank" rel="noopener" href="https://docs.unity3d.com/ScriptReference/ComputeShader.html">ComputeShader</a>
+programs often need arbitrary data to be read &amp; written into memory
+buffers. ComputeBuffer class is exactly for that - you can create &amp;
+fill them from script code, and use them in compute shaders or regular
+shaders.</p>
+</blockquote>
+<p>简单来说，就是ComputeBuffer是 C#脚本 和 Compute Shader
+数据传输的中介，在C#脚本中创建buffer并写入数据，在Compute
+Shader中使用数据。</p>
+<p><strong>RenderTexture</strong>
+正如前面部分说明过的，多用为结算结果载体。需要注意的一点是，如果要在compute
+shader中使用rendertexture，就需要将其enableRandomWrite属性置为ture。文档解释如下：</p>
+<blockquote>
+<p>Enable random access write into this render texture on Shader Model
+5.0 level shaders.</p>
+</blockquote>
+<p><strong>ComputeShader</strong>
+这个不用过多解释，用它在C#中操控shader的行为。</p>
+<p>要提一下的是kiCalc这个变量，它就是个int类型变量，使用ComputeShader.FindKernel(string)来获取核函数在shader中的索引，就像后面用到kiCalc那样用于设置其他变量。</p>
+<p>最后终于到了ComputeShader.Dispatch(int,int,int,int)，在C#脚本中调用这个函数就可以以我们设置的thread
+groups num 和 thread num
+来执行compute中的核函数，参数中也用到了kiCalc即核函数索引这个变量。在调用这个函数之后，执行的结果就会填充在我们特定的
+RenderTexture中。</p>
+<p>这便是C#脚本与Compute
+Shader配合使用的大致过程，在此做一个学习的记录，也希望能对你们有所帮助。</p>
+<h2 id="执行结果">执行结果</h2>
+<p><img src="/images/Unity/fractal-1.png" /></p>
+<h2 id="参考资料">参考资料</h2>
+<p>https://www.reddit.com/r/Unity3D/comments/7pa6bq/drawing_mandelbrot_fractal_using_gpu_compute/</p>
+<p>https://docs.unity3d.com/2020.3/Documentation/Manual/class-ComputeShader.html</p>
+<p>https://docs.microsoft.com/en-us/windows/win32/direct3dhlsl/sm5-attributes-numthreads?redirectedfrom=MSDN</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Unity/" rel="tag"># Unity</a>
+              <a href="/tags/Shader/" rel="tag"># Shader</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+            </div>
+            <div class="post-nav-item">
+                <a href="/2022/02/14/Game%20Development/Unity%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%20-%20%E6%B8%B2%E6%9F%93%E8%B7%AF%E5%BE%84/" rel="next" title="Unity学习笔记 - 渲染路径">
+                  Unity学习笔记 - 渲染路径 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Rigel Aster</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+
+</body>
+</html>
