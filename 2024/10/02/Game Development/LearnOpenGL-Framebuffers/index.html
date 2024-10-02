@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha256-5eIC48iZUHmSlSUz9XtjRyK2mzQkHScZY1WdMaoz74E=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"rigelaster.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.21.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"always","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="OpenGL中的帧缓存">
+<meta property="og:type" content="article">
+<meta property="og:title" content="learnopengl - Framebuffers">
+<meta property="og:url" content="https://rigelaster.github.io/2024/10/02/Game%20Development/LearnOpenGL-Framebuffers/index.html">
+<meta property="og:site_name" content="Rigel&#39;s Blog">
+<meta property="og:description" content="OpenGL中的帧缓存">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://rigelaster.github.io/images/LearnOpenGL/Advanced%20OpenGL/1-1.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/LearnOpenGL/Advanced%20OpenGL/1-3.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/LearnOpenGL/Advanced%20OpenGL/1-4.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/LearnOpenGL/Advanced%20OpenGL/1-5.png">
+<meta property="article:published_time" content="2024-10-02T07:13:35.000Z">
+<meta property="article:modified_time" content="2024-10-02T10:30:31.630Z">
+<meta property="article:author" content="Rigel Aster">
+<meta property="article:tag" content="LearnOpenGL">
+<meta property="article:tag" content="Game Development">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://rigelaster.github.io/images/LearnOpenGL/Advanced%20OpenGL/1-1.png">
+
+
+<link rel="canonical" href="https://rigelaster.github.io/2024/10/02/Game%20Development/LearnOpenGL-Framebuffers/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"https://rigelaster.github.io/2024/10/02/Game%20Development/LearnOpenGL-Framebuffers/","path":"2024/10/02/Game Development/LearnOpenGL-Framebuffers/","title":"learnopengl - Framebuffers"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>learnopengl - Framebuffers | Rigel's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Rigel's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#opengl%E4%B8%AD%E7%9A%84framebuffer"><span class="nav-number">2.</span> <span class="nav-text">OpenGL中的framebuffer</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#texture-attachments"><span class="nav-number">2.1.</span> <span class="nav-text">Texture attachments</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#renderbuffer-object-attachments"><span class="nav-number">2.2.</span> <span class="nav-text">Renderbuffer object
+attachments</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#post-processing"><span class="nav-number">3.</span> <span class="nav-text">Post-processing</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#rendering-to-a-texture"><span class="nav-number">3.1.</span> <span class="nav-text">Rendering to a texture</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#inversion"><span class="nav-number">3.2.</span> <span class="nav-text">Inversion</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#grayscale"><span class="nav-number">3.3.</span> <span class="nav-text">Grayscale</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#kernel-effects"><span class="nav-number">3.4.</span> <span class="nav-text">Kernel effects</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#blur"><span class="nav-number">3.5.</span> <span class="nav-text">Blur</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Rigel Aster"
+      src="/uploads/avatar.png">
+  <p class="site-author-name" itemprop="name">Rigel Aster</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">18</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://www.zhihu.com/people/ming-zi-13-35" title="Zhihu → https:&#x2F;&#x2F;www.zhihu.com&#x2F;people&#x2F;ming-zi-13-35" rel="noopener me" target="_blank"><i class="fab fa-zhihu fa-fw"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:remingzi7@gmail.com" title="E-Mail → mailto:remingzi7@gmail.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://github.com/MingZI-7" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;MingZI-7" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i></a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://rigelaster.github.io/2024/10/02/Game%20Development/LearnOpenGL-Framebuffers/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar.png">
+      <meta itemprop="name" content="Rigel Aster">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Rigel's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="learnopengl - Framebuffers | Rigel's Blog">
+      <meta itemprop="description" content="OpenGL中的帧缓存">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          learnopengl - Framebuffers
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+      
+
+      <time title="Created: 2024-10-02 15:13:35 / Modified: 18:30:31" itemprop="dateCreated datePublished" datetime="2024-10-02T15:13:35+08:00">2024-10-02</time>
+    </span>
+
+  
+</div>
+
+            <div class="post-description">OpenGL中的帧缓存</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h3 id="前言">前言</h3>
+<p>渲染中我们会用到很多类型的屏幕缓存：</p>
+<ul>
+<li>color buffer 颜色缓存，用于存储颜色值</li>
+<li>depth buffer 深度缓存，用于存储深度和进行深度测试</li>
+<li>stencil buffer
+模板缓存，用于进行模板测试，通过条件决定是否丢弃像素值</li>
+</ul>
+<p>这一系列缓存都存储于GPU中被称作
+<strong>framebuffer（帧缓存）</strong>的地方，OpenGL允许我们创建帧缓存用于存储渲染过程中的中间产物。这些帧缓存可以用来实现许多更复杂的效果，如镜像、后处理特效等。</p>
+<h3 id="opengl中的framebuffer">OpenGL中的framebuffer</h3>
+<p>像是openGL中的其他object一样，可以通过这样一系列过程创建和使用framebuffer：先创建一个framebuffer
+object，将其 bind 到
+GL_FRAMEBUFFER，做一些operations，最后再unbind。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">unsigned</span> <span class="type">int</span> fbo;</span><br><span class="line"><span class="built_in">glGenFramebuffers</span>(<span class="number">1</span>, &amp;fbo);</span><br><span class="line"><span class="built_in">glBindFramebuffer</span>(GL_FRAMEBUFFER, fbo);</span><br></pre></td></tr></table></figure>
+<p>只进行如上操作，framebuffer依然是不可用的。一个framebuffer被完整创建，还需要满足以下条件：</p>
+<ul>
+<li>需要为其链接（attach）至少一个缓存（color、depth 或 stencil）；</li>
+<li>应该至少有一个 color attachment；</li>
+<li>所有 attachments 也应该已经创建完成（reserved memory)；</li>
+<li>每一个缓存都拥有相同的 samples；</li>
+</ul>
+<p>不懂什么是 samples 没关系，Anti-Aliasing章节里面会讲到。</p>
+<p>随后使用函数
+<code>glCheckFramebufferStatus</code>检查帧缓存状态，当状态为<code>GL_FRAMEBUFFER_COMPLETE</code>时，代表帧缓存可以正式使用。</p>
+<p>这里解释一个名词
+<strong>attachment</strong>，其代表一个存储位置，可以最为帧缓存的一个buffer使用，类似于一个图像。在创建
+attachment 时有两种选择：textures, renderbuffer objects。</p>
+<h4 id="texture-attachments">Texture attachments</h4>
+<p>当使用 texture 作为帧缓存的 attachments
+时，就和普通的颜色、深度或者模板缓存一样，所有的渲染指令都会写入到这张
+texture 中。其优点是，可以轻松得将 texture 在 shader
+中使用。使用如下函数将 texture
+链接给帧缓存的颜色缓冲，对于深度缓冲和模板缓冲的链接具体方式请参考learnopengl文章：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">glFramebufferTexture2D</span>(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, <span class="number">0</span>);</span><br></pre></td></tr></table></figure>
+<h4 id="renderbuffer-object-attachments">Renderbuffer object
+attachments</h4>
+<p>renderbuffer object 是一个真正的 buffer，像是一组
+btyes，integers，pixels 等。render buffer object
+不能被直接读取，于是相比于 texture，openGL可以对 renderbuffer object
+做一些内存优化使其获得离屏渲染的性能优势。</p>
+<p>由于 renderbuffer object 是只写的，因此经常被用作 depth/stencil
+attachments，因为大多数情况下我们并不需要从中读取数据，只关心深度测试和模板测试。我们需要深度和模板值用于测试，但是不需要（sample）采样这些值。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">glRenderbufferStorage</span>(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, <span class="number">800</span>, <span class="number">600</span>);</span><br><span class="line"><span class="built_in">glFramebufferRenderbuffer</span>(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);</span><br></pre></td></tr></table></figure>
+<h3 id="post-processing">Post-processing</h3>
+<p>在了解了framebuffer如何工作之后，就是好好利用它做一些有趣的事情了。我们打算将一个场景渲染到创建的帧缓存中，然后将其color
+attachment渲染到一个quad上，随后我们就可以使用这张 texture
+做后处理效果了。</p>
+<h4 id="rendering-to-a-texture">Rendering to a texture</h4>
+<p>先来看准备工作，这里只列出一些核心代码。</p>
+<p>根据上文中提到的一系列操作，先创建出一个待使用的framebuffer：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">unsigned</span> <span class="type">int</span> framebuffer;</span><br><span class="line"><span class="built_in">glGenFramebuffers</span>(<span class="number">1</span>, &amp;framebuffer);</span><br><span class="line"><span class="built_in">glBindFramebuffer</span>(GL_FRAMEBUFFER, framebuffer);</span><br><span class="line"><span class="comment">// generate texture</span></span><br><span class="line"><span class="type">unsigned</span> <span class="type">int</span> textureColorbuffer;</span><br><span class="line"><span class="built_in">glGenTextures</span>(<span class="number">1</span>, &amp;textureColorbuffer);</span><br><span class="line"><span class="built_in">glTexImage2D</span>(GL_TEXTURE_2D, textureColorbuffer);</span><br><span class="line"><span class="built_in">glTexParameteri</span>(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);</span><br><span class="line"><span class="built_in">glTexParameteri</span>(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);</span><br><span class="line"><span class="built_in">glBindTexture</span>(GL_TEXTURE_2D, <span class="number">0</span>);</span><br><span class="line"><span class="comment">// attach</span></span><br><span class="line"><span class="built_in">glFramebufferTexture2D</span>(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureColorbuffer, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// generate renderbuffer object</span></span><br><span class="line"><span class="type">unsigned</span> <span class="type">int</span> rbo;</span><br><span class="line"><span class="built_in">glGenRenderbuffers</span>(<span class="number">1</span>, &amp;rbo);</span><br><span class="line"><span class="built_in">glBindRenderbuffer</span>(GL_RENDERBUFFER, rbo);</span><br><span class="line"><span class="built_in">glRenderbufferStorage</span>(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, <span class="number">800</span>, <span class="number">600</span>);</span><br><span class="line"><span class="built_in">glBindRenderbuffer</span>(GL_RENDERBUFFER, <span class="number">0</span>);</span><br><span class="line"><span class="comment">// attach</span></span><br><span class="line"><span class="built_in">glFramebufferRenderbuffer</span>(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GLRENDERBUFFER, rbo);</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span>(<span class="built_in">glCheckFramebufferStatus</span>(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;ERROR::FRAMEBUFFER::Framebuffer is not complete!&quot;</span> &lt;&lt; std::endl;</span><br><span class="line"><span class="built_in">glBindFramebuffer</span>(GL_FRAMEBUFFER, <span class="number">0</span>);</span><br></pre></td></tr></table></figure>
+<p>随后，将场景渲染到一个texture需要以下几步：</p>
+<ol type="1">
+<li>使用新创建的 framebuffer 正常渲染场景；</li>
+<li>切换回默认framebuffer；</li>
+<li>渲染一个覆盖整个屏幕的quad，使用之前framebuffer的color
+attachment用作贴图；</li>
+</ol>
+<p>完成上述步骤后得到如下结果：</p>
+<p><img src="/images/LearnOpenGL/Advanced%20OpenGL/1-1.png" /></p>
+<p>然后，我们就可以以此为基础实现很多后处理效果，下面是一些效果的简单说明。</p>
+<h4 id="inversion">Inversion</h4>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">    FragColor = <span class="built_in">vec4</span>(<span class="built_in">vec3</span>(<span class="number">1.0</span> - <span class="built_in">texture</span>(screenTexture, TexCoords)), <span class="number">1.0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="grayscale">Grayscale</h4>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">    FragColor = <span class="built_in">texture</span>(screenTexture, TexCoords);</span><br><span class="line">    <span class="type">float</span> average = (FragColor.r + FragColor.g + FragColor.b) / <span class="number">3.0</span>;</span><br><span class="line">    FragColor = <span class="built_in">vec4</span>(average, average, average, <span class="number">1.0</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// the human eye tends to be more sensitive to green colors and the least to blue</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">    FragColor = <span class="built_in">texture</span>(screenTexture, TexCoords);</span><br><span class="line">    <span class="type">float</span> average = <span class="number">0.2126</span> * FragColor.r + <span class="number">0.7152</span> * FragColor.g + <span class="number">0.0722</span> * FragColor.b;</span><br><span class="line">    FragColor = <span class="built_in">vec4</span>(average, average, average, <span class="number">1.0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><img src="/images/LearnOpenGL/Advanced%20OpenGL/1-3.png" /></p>
+<h4 id="kernel-effects">Kernel effects</h4>
+<p>kernels 是后处理中一种非常有用的工具，本案例使用的是一个3x3 的
+sharpen kernel，可以锐化原图像。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">const</span> <span class="type">float</span> offset = <span class="number">1.0</span> / <span class="number">300.0</span>;  </span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    vec2 offsets[<span class="number">9</span>] = vec2[](</span><br><span class="line">        <span class="built_in">vec2</span>(-offset,  offset), <span class="comment">// top-left</span></span><br><span class="line">        <span class="built_in">vec2</span>( <span class="number">0.0f</span>,    offset), <span class="comment">// top-center</span></span><br><span class="line">        <span class="built_in">vec2</span>( offset,  offset), <span class="comment">// top-right</span></span><br><span class="line">        <span class="built_in">vec2</span>(-offset,  <span class="number">0.0f</span>),   <span class="comment">// center-left</span></span><br><span class="line">        <span class="built_in">vec2</span>( <span class="number">0.0f</span>,    <span class="number">0.0f</span>),   <span class="comment">// center-center</span></span><br><span class="line">        <span class="built_in">vec2</span>( offset,  <span class="number">0.0f</span>),   <span class="comment">// center-right</span></span><br><span class="line">        <span class="built_in">vec2</span>(-offset, -offset), <span class="comment">// bottom-left</span></span><br><span class="line">        <span class="built_in">vec2</span>( <span class="number">0.0f</span>,   -offset), <span class="comment">// bottom-center</span></span><br><span class="line">        <span class="built_in">vec2</span>( offset, -offset)  <span class="comment">// bottom-right    </span></span><br><span class="line">    );</span><br><span class="line"></span><br><span class="line">    <span class="type">float</span> kernel[<span class="number">9</span>] = <span class="type">float</span>[](</span><br><span class="line">        <span class="number">-1</span>, <span class="number">-1</span>, <span class="number">-1</span>,</span><br><span class="line">        <span class="number">-1</span>,  <span class="number">9</span>, <span class="number">-1</span>,</span><br><span class="line">        <span class="number">-1</span>, <span class="number">-1</span>, <span class="number">-1</span></span><br><span class="line">    );</span><br><span class="line">    </span><br><span class="line">    vec3 sampleTex[<span class="number">9</span>];</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">9</span>; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        sampleTex[i] = <span class="built_in">vec3</span>(<span class="built_in">texture</span>(screenTexture, TexCoords.st + offsets[i]));</span><br><span class="line">    &#125;</span><br><span class="line">    vec3 col = <span class="built_in">vec3</span>(<span class="number">0.0</span>);</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">9</span>; i++)</span><br><span class="line">        col += sampleTex[i] * kernel[i];</span><br><span class="line">    </span><br><span class="line">    FragColor = <span class="built_in">vec4</span>(col, <span class="number">1.0</span>);</span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
+<p><img src="/images/LearnOpenGL/Advanced%20OpenGL/1-4.png" /></p>
+<h4 id="blur">Blur</h4>
+<p>blur是一种特殊的核函数，用于模糊图像。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">float</span> kernel[<span class="number">9</span>] = <span class="type">float</span>[](</span><br><span class="line">    <span class="number">1.0</span> / <span class="number">16</span>, <span class="number">2.0</span> / <span class="number">16</span>, <span class="number">1.0</span> / <span class="number">16</span>,</span><br><span class="line">    <span class="number">2.0</span> / <span class="number">16</span>, <span class="number">4.0</span> / <span class="number">16</span>, <span class="number">2.0</span> / <span class="number">16</span>,</span><br><span class="line">    <span class="number">1.0</span> / <span class="number">16</span>, <span class="number">2.0</span> / <span class="number">16</span>, <span class="number">1.0</span> / <span class="number">16</span>  </span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+<p><img src="/images/LearnOpenGL/Advanced%20OpenGL/1-5.png" /></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/LearnOpenGL/" rel="tag"># LearnOpenGL</a>
+              <a href="/tags/Game-Development/" rel="tag"># Game Development</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2024/10/01/Unity/Unity%E4%BD%BF%E7%94%A8%E4%B8%AD%E7%9A%84%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98/" rel="prev" title="Unity使用中的常见问题">
+                  <i class="fa fa-angle-left"></i> Unity使用中的常见问题
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Rigel Aster</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+
+</body>
+</html>

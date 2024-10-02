@@ -22,14 +22,15 @@
 
     <meta name="description" content="本篇用于记录平时作业中遇到或者使用过的图形工具等其他方面的内容">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Shader Tools">
+<meta property="og:title" content="Shader杂记">
 <meta property="og:url" content="https://rigelaster.github.io/2022/12/31/Shader-Tools/index.html">
 <meta property="og:site_name" content="Rigel&#39;s Blog">
 <meta property="og:description" content="本篇用于记录平时作业中遇到或者使用过的图形工具等其他方面的内容">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2022-12-31T03:43:39.000Z">
-<meta property="article:modified_time" content="2022-12-31T07:07:42.649Z">
+<meta property="article:modified_time" content="2024-10-02T02:33:18.380Z">
 <meta property="article:author" content="Rigel Aster">
+<meta property="article:tag" content="GameDevelopment">
 <meta property="article:tag" content="Unity Shader">
 <meta name="twitter:card" content="summary">
 
@@ -38,10 +39,10 @@
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"https://rigelaster.github.io/2022/12/31/Shader-Tools/","path":"2022/12/31/Shader-Tools/","title":"Shader Tools"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"https://rigelaster.github.io/2022/12/31/Shader-Tools/","path":"2022/12/31/Shader-Tools/","title":"Shader杂记"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>Shader Tools | Rigel's Blog</title>
+<title>Shader杂记 | Rigel's Blog</title>
   
 
 
@@ -113,7 +114,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#cg-standard-library"><span class="nav-number">1.</span> <span class="nav-text">Cg Standard Library</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#step"><span class="nav-number">1.0.1.</span> <span class="nav-text">step</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#parameters"><span class="nav-number">1.0.1.1.</span> <span class="nav-text">Parameters</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#description"><span class="nav-number">1.0.1.2.</span> <span class="nav-text">Description</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#smoothstep"><span class="nav-number">1.0.2.</span> <span class="nav-text">smoothstep</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#parameters-1"><span class="nav-number">1.0.2.1.</span> <span class="nav-text">Parameters</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#decription"><span class="nav-number">1.0.2.2.</span> <span class="nav-text">Decription</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#unity-built-in-shader-include-files"><span class="nav-number">2.</span> <span class="nav-text">Unity Built-in shader
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#cg-standard-library"><span class="nav-number">1.</span> <span class="nav-text">Cg Standard Library</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#step"><span class="nav-number">1.0.1.</span> <span class="nav-text">step</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#parameters"><span class="nav-number">1.0.1.1.</span> <span class="nav-text">Parameters</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#description"><span class="nav-number">1.0.1.2.</span> <span class="nav-text">Description</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#smoothstep"><span class="nav-number">1.0.2.</span> <span class="nav-text">smoothstep</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#parameters-1"><span class="nav-number">1.0.2.1.</span> <span class="nav-text">Parameters</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#decription"><span class="nav-number">1.0.2.2.</span> <span class="nav-text">Decription</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ddx-ddy"><span class="nav-number">1.0.3.</span> <span class="nav-text">ddx ddy</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#parameters-2"><span class="nav-number">1.0.3.1.</span> <span class="nav-text">Parameters</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#description-1"><span class="nav-number">1.0.3.2.</span> <span class="nav-text">Description</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#unity-built-in-shader-include-files"><span class="nav-number">2.</span> <span class="nav-text">Unity Built-in shader
 include files</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#unitycg.cginc"><span class="nav-number">2.1.</span> <span class="nav-text">UnityCG.cginc</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#data-structures"><span class="nav-number">2.1.1.</span> <span class="nav-text">Data structures</span></a></li></ol></li></ol></li></ol></div>
         </div>
         <!--/noindex-->
@@ -129,7 +130,7 @@ include files</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">16</span>
+          <span class="site-state-item-count">18</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -140,7 +141,7 @@ include files</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-count">11</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
@@ -191,12 +192,12 @@ include files</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="Shader Tools | Rigel's Blog">
+      <meta itemprop="name" content="Shader杂记 | Rigel's Blog">
       <meta itemprop="description" content="本篇用于记录平时作业中遇到或者使用过的图形工具等其他方面的内容">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          Shader Tools
+          Shader杂记
         </h1>
 
         <div class="post-meta-container">
@@ -206,9 +207,15 @@ include files</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><
         <i class="far fa-calendar"></i>
       </span>
       <span class="post-meta-item-text">Posted on</span>
-      
 
-      <time title="Created: 2022-12-31 11:43:39 / Modified: 15:07:42" itemprop="dateCreated datePublished" datetime="2022-12-31T11:43:39+08:00">2022-12-31</time>
+      <time title="Created: 2022-12-31 11:43:39" itemprop="dateCreated datePublished" datetime="2022-12-31T11:43:39+08:00">2022-12-31</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2024-10-02 10:33:18" itemprop="dateModified" datetime="2024-10-02T10:33:18+08:00">2024-10-02</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -216,7 +223,7 @@ include files</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><
       </span>
       <span class="post-meta-item-text">In</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/Shader/" itemprop="url" rel="index"><span itemprop="name">Shader</span></a>
+          <a href="/categories/inc/" itemprop="url" rel="index"><span itemprop="name">inc</span></a>
         </span>
     </span>
 
@@ -260,6 +267,17 @@ vector <code>a</code>, and <u>zero</u> otherwise</p>
 <p>The slope of smoothstep(a, b, a) and smoothstep(a, b, b) is zero.</p>
 <p>For vectors, the return vector contains the smooth interpolation of
 each element of the vector x</p>
+<h4 id="ddx-ddy">ddx ddy</h4>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">float</span> <span class="title">ddx</span><span class="params">(<span class="type">float</span> a)</span></span>;</span><br><span class="line"><span class="comment">// float1 float2 float3 float4</span></span><br><span class="line"><span class="comment">// half, fixed</span></span><br></pre></td></tr></table></figure>
+<h5 id="parameters-2">Parameters</h5>
+<p><code>a</code> Vector or scalar of which to approximate the partial
+derivative with respect to window-space X.</p>
+<h5 id="description-1">Description</h5>
+<p>Returns approximate partial derivative of <em>a</em> with respect to
+the window-space (horizontal) <em>x</em> coordinate.For vectors, the
+returned vector contains the approximate partial derivative of each
+element of the input vector.</p>
+<p>这个函数单看文档有些难以理解，贴一个方便理解的博客：https://blog.csdn.net/yinhun2012/article/details/109393911</p>
 <h2 id="unity-built-in-shader-include-files">Unity Built-in shader
 include files</h2>
 <p>Unity提供了很多内置的工具函数来让编写Shader变得更加简化和容易。这些工具函数都被声明在<code>.cginc</code>文件中，可以在这里查看Unity内置的文件：
@@ -314,6 +332,7 @@ Shader Base》。</p>
 
     <footer class="post-footer">
           <div class="post-tags">
+              <a href="/tags/GameDevelopment/" rel="tag"># GameDevelopment</a>
               <a href="/tags/Unity-Shader/" rel="tag"># Unity Shader</a>
           </div>
 
@@ -321,7 +340,7 @@ Shader Base》。</p>
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="/2022/12/29/Unity-Shader-Base/" rel="prev" title="Unity Shader Base">
+                <a href="/2022/12/29/Unity/Unity-Shader-Base/" rel="prev" title="Unity Shader Base">
                   <i class="fa fa-angle-left"></i> Unity Shader Base
                 </a>
             </div>
