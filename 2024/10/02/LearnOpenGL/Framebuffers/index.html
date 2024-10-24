@@ -32,10 +32,10 @@
 <meta property="og:image" content="https://rigelaster.github.io/images/LearnOpenGL/Advanced%20OpenGL/1-4.png">
 <meta property="og:image" content="https://rigelaster.github.io/images/LearnOpenGL/Advanced%20OpenGL/1-5.png">
 <meta property="article:published_time" content="2024-10-02T07:13:35.000Z">
-<meta property="article:modified_time" content="2024-10-02T14:47:04.359Z">
+<meta property="article:modified_time" content="2024-10-23T14:31:20.066Z">
 <meta property="article:author" content="Rigel Aster">
-<meta property="article:tag" content="Shader">
 <meta property="article:tag" content="OpenGL">
+<meta property="article:tag" content="Shader">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://rigelaster.github.io/images/LearnOpenGL/Advanced%20OpenGL/1-1.png">
 
@@ -135,7 +135,7 @@ attachments</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">22</span>
+          <span class="site-state-item-count">25</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -212,9 +212,15 @@ attachments</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="
         <i class="far fa-calendar"></i>
       </span>
       <span class="post-meta-item-text">Posted on</span>
-      
 
-      <time title="Created: 2024-10-02 15:13:35 / Modified: 22:47:04" itemprop="dateCreated datePublished" datetime="2024-10-02T15:13:35+08:00">2024-10-02</time>
+      <time title="Created: 2024-10-02 15:13:35" itemprop="dateCreated datePublished" datetime="2024-10-02T15:13:35+08:00">2024-10-02</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2024-10-23 22:31:20" itemprop="dateModified" datetime="2024-10-23T22:31:20+08:00">2024-10-23</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -262,7 +268,7 @@ GL_FRAMEBUFFER，做一些operations，最后再unbind。</p>
 <p>随后使用函数
 <code>glCheckFramebufferStatus</code>检查帧缓存状态，当状态为<code>GL_FRAMEBUFFER_COMPLETE</code>时，代表帧缓存可以正式使用。</p>
 <p>这里解释一个名词
-<strong>attachment</strong>，其代表一个存储位置，可以最为帧缓存的一个buffer使用，类似于一个图像。在创建
+<strong>attachment</strong>，其代表一个存储位置，可以做为帧缓存的一个buffer使用，类似于一个图像。在创建
 attachment 时有两种选择：textures, renderbuffer objects。</p>
 <h4 id="texture-attachments">Texture attachments</h4>
 <p>当使用 texture 作为帧缓存的 attachments
@@ -321,8 +327,8 @@ sharpen kernel，可以锐化原图像。</p>
 
     <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/Shader/" rel="tag"># Shader</a>
               <a href="/tags/OpenGL/" rel="tag"># OpenGL</a>
+              <a href="/tags/Shader/" rel="tag"># Shader</a>
           </div>
 
         
@@ -334,6 +340,9 @@ sharpen kernel，可以锐化原图像。</p>
                 </a>
             </div>
             <div class="post-nav-item">
+                <a href="/2024/10/03/Equirectangular%20Projection/" rel="next" title="Equirectangular projection">
+                  Equirectangular projection <i class="fa fa-angle-right"></i>
+                </a>
             </div>
           </div>
     </footer>

@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha256-5eIC48iZUHmSlSUz9XtjRyK2mzQkHScZY1WdMaoz74E=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"rigelaster.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.21.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"always","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="Image based lighting Specular part">
+<meta property="og:type" content="article">
+<meta property="og:title" content="IBL-Specular IBL">
+<meta property="og:url" content="https://rigelaster.github.io/2024/10/22/LearnOpenGL/IBL-Specular%20IBL/index.html">
+<meta property="og:site_name" content="Rigel&#39;s Blog">
+<meta property="og:description" content="Image based lighting Specular part">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://rigelaster.github.io/images/LearnOpenGL/3-4.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/LearnOpenGL/3-5.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/LearnOpenGL/3-6.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/LearnOpenGL/3-7.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/LearnOpenGL/3-8.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/LearnOpenGL/3-9.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/LearnOpenGL/3-10.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/LearnOpenGL/3-15.png">
+<meta property="article:published_time" content="2024-10-22T08:19:35.000Z">
+<meta property="article:modified_time" content="2024-10-24T02:54:22.071Z">
+<meta property="article:author" content="Rigel Aster">
+<meta property="article:tag" content="OpenGL">
+<meta property="article:tag" content="Shader">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://rigelaster.github.io/images/LearnOpenGL/3-4.png">
+
+
+<link rel="canonical" href="https://rigelaster.github.io/2024/10/22/LearnOpenGL/IBL-Specular%20IBL/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"https://rigelaster.github.io/2024/10/22/LearnOpenGL/IBL-Specular%20IBL/","path":"2024/10/22/LearnOpenGL/IBL-Specular IBL/","title":"IBL-Specular IBL"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>IBL-Specular IBL | Rigel's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Rigel's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#pre-filtering-an-hdr-environment-map"><span class="nav-number">2.</span> <span class="nav-text">Pre-filtering an HDR
+environment map</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#monte-carlo-integration-and-importance-sampling"><span class="nav-number">2.1.</span> <span class="nav-text">Monte Carlo
+integration and importance sampling</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#a-low-discrepancy-sequence"><span class="nav-number">2.2.</span> <span class="nav-text">A low-discrepancy sequence</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ggx-importance-sampling"><span class="nav-number">2.3.</span> <span class="nav-text">GGX Importance sampling</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#capturing-pre-filter-mipmap-levels"><span class="nav-number">2.4.</span> <span class="nav-text">Capturing pre-filter mipmap
+levels</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#pre-computing-the-brdf"><span class="nav-number">3.</span> <span class="nav-text">Pre-computing the BRDF</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#completing-the-ibl-reflectance"><span class="nav-number">4.</span> <span class="nav-text">Completing the IBL
+reflectance</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Rigel Aster"
+      src="/uploads/avatar.png">
+  <p class="site-author-name" itemprop="name">Rigel Aster</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">25</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">14</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://www.zhihu.com/people/ming-zi-13-35" title="Zhihu → https:&#x2F;&#x2F;www.zhihu.com&#x2F;people&#x2F;ming-zi-13-35" rel="noopener me" target="_blank"><i class="fab fa-zhihu fa-fw"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:remingzi7@gmail.com" title="E-Mail → mailto:remingzi7@gmail.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://github.com/MingZI-7" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;MingZI-7" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i></a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://rigelaster.github.io/2024/10/22/LearnOpenGL/IBL-Specular%20IBL/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar.png">
+      <meta itemprop="name" content="Rigel Aster">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Rigel's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="IBL-Specular IBL | Rigel's Blog">
+      <meta itemprop="description" content="Image based lighting Specular part">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          IBL-Specular IBL
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2024-10-22 16:19:35" itemprop="dateCreated datePublished" datetime="2024-10-22T16:19:35+08:00">2024-10-22</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2024-10-24 10:54:22" itemprop="dateModified" datetime="2024-10-24T10:54:22+08:00">2024-10-24</time>
+    </span>
+
+  
+</div>
+
+            <div class="post-description">Image based lighting Specular part</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h3 id="前言">前言</h3>
+<p>上篇文章我们讲了PBR管线中IBL的漫反射部分，将其预计算之后存储到一张
+irradiance map
+中，在渲染时可以高效的读取环境光的漫反射值。本文将专注于反射方程的高光反射部分：
+<span class="math display">\[
+L_o(p,\omega_o)=\int_\Omega  (k_d \frac{c}{\pi} + \frac{DFG}{4(w_o \cdot
+n)(w_i \cdot n)}) L_i(p,\omega_i)n\cdot\omega_id\omega_i
+\]</span> 可以注意到Cook-Torrance近似的specular portion（乘以 <span
+class="math inline">\(kS\)</span>的部分）在积分过程中并不是常量，不仅依赖于光的入射方向<span
+class="math inline">\(\omega_i\)</span>，而且和视角方向<span
+class="math inline">\(\omega_o\)</span>有关。在实时渲染中计算两者的积分着实不太可能，于是Epic
+Games提出了一个著名的解决方案，在为实时计算做出了妥协的同时也有不错的效果，这种方案被称为<strong>分割求和近似法（split
+sum approximation）</strong>。</p>
+<p>分割求和近似法将反射方程的高光项分为独立的两部分，可以分别做卷积计算，并随后在PBR流程中重新组合起来计算IBL的高光项。和预卷积得到
+irradiance map
+类似，分割求和近似方法也需要一张HDR的环境贴图作为卷积输入。为了更好的理解近似分割求和方法，我们先来看一下反射方程中的高光部分：
+<span class="math display">\[
+L_o(p,\omega_o)=\int_\Omega  \frac{DFG}{4(w_o \cdot n)(w_i \cdot n)}
+L_i(p,\omega_i)n\cdot\omega_id\omega_i
+\\= \int_\Omega f_r(p, \omega_i, \omega_o) L_i(p, \omega_i)n \cdot
+\omega_i d\omega_i
+\]</span></p>
+<p>由于性能问题，我们还是希望和 irradiance map
+一样，将积分的与计算结果存储于一个类似于 specular IBL
+map的贴图，在渲染时通过采样此贴图便可以高效的完成IBL的高光部分。但是，和IBL的漫反射部分不同，高光部分积分依赖于BRDF中的更多变量：
+<span class="math display">\[
+f_r(p, \omega_i, \omega_o) = \frac{DFG}{
+4(\omega_o \cdot n)(\omega_i \cdot n)
+}
+\]</span> Epic Game 的 split sum approximation
+通过将其分割为两个可以预计算的独立部分、随后再将两部分结合的方式，来使其满足与计算的条件。通过数学近似，反射方程的高光部分可写为：
+<span class="math display">\[
+L_o(p,\omega_o)= \int_\Omega L_i(p, \omega_i) d \omega_i * \int_\Omega
+f_r (p, \omega_i, \omega_o) n \cdot \omega_i d \omega_i
+\]</span>
+<u>等式的第一部分</u>（被卷积以后）被称作<strong>预滤波环境贴图（pre-filtered
+environment map）</strong>，其和 irradiance map
+类似是一张预计算的环境卷积贴图，但是这次会考虑粗糙度的影响。因为随着粗糙度的增加，参与到环境贴图卷积的采样向量会更分散，导致反射更模糊。所以对于卷积的每个粗糙度级别，我们将按顺序把模糊后的结果存储在预滤波贴图的mipmap中。例如，预过滤的环境贴图在其
+5 个 mipmap 级别中存储 5 个不同粗糙度值的预卷积结果，如下图所示：</p>
+<p><img src="/images/LearnOpenGL/3-4.png" /></p>
+<p>我们hi用Cook-Torrance
+BRDF的法线分布函数生成采样向量及其散射强度，该函数将法线normal和视角view
+direction用作输入。由于在对环境贴图进行卷积时不知道视角方向，于是Epic
+Games假设视角方向——即镜面反射方向——总是等于输出采样方向，以作进一步近似。代码表示如下：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">vec3 N = <span class="built_in">normal</span>(w_o);</span><br><span class="line">vec3 R = N;</span><br><span class="line">vec3 V = R;</span><br></pre></td></tr></table></figure>
+<p>这样，pre-filtered environment convolution
+就不需要关心视角方向了。但是如此做有一个缺点，我们在如下图所示的角度观察表面时，得到的镜面发射结果不是很好（图片来自《Moving
+Frostbite to PBR》。通常认为此近似是可以接受的：</p>
+<p><img src="/images/LearnOpenGL/3-5.png" /></p>
+<p><u>等式的第二部分</u>就是镜面反射积分的BRDF部分。如果我们假设入射的辐照度在每个方向都是白色（<span
+class="math inline">\(L(p,x)=1.0\)</span>），就可以在给定粗糙度roughness和法线<span
+class="math inline">\(n\)</span>与光照方向<span
+class="math inline">\(\omega_i\)</span>的夹角（或是<span
+class="math inline">\(n \cdot
+\omega_i\)</span>）的前提下，预计算得出BRDF的值。Epic
+Games将BRDF对于每个粗糙度roughness和每个法线<span
+class="math inline">\(n\)</span>与光照方向<span
+class="math inline">\(\omega_i\)</span>的夹角组合的预计算结果存储于一张2D查找表中（LUT），这张LUT被称为<strong>BRDF积分贴图（BRDF
+integration map）</strong>。这张2D
+LUT存储的是菲涅尔函数的系数（R通道）和偏差值（G通道）。</p>
+<blockquote>
+<p>The 2D lookup texture outputs a scale (red) and a bias value (green)
+to the surface's Fresnel response giving us the second part of the split
+specular integral</p>
+</blockquote>
+<p><img src="/images/LearnOpenGL/3-6.png" /></p>
+<p>这张LUT的水平坐标是 <span class="math inline">\(n \cdot
+\omega_i\)</span>（范围0.0 - 1.0），垂直坐标是roughness。结合这张BRDF
+integration map 和 pre-filtered environment map
+便可以得到环境光的高光反射部分积分值。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">float</span> lod = <span class="built_in">getMipLevelFromRoughness</span>(roughness);</span><br><span class="line">vec3 prefilteredColor = <span class="built_in">textureCubeLod</span>(PrefilteredEnvMap, refVec, lod);</span><br><span class="line">vec2 envBRDF = <span class="built_in">texture2D</span>(BRDFintegrationMap, <span class="built_in">vec2</span>(NdotV, roughness)).xy;</span><br><span class="line">vec3 indirectSpecular = prefilteredColor * (F * envBRDF.x + envBRDF.y);</span><br></pre></td></tr></table></figure>
+<h3 id="pre-filtering-an-hdr-environment-map">Pre-filtering an HDR
+environment map</h3>
+<p>预滤波环境贴图的方法与我们对 irradiance map
+求卷积的方法非常相似。区别在于，此次会考虑到粗糙度，对于卷积的每个粗糙度级别，我们将按顺序把模糊后的结果存储在预滤波贴图的
+mipmap 中。</p>
+<p>首先，我们需要生成一个新的立方体贴图来保存预过滤的环境贴图数据。为了确保分配足够的内存，可以调用
+glGenerateMipmap函数。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">unsigned</span> <span class="type">int</span> prefilterMap;</span><br><span class="line"><span class="built_in">glGenTextures</span>(<span class="number">1</span>, &amp;prefilterMap);</span><br><span class="line"><span class="built_in">glBindTexture</span>(GL_TEXTURE_CUBE_MAP, prefilterMap);</span><br><span class="line"><span class="keyword">for</span>(<span class="type">unsigned</span> <span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">6</span>; ++i)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">glTexImage2D</span>(GL_TEXTUER_CUBE_MAP_POSITIVE_X + i, <span class="number">0</span>, GL_RGB16F, <span class="number">128</span>, <span class="number">128</span>, <span class="number">0</span>, GL_RGB, GL_FLOAT, <span class="literal">nullptr</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">glTexParameteri</span>(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);</span><br><span class="line"><span class="built_in">glTexParameteri</span>(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);</span><br><span class="line"><span class="built_in">glTexParameteri</span>(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);</span><br><span class="line"><span class="built_in">glTexParameteri</span>(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR); </span><br><span class="line"><span class="built_in">glTexParameteri</span>(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);</span><br><span class="line"></span><br><span class="line"><span class="built_in">glGenerateMipmap</span>(GL_TEXTURE_CUBE_MAP);</span><br></pre></td></tr></table></figure>
+<p>需要注意的是，因为我们计划采样 prefilterMap 的
+mipmap，所以需要确保将其minification filter设置为
+GL_LINEAR_MIPMAP_LINEAR 以启用三线性过滤。我们使用每面
+128×128的分辨率作为基础 mip
+级别来存储预滤波的镜面反射，对于大多数场景来说已经足够了，但如果场景里有大量光滑材料（想想汽车上的反射），可能需要提高分辨率。</p>
+<p>在前篇文章中，我们使用球面坐标生成均匀分布在半球<span
+class="math inline">\(\Omega\)</span>上的采样向量，用于对环境贴图进行卷积。虽然这个方法非常适用于辐照度，但对于镜面反射效果较差。镜面反射依赖于表面的粗糙度，反射光线可能比较松散，也可能比较紧密，但是一定会围绕着反射向量，除非表面极度粗糙：</p>
+<p><img src="/images/LearnOpenGL/3-7.png" /></p>
+<p>反射光线可能的出射范围构成的形状被称作<strong>镜面波瓣（specular
+lobe）</strong>。当表面粗糙度增加时，镜面波瓣的大小增加；波瓣的形状随着入射光线方向的改变而改变。因此，镜面波瓣的形状高度依赖于表面材质。</p>
+<p>对于微表面模型，当给出入射光线方向后，我们就能得到微表面半程向量，从而可以想象出镜面波瓣的大致反射方向。正如所想，大部分光线都在以微表面半程向量为基础的波瓣中，这可以启发我们如何生成采样向量，此过程被称为<strong>重要性采样</strong>。（原文如下，翻译可能有些拗口）</p>
+<blockquote>
+<p>When it comes to the microsurface model, we can imagine the specular
+lobe as the reflection orientation about the microfacet halfway vectors
+given some incoming light direction. Seeing as most light rays end up in
+a specular lobe reflected around the microfacet halfway vectors, it
+makes sense to generate the sample vectors in a similar fashion as most
+would otherwise be wasted. This process is known as importance
+sampling.</p>
+</blockquote>
+<h4 id="monte-carlo-integration-and-importance-sampling">Monte Carlo
+integration and importance sampling</h4>
+<p>为了完全理解重要性采样，我们首先要深入研究被称为蒙特卡洛积分的数学概念。蒙特卡洛积分主要出现在统计学和概率学的理论中。蒙特卡洛帮助我们离散地解决一些统计学的总体问题，而非直接考虑整体。</p>
+<p>例如，你想去测量一个国家公民的平均身高。为了得到问题的准确答案，需要测量每个公民的身高然后取平均值。但是，由于大多数国家都有相当多的人口，测量每个公民身高并不是一个现实的方法，需要太多精力和时间。另外一个方法是，从整体中完全随机的选取部分公民，测量他们的身高，取平均值。例如可以只测量100人的身高，虽然结果并不准确，但是你会得到一个<strong>接近</strong>于真实数据的结果。这种规律可以被称为<strong>大数定律（law
+of large numbers）</strong>。也就是说，如果从总体测量一个大小为<span
+class="math inline">\(N\)</span>的真正随机样本的较小集合，那么结果将相对接近真实答案，并且随着样本数量<span
+class="math inline">\(N\)</span>的增加而越来越接近。</p>
+<p>蒙特卡洛积分便是建立在大数定律之上的，使用相同的方式解决积分问题。不使用所有可能的采样值
+<span class="math inline">\(x\)</span>
+来求得积分，而是生成几个随机采样值 <span
+class="math inline">\(N\)</span> 来解决积分，随着 <span
+class="math inline">\(N\)</span>
+的增大，会获得更接近准确答案的积分结果： <span class="math display">\[
+O = \int_{a}^{b} f(x)dx \approx \frac{1}{N} \sum_{i=0}^{N-1}
+\frac{f(x)}{pdf(x)}
+\]</span> 式中 <span class="math inline">\(pdf\)</span>
+表示<strong>可能性密度函数（probability density
+function）</strong>，告诉我们在总采样集合中选取某个特定采样的概率。举个例子，一个人群身高的
+<span class="math inline">\(pdf\)</span>
+如下图所示。根据图可以得出结论，当从此人群中随机采样身高时，有很高的概率会采样到1.70附近的人，而采样到1.50的概率较低。</p>
+<p><img src="/images/LearnOpenGL/3-8.png" /></p>
+<p>对于蒙特卡洛积分，一些采样拥有比其他采样更高的出现概率，这也是蒙特卡洛估算会乘以或除以
+<span class="math inline">\(pdf\)</span>
+的原因。目前为止，我们估算积分的例子中采样都是平均的，每个样本都有平均的生成概率。这样，我们最终得到的结果是<strong>无偏的（unbiased）</strong>，这意味着随着样本数量的增加，结果最终<strong>收敛（converge）</strong>于积分的精确解。</p>
+<p>但是，一些蒙特卡洛估算子<strong>是有偏的（biased）</strong>，其样本生成不是完全随机的，而是偏向某个特定值或特定方向。这种有偏的蒙特卡罗估算子具有<strong>更快的收敛速度（faster
+rate of
+convergence）</strong>，只是由于其特性，其最终收敛结果可能并不准确。在图形学中，只要最终渲染结果是可以接受的，这种快速但是不准确的收敛特性也是可以商榷的。</p>
+<p>由于蒙特卡洛积分可以很直观的以离散和高效的方式估算连续函数的积分，其在图形学中的应用是非常普遍的：取一片面积/体积进行采样，生成
+<span class="math inline">\(N\)</span>
+个随机样本，加权平均来得到最终的结果。蒙特卡洛积分是一个很庞大的数学话题，在此不多展开，只涉及到如何生成<em>随机采样（random
+samples）</em>。</p>
+<p>大多数情况下，我们使用的是完全（伪）随机采样。但通过利用半随机（semi-random）序列的某些属性，我们可以生成一些具有有趣属性的随机样本。例如，我们可以通过一种叫做<strong>低差异序列（low-discrepancy
+sequences）</strong>的东西来进行蒙特卡洛积分，它会产生分布均匀的随机样本：</p>
+<p><img src="/images/LearnOpenGL/3-9.png" /></p>
+<p>当使用低差异序列生成蒙特卡洛样本向量时，该过程被称为<strong>拟蒙特卡洛积分（Quasi-Monte
+Carlo）</strong>。拟蒙特卡洛积分拥有更快的收敛速度，使它对于性能繁重的应用很有用。鉴于我们刚了解蒙特卡洛和拟蒙特卡洛积分，我们可以使用一个有趣的属性来获得更快的收敛速度，那就是<strong>重要性采样（importance
+sampling）</strong>。前文提到，在镜面反射的情况下，反射的光被限制在镜面波瓣内，波瓣的大小取决于表面粗糙度。既然镜面波瓣外的任何随机样本都与镜面积分无关，将样本集中在镜面波瓣内生成是有意义的，但代价是蒙特卡洛估算会产生偏差。</p>
+<p>重要性采样的核心是：只在围绕微表面半程向量并受粗糙度限制的区域生成采样向量。通过将拟蒙特卡洛和重要性采样结合，我们可以得到更快的收敛效率。因为求解速度的增快，得到足够近似度所需要的样本会更少，其速度基本满足我们的需求。</p>
+<h4 id="a-low-discrepancy-sequence">A low-discrepancy sequence</h4>
+<p>在本文中，我们将使用基于拟蒙特卡洛方法的随机低差异序列的重要性采样来预计算反射方程的镜面反射部分。我们将使用的序列被称为
+<strong>Hammersley Sequence</strong> ，Holger Dammertz
+曾详细描述过它。Hammersley序列基于 <strong>Van Der Corput</strong>
+序列，该序列是把十进制数字的二进制表示镜像翻转到小数点右边而得。</p>
+<p>这里有一个小技巧，我们可以在着色器程序中非常有效地生成 Van Der Corput
+序列，我们将用它来获得 Hammersley 序列，设总样本数为<span
+class="math inline">\(N\)</span>，样本索引为<span
+class="math inline">\(i\)</span>：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">float</span> <span class="title">RadicalInvers_VdC</span><span class="params">(uint bits)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    bits = (bits &lt;&lt; <span class="number">16u</span>) | (bits &gt;&gt; <span class="number">16u</span>);</span><br><span class="line">    bits = ((bits &amp; <span class="number">0x55555555</span>u) &lt;&lt; <span class="number">1u</span>) | ((bits &amp; <span class="number">0xAAAAAAAA</span>u) &gt;&gt; <span class="number">1u</span>);</span><br><span class="line">    bits = ((bits &amp; <span class="number">0x33333333</span>u) &lt;&lt; <span class="number">2u</span>) | ((bits &amp; <span class="number">0xCCCCCCCC</span>u) &gt;&gt; <span class="number">2u</span>);</span><br><span class="line">    bits = ((bits &amp; <span class="number">0x0F0F0F0F</span>u) &lt;&lt; <span class="number">4u</span>) | ((bits &amp; <span class="number">0xF0F0F0F0</span>u) &gt;&gt; <span class="number">4u</span>);</span><br><span class="line">    bits = ((bits &amp; <span class="number">0x00FF00FF</span>u) &lt;&lt; <span class="number">8u</span>) | ((bits &amp; <span class="number">0xFF00FF00</span>u) &gt;&gt; <span class="number">8u</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">float</span>(bits) * <span class="number">2.3283064365386963e-10</span>; <span class="comment">// / 0x100000000</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// ----------------------------------------------------------------------</span></span><br><span class="line"><span class="function">vec2 <span class="title">Hammersley</span><span class="params">(uint i, uint N)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">vec2</span>(<span class="built_in">float</span>(i)/<span class="built_in">float</span>(N), <span class="built_in">RadicalInverse_VdC</span>(i));</span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
+<h4 id="ggx-importance-sampling">GGX Importance sampling</h4>
+<p>相比于均匀或随机地在积分半球 <span
+class="math inline">\(\Omega\)</span>
+产生采样向量，我们会根据粗糙度，偏向微表面的半程向量进行采样。采样过程与之前类似，区别在于，现在使用地差异序列作为输出：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">const</span> uint SAMPLE_COUNT = <span class="number">4096u</span>;</span><br><span class="line"><span class="keyword">for</span>(uint i = <span class="number">0u</span>; i &lt; SAMPLE_COUNT; ++i)</span><br><span class="line">&#123;</span><br><span class="line">	vec2 Xi = <span class="built_in">Hammersley</span>(i, SAMPLE_COUNT);</span><br></pre></td></tr></table></figure>
+<p>此外，为了构建采样向量，我们需要一些方法来偏移采样向量，以使其朝向特定粗糙度的镜面波瓣方向。可以使用理论教程中描述的NDF，并将GGX
+NDF集合到Epic Games 所描述的球形采样向量的处理中：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">vec3 <span class="title">ImportanceSampleGGX</span><span class="params">(vec2 Xi, vec3 N, <span class="type">float</span> roughness)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="type">float</span> a = roughness * roughness;</span><br><span class="line">    <span class="type">float</span> phi = <span class="number">2.0</span> * PI * Xi.x;</span><br><span class="line">    <span class="type">float</span> cosTheta = <span class="built_in">sqrt</span>((<span class="number">1.0</span> - Xi.y)/(<span class="number">1.0</span> + (a*a - <span class="number">1.0</span>) * Xi.y));</span><br><span class="line">    <span class="type">float</span> sinTheta = <span class="built_in">sqrt</span>(<span class="number">1.0</span> - cosTheta*cosTheta);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// form spherical coordinates to cartesian coordinates</span></span><br><span class="line">    vec3 H;</span><br><span class="line">    H.x = <span class="built_in">cos</span>(phi) * sinTheta;</span><br><span class="line">    H.y = <span class="built_in">sin</span>(phi) * sinTheta;</span><br><span class="line">    H.z = cosTheta;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// form tangent-space vector to world-space sample vector</span></span><br><span class="line">    vec3 up        = <span class="built_in">abs</span>(N.z) &lt; <span class="number">0.999</span> ? <span class="built_in">vec3</span>(<span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">1.0</span>) : <span class="built_in">vec3</span>(<span class="number">1.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>);</span><br><span class="line">    vec3 tangent   = <span class="built_in">normalize</span>(<span class="built_in">cross</span>(up, N));</span><br><span class="line">    vec3 bitangent = <span class="built_in">cross</span>(N, tangent);</span><br><span class="line">    </span><br><span class="line">    vec3 sampleVec = tanget * H.x + bitangent * H.y + N * H.z;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">normalize</span>(sampleVec);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>基于特定粗糙度输入和低差异序列值<span
+class="math inline">\(X_i\)</span>，我们获得了一个采样向量，该向量大体围绕着预估的微表面的半程向量。值得一提的是，根据迪士尼对PBR的研究，Epic
+Games使用了平方粗糙度以获得更好的视觉效果。</p>
+<p>使用低差异Hammersley序列和上述定义的样本生成方法，我们最终完成预滤波卷积着色器：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#version 330 core</span></span><br><span class="line">out vec4 FragColor;</span><br><span class="line">in vec3 localPos;</span><br><span class="line"></span><br><span class="line">uniform samplerCube environmentMap;</span><br><span class="line">uniform <span class="type">float</span> roughness;</span><br><span class="line"></span><br><span class="line"><span class="type">const</span> <span class="type">float</span> PI = <span class="number">3.14159265359</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">float</span> <span class="title function_">RadicalInverse_VdC</span><span class="params">(uint bits)</span>;</span><br><span class="line">vec2 <span class="title function_">Hammersley</span><span class="params">(uint i, uint N)</span>;</span><br><span class="line">vec3 <span class="title function_">ImportanceSampleGGX</span><span class="params">(vec2 Xi, vec3 N, <span class="type">float</span> roughness)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">&#123;		</span><br><span class="line">    vec3 N = normalize(localPos);    </span><br><span class="line">    vec3 R = N;</span><br><span class="line">    vec3 V = R;</span><br><span class="line"></span><br><span class="line">    <span class="type">const</span> uint SAMPLE_COUNT = <span class="number">1024u</span>;</span><br><span class="line">    <span class="type">float</span> totalWeight = <span class="number">0.0</span>;   </span><br><span class="line">    vec3 prefilteredColor = vec3(<span class="number">0.0</span>);     </span><br><span class="line">    <span class="keyword">for</span>(uint i = <span class="number">0u</span>; i &lt; SAMPLE_COUNT; ++i)</span><br><span class="line">    &#123;</span><br><span class="line">        vec2 Xi = Hammersley(i, SAMPLE_COUNT);</span><br><span class="line">        vec3 H  = ImportanceSampleGGX(Xi, N, roughness);</span><br><span class="line">        vec3 L  = normalize(<span class="number">2.0</span> * dot(V, H) * H - V);</span><br><span class="line"></span><br><span class="line">        <span class="type">float</span> NdotL = max(dot(N, L), <span class="number">0.0</span>);</span><br><span class="line">        <span class="keyword">if</span>(NdotL &gt; <span class="number">0.0</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            prefilteredColor += texture(environmentMap, L).rgb * NdotL;</span><br><span class="line">            totalWeight      += NdotL;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    prefilteredColor = prefilteredColor / totalWeight;</span><br><span class="line"></span><br><span class="line">    FragColor = vec4(prefilteredColor, <span class="number">1.0</span>);</span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
+<p>输入的粗糙度随着预滤波的立方体贴图的 mipmap
+级别变化（从0.0到1.0），我们根据据粗糙度预滤波环境贴图，把结果存在
+prefilteredColor 里。再用 prefilteredColor
+除以采样权重总和，其中对最终结果影响较小（NdotL
+较小）的采样最终权重也较小。</p>
+<h4 id="capturing-pre-filter-mipmap-levels">Capturing pre-filter mipmap
+levels</h4>
+<p>剩下要做的就是让OpenGL在多个mipmap级别上以不同的粗糙度值pre-filter环境贴图，有了之前irradiance章节的铺垫，这里做起来就十分简单：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">prefilterShader.<span class="built_in">use</span>();</span><br><span class="line">prefilterShader.<span class="built_in">setInt</span>(<span class="string">&quot;environmentMap&quot;</span>, <span class="number">0</span>);</span><br><span class="line">prefilterShader.<span class="built_in">setMat4</span>(<span class="string">&quot;projection&quot;</span>, captureProjection);</span><br><span class="line"><span class="built_in">glActiveTexture</span>(GL_TEXTURE0);</span><br><span class="line"><span class="built_in">glBindTexture</span>(GL_TEXTURE_CUBE_MAP, envCubemap);</span><br><span class="line"></span><br><span class="line"><span class="built_in">glBindFramebuffer</span>(GL_FRAMEBUFFER, captureFBO);</span><br><span class="line"><span class="type">unsigned</span> <span class="type">int</span> maxMipLevels = <span class="number">5</span>;</span><br><span class="line"><span class="keyword">for</span> (<span class="type">unsigned</span> <span class="type">int</span> mip = <span class="number">0</span>; mip &lt; maxMipLevels; ++mip)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// reisze framebuffer according to mip-level size.</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> mipWidth  = <span class="number">128</span> * std::<span class="built_in">pow</span>(<span class="number">0.5</span>, mip);</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> mipHeight = <span class="number">128</span> * std::<span class="built_in">pow</span>(<span class="number">0.5</span>, mip);</span><br><span class="line">    <span class="built_in">glBindRenderbuffer</span>(GL_RENDERBUFFER, captureRBO);</span><br><span class="line">    <span class="built_in">glRenderbufferStorage</span>(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, mipWidth, mipHeight);</span><br><span class="line">    <span class="built_in">glViewport</span>(<span class="number">0</span>, <span class="number">0</span>, mipWidth, mipHeight);</span><br><span class="line"></span><br><span class="line">    <span class="type">float</span> roughness = (<span class="type">float</span>)mip / (<span class="type">float</span>)(maxMipLevels - <span class="number">1</span>);</span><br><span class="line">    prefilterShader.<span class="built_in">setFloat</span>(<span class="string">&quot;roughness&quot;</span>, roughness);</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">unsigned</span> <span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">6</span>; ++i)</span><br><span class="line">    &#123;</span><br><span class="line">        prefilterShader.<span class="built_in">setMat4</span>(<span class="string">&quot;view&quot;</span>, captureViews[i]);</span><br><span class="line">        <span class="built_in">glFramebufferTexture2D</span>(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, </span><br><span class="line">                               GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, prefilterMap, mip);</span><br><span class="line"></span><br><span class="line">        <span class="built_in">glClear</span>(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);</span><br><span class="line">        <span class="built_in">renderCube</span>();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">glBindFramebuffer</span>(GL_FRAMEBUFFER, <span class="number">0</span>);   </span><br></pre></td></tr></table></figure>
+<p>这个过程类似于辐照度贴图卷积，但是这次我们将帧缓冲区缩放到适当的
+mipmap 尺寸， mip 级别每增加一级，尺寸缩小为一半。此外，我们在
+glFramebufferTexture2D 的最后一个参数中指定要渲染的目标 mip
+级别，然后将要预过滤的粗糙度传给预过滤着色器。</p>
+<h3 id="pre-computing-the-brdf">Pre-computing the BRDF</h3>
+<p>现在让我们专注于BRDF，split-sum
+approximation的第二部分。先简单回顾一下分割求和近似的公式： <span
+class="math display">\[
+L_o(p,\omega_o)= \int_\Omega L_i(p, \omega_i) d \omega_i * \int_\Omega
+f_r (p, \omega_i, \omega_o) n \cdot \omega_i d \omega_i
+\]</span>
+我们已经预计算了公式的左半部分，并将结果存储在根据粗糙度划分等级pre-filter
+map中。在公式右半部分的BRDF卷积中，需要考虑入射角度 <span
+class="math inline">\(n\cdot \omega_o\)</span>，表面粗糙度和菲涅尔 <span
+class="math inline">\(F_0\)</span>。这等同于在纯白的环境光或辐射度恒定为
+0.1 的情况下，对镜面BRDF求积分。让我们先尝试将 <span
+class="math inline">\(F_0\)</span>提出镜面BRDF等式： <span
+class="math display">\[
+\int_{\Omega} f_r(p, \omega_i, \omega_o)n\cdot \omega_i d\omega_i =
+\int_{\Omega} f_r(p, \omega_i, \omega_o) \frac{F(\omega_o,
+h)}{F(\omega_o, h)} n \cdot \omega_i d\omega_i
+\]</span> 然后将Fresnel-Schlick近似带入等式右边得： <span
+class="math display">\[
+\int_{\Omega} \frac{f_r(p, \omega_i, \omega_o)}{F(\omega_o, h)}
+(F_0 + (1-F_0)(1-\omega_o\cdot h)^5)
+n \cdot \omega_i d\omega_i
+\]</span> 让我们使用 <span class="math inline">\(\alpha\)</span> 代替
+<span class="math inline">\((1-\omega_o\cdot
+h)^5\)</span>对表达式进行变换： <span class="math display">\[
+\begin{align}
+\int_{\Omega} \frac{f_r(p, \omega_i, \omega_o)}{F(\omega_o, h)}
+(F_0 + (1-F_0) \alpha) n \cdot \omega_i d\omega_i
+\\
+\int_{\Omega} \frac{f_r(p, \omega_i, \omega_o)}{F(\omega_o, h)}
+(F_0 + \alpha - F_0\alpha) n \cdot \omega_i d\omega_i
+\\
+\int_{\Omega} \frac{f_r(p, \omega_i, \omega_o)}{F(\omega_o, h)}
+(F_0 (1 - \alpha) + \alpha) n \cdot \omega_i d\omega_i
+\end{align}
+\]</span> 然后可以将表达式分称两个积分和： <span class="math display">\[
+\int_{\Omega} \frac{f_r(p, \omega_i, \omega_o)}{F(\omega_o, h)}
+F_0 (1 - \alpha)  n \cdot \omega_i d\omega_i
++
+\int_{\Omega} \frac{f_r(p, \omega_i, \omega_o)}{F(\omega_o, h)}
+\alpha n \cdot \omega_i d\omega_i
+\]</span> 如此，<span
+class="math inline">\(F_0\)</span>在积分过程中便是一个常量，可以将其提出积分。然后将
+<span class="math inline">\(\alpha\)</span>
+代入回到表达式，得到最终的split sum BRDF equation： <span
+class="math display">\[
+F_0\int_{\Omega} f_r(p, \omega_i, \omega_o)
+(1 - (1-\omega_o\cdot h)^5)  n \cdot \omega_i d\omega_i
++
+\int_{\Omega} f_r(p, \omega_i, \omega_o)
+(1-\omega_o\cdot h)^5 n \cdot \omega_i d\omega_i
+\]</span> 需要注意的是此时表达式中 <span
+class="math inline">\(f_r\)</span> 函数已经不在包含菲涅尔函数<span
+class="math inline">\(F\)</span>。再看最中得到的表达式，<strong>两个积分的结果相当于
+<span class="math inline">\(F_0\)</span> 的 scale 和 bias</strong>。</p>
+<p>和之前卷积环境贴图类似，可以使用卷积来求的上述 BRDF
+表达式的积分，其输入是 <span class="math inline">\(n\)</span> 和 <span
+class="math inline">\(\omega_o\)</span>
+的夹角，以及粗糙度。将卷积后的结果存储在 2D 查找纹理（Look Up Texture,
+LUT）中，这张纹理被称为 <strong>BRDF 积分贴图（BRDF integration
+map）</strong>，稍后会将其用于 PBR
+光照着色器中，以获得间接镜面反射的最终卷积结果。</p>
+<p>代码与预滤波器的卷积代码大体相似，不同之处在于，它现在根据 BRDF
+的几何函数Geometry和 Fresnel-Schlick 近似来处理采样向量：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">vec2 <span class="title">IntegrateBRDF</span><span class="params">(<span class="type">float</span> NdotV, <span class="type">float</span> roughness)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    vec3 V;</span><br><span class="line">    V.x = <span class="built_in">sqrt</span>(<span class="number">1.0</span> - NdotV * NdotV);</span><br><span class="line">    v.y = <span class="number">0.0</span>;</span><br><span class="line">    v.z = NdotV;</span><br><span class="line">    </span><br><span class="line">    <span class="type">float</span> A = <span class="number">0.0</span>;</span><br><span class="line">    <span class="type">float</span> B = <span class="number">0.0</span>;</span><br><span class="line">    </span><br><span class="line">    vec3 N = <span class="built_in">vec3</span>(<span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">1.0</span>);</span><br><span class="line">    </span><br><span class="line">    <span class="type">const</span> uint SAMPLE_COUNT = <span class="number">1024u</span>;</span><br><span class="line">    <span class="keyword">for</span>(uint i = <span class="number">0u</span>; i &lt; SAMPLE_COUNT; ++i)</span><br><span class="line">    &#123;</span><br><span class="line">        vec2 Xi = <span class="built_in">Hammersley</span>(i, SAMPLE_COUNT);</span><br><span class="line">        vec3 H  = <span class="built_in">ImportanceSampleGGX</span>(Xi, N, roughness);</span><br><span class="line">        vec3 L  = <span class="built_in">normalize</span>(<span class="number">2.0</span> * <span class="built_in">dot</span>(V, H) * H - V);</span><br><span class="line"></span><br><span class="line">        <span class="type">float</span> NdotL = <span class="built_in">max</span>(L.z, <span class="number">0.0</span>);</span><br><span class="line">        <span class="type">float</span> NdotH = <span class="built_in">max</span>(H.z, <span class="number">0.0</span>);</span><br><span class="line">        <span class="type">float</span> VdotH = <span class="built_in">max</span>(<span class="built_in">dot</span>(V, H), <span class="number">0.0</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span>(NdotL &gt; <span class="number">0.0</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="type">float</span> G = <span class="built_in">GeometrySmith</span>(N, V, L, roughness);</span><br><span class="line">            <span class="type">float</span> G_Vis = (G * VdotH) / (NdotH * NdotV);</span><br><span class="line">            <span class="type">float</span> Fc = <span class="built_in">pow</span>(<span class="number">1.0</span> - VdotH, <span class="number">5.0</span>);</span><br><span class="line"></span><br><span class="line">            A += (<span class="number">1.0</span> - Fc) * G_Vis;</span><br><span class="line">            B += Fc * G_Vis;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    A /= <span class="built_in">float</span>(SAMPLE_COUNT);</span><br><span class="line">    B /= <span class="built_in">float</span>(SAMPLE_COUNT);</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">vec2</span>(A, B);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// ---------------------------------------------------------------------</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">main</span><span class="params">()</span> </span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    vec2 integratedBRDF = <span class="built_in">IntegrateBRDF</span>(TexCoords.x, TexCoords.y);</span><br><span class="line">    FragColor = integratedBRDF;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如你所见，BRDF卷积部分就是直接将数学公式转换为了代码。将角度 <span
+class="math inline">\(\theta\)</span>和粗糙度作为输入，使用重要性采样，再使用Geometry函数和衍生的Fresnel
+term处理，然后输出<span
+class="math inline">\(F_0\)</span>的scale和bias，最后取平均值。</p>
+<p>你可能会想起在PBR理论那篇文章中，BRDF的geometry
+term用在IBL的时候是有些微区别的： <span class="math display">\[
+\begin{align}
+k_{direct} = \frac{(\alpha + 1)^2}{8}
+\\
+k_{IBL} = \frac{\alpha ^ 2}{2}
+\end{align}
+\]</span> 此时BRDF的卷积是镜面IBL积分的一部分，因此Schlick-GGX
+geometry函数使用 <span class="math inline">\(k_{IBL}\)</span>：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">float</span> <span class="title">GeometrySchlickGGX</span><span class="params">(<span class="type">float</span> NdotV, <span class="type">float</span> roughness)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="type">float</span> a = roughness;</span><br><span class="line">    <span class="type">float</span> k = (a * a) / <span class="number">2.0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="type">float</span> nom   = NdotV;</span><br><span class="line">    <span class="type">float</span> denom = NdotV * (<span class="number">1.0</span> - k) + k;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> nom / denom;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// ---------------------------------------------------------------------</span></span><br><span class="line"><span class="function"><span class="type">float</span> <span class="title">GeometrySmith</span><span class="params">(vec3 N, vec3 V, vec3 L, <span class="type">float</span> roughness)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="type">float</span> NdotV = <span class="built_in">max</span>(<span class="built_in">dot</span>(N, V), <span class="number">0.0</span>);</span><br><span class="line">    <span class="type">float</span> NdotL = <span class="built_in">max</span>(<span class="built_in">dot</span>(N, L), <span class="number">0.0</span>);</span><br><span class="line">    <span class="type">float</span> ggx2 = <span class="built_in">GeometrySchlickGGX</span>(NdotV, roughness);</span><br><span class="line">    <span class="type">float</span> ggx1 = <span class="built_in">GeometrySchlickGGX</span>(NdotL, roughness);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> ggx1 * ggx2;</span><br><span class="line">&#125; </span><br></pre></td></tr></table></figure>
+<p>最后，将BRDF卷积结果存储在一张分辨率为512*512的2D纹理中：</p>
+<p><img src="/images/LearnOpenGL/3-10.png" /></p>
+<p>于是，有了pre-filtered environment map 和 BRDF 2D
+LUT，使用这两者再根据split sum
+approximation就可以重建高光反射积分了。</p>
+<h3 id="completing-the-ibl-reflectance">Completing the IBL
+reflectance</h3>
+<p>现在就让我们把之前独立分析的两部分结合起来，完成IBL反射。</p>
+<p>将预计算得到的光照数据添加到PBR shader中：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">uniform samplerCube prefilterMap;</span><br><span class="line">uniform sampler2D   brdfLUT;</span><br></pre></td></tr></table></figure>
+<p>第一步，通过反射向量采样 pre-filtered environment map
+得到表面间接镜面反射。注意，需要根据表面粗糙度采样对应level的贴图，使更粗糙的表面表现出更模糊的高光反射：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	[...]</span><br><span class="line">    vec3 R = <span class="built_in">reflect</span>(-V, N);</span><br><span class="line">    </span><br><span class="line">    <span class="type">const</span> <span class="type">float</span> MAX_REFLECTION_LOD = <span class="number">4.0</span>;</span><br><span class="line">    vec3 prefilteredColor = <span class="built_in">textureLod</span>(prefilterMap, R, roughness * MAX_REFLECTION_LOD).rgb;</span><br><span class="line">    [...]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>接下来，根据法线和视线的夹角以及表面粗糙度采样BRDF LUT：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">vec3 F		= <span class="built_in">FresnelSchlickRoughness</span>(<span class="built_in">max</span>(<span class="built_in">dot</span>(N, V), <span class="number">0.0</span>), F0, roughness);</span><br><span class="line">vec2 envBRDF = <span class="built_in">texture</span>(brdfLUT, <span class="built_in">vec2</span>(<span class="built_in">max</span>(<span class="built_in">dot</span>(N, V), <span class="number">0.0</span>), roughness)).rg;</span><br><span class="line">vec3 specular = prefilteredColor * (F * envBRDF.x + envBRDF.y);</span><br></pre></td></tr></table></figure>
+<p>于是，我们得到了反射方程环境光的镜面反射部分。现在，将其预前篇文章中的环境光漫反射部分结合在一起，得到最终的PBR
+IBL结果：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">vec3 F = <span class="built_in">FresnelSchlickRoughness</span>(<span class="built_in">max</span>(<span class="built_in">dot</span>(N, V), <span class="number">0.0</span>), F0, roughness);</span><br><span class="line"></span><br><span class="line">vec3 kS = F;</span><br><span class="line">vec3 kD = <span class="number">1.0</span> - kS;</span><br><span class="line">kD *= <span class="number">1.0</span> - metallic;</span><br><span class="line"></span><br><span class="line">vec3 irradiance = <span class="built_in">texture</span>(irradianceMap, N).rgb;</span><br><span class="line">vec3 diffuse    = irradiance * albedo;</span><br><span class="line"></span><br><span class="line"><span class="type">const</span> <span class="type">float</span> MAX_REFLECTION_LOD = <span class="number">4.0</span>;</span><br><span class="line">vec3 prefilteredColor = <span class="built_in">textureLod</span>(prefilterMap, R,  roughness * MAX_REFLECTION_LOD).rgb;   </span><br><span class="line">vec2 envBRDF  = <span class="built_in">texture</span>(brdfLUT, <span class="built_in">vec2</span>(<span class="built_in">max</span>(<span class="built_in">dot</span>(N, V), <span class="number">0.0</span>), roughness)).rg;</span><br><span class="line">vec3 specular = prefilteredColor * (F * envBRDF.x + envBRDF.y);</span><br><span class="line"></span><br><span class="line">vec3 ambient = (kD * diffuse + specular) * ao; </span><br></pre></td></tr></table></figure>
+<p>现在，在一系列粗糙度和金属度各异的球上运行此代码，我们终于可以在最终的
+PBR 渲染器中看到其真实颜色：</p>
+<p><img src="/images/LearnOpenGL/3-15.png" /></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/OpenGL/" rel="tag"># OpenGL</a>
+              <a href="/tags/Shader/" rel="tag"># Shader</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2024/10/22/LearnOpenGL/IBL-Diffuse%20irradiance/" rel="prev" title="IBL-Diffuse irradiance">
+                  <i class="fa fa-angle-left"></i> IBL-Diffuse irradiance
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Rigel Aster</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+
+</body>
+</html>

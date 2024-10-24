@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha256-5eIC48iZUHmSlSUz9XtjRyK2mzQkHScZY1WdMaoz74E=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"rigelaster.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.21.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"always","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="看文献时看到的一个名词——等距柱状图投影图（Equirectangular Map），好像是绘图学上很早就出现的一个技术，简单翻译wiki百科里面的内容写在这里。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Equirectangular projection">
+<meta property="og:url" content="https://rigelaster.github.io/2024/10/03/Equirectangular%20Projection/index.html">
+<meta property="og:site_name" content="Rigel&#39;s Blog">
+<meta property="og:description" content="看文献时看到的一个名词——等距柱状图投影图（Equirectangular Map），好像是绘图学上很早就出现的一个技术，简单翻译wiki百科里面的内容写在这里。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://rigelaster.github.io/images/3DMath/equirectangular-projection-1.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/3DMath/equirectangular-projection-2.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/3DMath/equirectangular-projection-1.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/3DMath/equirectangular-projection-4.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/3DMath/equirectangular-projection-5.png">
+<meta property="article:published_time" content="2024-10-03T02:02:36.000Z">
+<meta property="article:modified_time" content="2024-10-03T05:25:40.325Z">
+<meta property="article:author" content="Rigel Aster">
+<meta property="article:tag" content="3D Math">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://rigelaster.github.io/images/3DMath/equirectangular-projection-1.png">
+
+
+<link rel="canonical" href="https://rigelaster.github.io/2024/10/03/Equirectangular%20Projection/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"https://rigelaster.github.io/2024/10/03/Equirectangular%20Projection/","path":"2024/10/03/Equirectangular Projection/","title":"Equirectangular projection"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Equirectangular projection | Rigel's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Rigel's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#definition"><span class="nav-number">1.</span> <span class="nav-text">Definition</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#forward"><span class="nav-number">1.1.</span> <span class="nav-text">forward</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#reverse"><span class="nav-number">1.2.</span> <span class="nav-text">Reverse</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E7%8C%AE"><span class="nav-number">2.</span> <span class="nav-text">参考文献</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Rigel Aster"
+      src="/uploads/avatar.png">
+  <p class="site-author-name" itemprop="name">Rigel Aster</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">25</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">14</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://www.zhihu.com/people/ming-zi-13-35" title="Zhihu → https:&#x2F;&#x2F;www.zhihu.com&#x2F;people&#x2F;ming-zi-13-35" rel="noopener me" target="_blank"><i class="fab fa-zhihu fa-fw"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:remingzi7@gmail.com" title="E-Mail → mailto:remingzi7@gmail.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://github.com/MingZI-7" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;MingZI-7" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i></a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://rigelaster.github.io/2024/10/03/Equirectangular%20Projection/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar.png">
+      <meta itemprop="name" content="Rigel Aster">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Rigel's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Equirectangular projection | Rigel's Blog">
+      <meta itemprop="description" content="看文献时看到的一个名词——等距柱状图投影图（Equirectangular Map），好像是绘图学上很早就出现的一个技术，简单翻译wiki百科里面的内容写在这里。">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Equirectangular projection
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+      
+
+      <time title="Created: 2024-10-03 10:02:36 / Modified: 13:25:40" itemprop="dateCreated datePublished" datetime="2024-10-03T10:02:36+08:00">2024-10-03</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/ink/" itemprop="url" rel="index"><span itemprop="name">ink</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+            <div class="post-description">看文献时看到的一个名词——等距柱状图投影图（Equirectangular Map），好像是绘图学上很早就出现的一个技术，简单翻译wiki百科里面的内容写在这里。</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>equirectangular projection 又称 equidistant cylindrical
+projection（其实是它的一种特例），国内主要翻译为<strong>等距柱状投影</strong>，是一种简单的地图投影，用于将球体表面投影到圆柱体竖直表面（等效于平面）。一般认为是马里纳斯（Marinus
+of Tyre）最早用于绘制海图。</p>
+<p>这种投影将<strong>经线</strong>映射为<strong>等距的垂直直线</strong>，将<strong>纬线</strong>映射为<strong>等距的水平直线</strong>。投影的面积和角度都会改变，会扭曲球体表面内容，多用于地图测绘。</p>
+<figure>
+<img src="/images/3DMath/equirectangular-projection-1.png"
+alt="distortions -- wiki" />
+<figcaption aria-hidden="true">distortions -- wiki</figcaption>
+</figure>
+<p>其属于Cylindrical projection的一种，相关的其他技术就不细说了。</p>
+<p><img src="/images/3DMath/equirectangular-projection-2.png" /></p>
+<h3 id="definition">Definition</h3>
+<p>正投影（forward projection）会将球面坐标变为平面坐标，反投影（reverse
+projection）会将平面重新变为球体。使用以下定义描述球体：</p>
+<ul>
+<li><span class="math inline">\(\lambda\)</span>
+是被投影位置的经度；</li>
+<li><span class="math inline">\(\varphi\)</span>
+是被投影位置的维度；</li>
+<li><span class="math inline">\(\varphi _1\)</span> 是基准线(standard
+line)的维度，在投影前后其长度并未被扭曲；</li>
+<li><span class="math inline">\(\varphi _0\)</span> 是地图的central
+parallel；</li>
+<li><span class="math inline">\(\lambda _0\)</span> 是地图的central
+meridian；</li>
+<li><span class="math inline">\(x\)</span> 是投影之后的水平坐标；</li>
+<li><span class="math inline">\(y\)</span> 是投影之后的垂直坐标；</li>
+<li><span class="math inline">\(R\)</span> 是球体半径；</li>
+</ul>
+<p><img src="/images/3DMath/equirectangular-projection-1.png" /></p>
+<h4 id="forward">forward</h4>
+<p><span class="math display">\[
+\begin{aligned}
+x&amp;=R(\lambda -\lambda _{0})\cos \varphi _{1}\\
+y&amp;=R(\varphi -\varphi _{0})
+\end{aligned}
+\]</span></p>
+<p>当 <span class="math inline">\(\varphi_1 = 0\)</span>
+时，基准线位于赤道，只有赤道长度没有被扭曲。此投影将经度值映射为 <span
+class="math inline">\(x\)</span>，将纬度值映射为 <span
+class="math inline">\(y\)</span>，所以有时也被称作 latitude/longitude 或
+lat/lon(g) 投影。</p>
+<p>当 <span class="math inline">\(\varphi_1 \neq 0\)</span> 时，例如
+<span class="math inline">\(\varphi_1 = 36°\)</span> 或者 <span
+class="math inline">\(\varphi_1 =
+37.5°\)</span>时，只有对应部分纬线长度没有被扭曲，其他部分仍然被扭曲了。放几个图就容易理解了：</p>
+<figure>
+<img src="/images/3DMath/equirectangular-projection-4.png"
+alt="Equirectangular Projection" />
+<figcaption aria-hidden="true">Equirectangular Projection</figcaption>
+</figure>
+<figure>
+<img src="/images/3DMath/equirectangular-projection-5.png"
+alt="Miller Equidistant Projection" />
+<figcaption aria-hidden="true">Miller Equidistant
+Projection</figcaption>
+</figure>
+<h4 id="reverse">Reverse</h4>
+<p><span class="math display">\[
+\begin{aligned}
+\lambda &amp;={\frac {x}{R\cos \varphi _{1}}}+\lambda _{0}\\
+\varphi &amp;={\frac {y}{R}}+\varphi _{0}
+\end{aligned}
+\]</span></p>
+<p>注：有时 <span class="math inline">\(\lambda\)</span>
+也被称作"yaw"，<span class="math inline">\(\varphi\)</span> 被称作
+"pitch"。无论名称如何，都代表角度。</p>
+<h3 id="参考文献">参考文献</h3>
+<p>https://en.wikipedia.org/wiki/Equirectangular_projection</p>
+<p>https://www.youtube.com/watch?v=EnW7TPnDN8Y</p>
+<p>https://mathworld.wolfram.com/EquirectangularProjection.html</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/3D-Math/" rel="tag"># 3D Math</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2024/10/02/LearnOpenGL/Framebuffers/" rel="prev" title="LearnOpenGL - Framebuffers">
+                  <i class="fa fa-angle-left"></i> LearnOpenGL - Framebuffers
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2024/10/22/LearnOpenGL/IBL-Diffuse%20irradiance/" rel="next" title="IBL-Diffuse irradiance">
+                  IBL-Diffuse irradiance <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Rigel Aster</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+
+</body>
+</html>
