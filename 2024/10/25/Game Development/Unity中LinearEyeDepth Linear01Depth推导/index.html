@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha256-5eIC48iZUHmSlSUz9XtjRyK2mzQkHScZY1WdMaoz74E=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"rigelaster.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.21.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"always","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="Unity开发中会利用深度缓存做很多事情，了解深度缓存的由来细节可以让开发过程更顺利，本文讨论不同平台下渲染管线中深度值的由来以及LinearEyeDepth Linear01Depth函数的输出值细节。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Unity中LinearEyeDepth Linear01Depth推导">
+<meta property="og:url" content="https://rigelaster.github.io/2024/10/25/Game%20Development/Unity%E4%B8%ADLinearEyeDepth%20Linear01Depth%E6%8E%A8%E5%AF%BC/index.html">
+<meta property="og:site_name" content="Rigel&#39;s Blog">
+<meta property="og:description" content="Unity开发中会利用深度缓存做很多事情，了解深度缓存的由来细节可以让开发过程更顺利，本文讨论不同平台下渲染管线中深度值的由来以及LinearEyeDepth Linear01Depth函数的输出值细节。">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-10-25T08:04:02.000Z">
+<meta property="article:modified_time" content="2024-10-26T03:57:41.599Z">
+<meta property="article:author" content="Rigel Aster">
+<meta property="article:tag" content="Unity">
+<meta property="article:tag" content="Z-Buffer">
+<meta property="article:tag" content="LinearDepth">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://rigelaster.github.io/2024/10/25/Game%20Development/Unity%E4%B8%ADLinearEyeDepth%20Linear01Depth%E6%8E%A8%E5%AF%BC/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"https://rigelaster.github.io/2024/10/25/Game%20Development/Unity%E4%B8%ADLinearEyeDepth%20Linear01Depth%E6%8E%A8%E5%AF%BC/","path":"2024/10/25/Game Development/Unity中LinearEyeDepth Linear01Depth推导/","title":"Unity中LinearEyeDepth Linear01Depth推导"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Unity中LinearEyeDepth Linear01Depth推导 | Rigel's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Rigel's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A6%82%E5%BF%B5%E8%AF%B4%E6%98%8E"><span class="nav-number">2.</span> <span class="nav-text">概念说明</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#view-space"><span class="nav-number">2.1.</span> <span class="nav-text">View Space</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#clip-space"><span class="nav-number">2.2.</span> <span class="nav-text">Clip Space</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#perspective-projection"><span class="nav-number">3.</span> <span class="nav-text">Perspective Projection</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#opengl-like"><span class="nav-number">3.1.</span> <span class="nav-text">OpenGL-like</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#direct3d-like"><span class="nav-number">3.2.</span> <span class="nav-text">Direct3D-like</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#unity-srp-%E5%B7%A5%E5%85%B7%E5%87%BD%E6%95%B0"><span class="nav-number">4.</span> <span class="nav-text">Unity SRP 工具函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B0%8F%E7%BB%93"><span class="nav-number">5.</span> <span class="nav-text">小结</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E7%8C%AE"><span class="nav-number">6.</span> <span class="nav-text">参考文献</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Rigel Aster"
+      src="/uploads/avatar.png">
+  <p class="site-author-name" itemprop="name">Rigel Aster</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">30</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://www.zhihu.com/people/ming-zi-13-35" title="Zhihu → https:&#x2F;&#x2F;www.zhihu.com&#x2F;people&#x2F;ming-zi-13-35" rel="noopener me" target="_blank"><i class="fab fa-zhihu fa-fw"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:remingzi7@gmail.com" title="E-Mail → mailto:remingzi7@gmail.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://github.com/MingZI-7" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;MingZI-7" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i></a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://rigelaster.github.io/2024/10/25/Game%20Development/Unity%E4%B8%ADLinearEyeDepth%20Linear01Depth%E6%8E%A8%E5%AF%BC/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar.png">
+      <meta itemprop="name" content="Rigel Aster">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Rigel's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Unity中LinearEyeDepth Linear01Depth推导 | Rigel's Blog">
+      <meta itemprop="description" content="Unity开发中会利用深度缓存做很多事情，了解深度缓存的由来细节可以让开发过程更顺利，本文讨论不同平台下渲染管线中深度值的由来以及LinearEyeDepth Linear01Depth函数的输出值细节。">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Unity中LinearEyeDepth Linear01Depth推导
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2024-10-25 16:04:02" itemprop="dateCreated datePublished" datetime="2024-10-25T16:04:02+08:00">2024-10-25</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2024-10-26 11:57:41" itemprop="dateModified" datetime="2024-10-26T11:57:41+08:00">2024-10-26</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Real-time-Rendering/" itemprop="url" rel="index"><span itemprop="name">Real-time Rendering</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+            <div class="post-description">Unity开发中会利用深度缓存做很多事情，了解深度缓存的由来细节可以让开发过程更顺利，本文讨论不同平台下渲染管线中深度值的由来以及LinearEyeDepth Linear01Depth函数的输出值细节。</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h3 id="前言">前言</h3>
+<p>Unity开发中会利用深度缓存做很多事情，了解深度缓存的由来细节可以让开发过程更顺利，本文讨论不同平台下渲染管线中深度值的由来以及LinearEyeDepth
+Linear01Depth函数的输出值细节。</p>
+<h3 id="概念说明">概念说明</h3>
+<ul>
+<li><span class="math inline">\(f\)</span>
+远裁剪面到相机的距离，正值</li>
+<li><span class="math inline">\(n\)</span>
+近裁剪面到相机的距离，正值</li>
+<li><span class="math inline">\(z_{eye}\)</span> 视角空间（view
+space）中坐标的z分量</li>
+<li><span class="math inline">\(z_{clip}\)</span>
+齐次裁剪空间（homogeneous clip space）中坐标的z分量</li>
+<li><span class="math inline">\(w_{clip}\)</span>
+齐次裁剪空间（homogeneous clip space）中坐标的w分量</li>
+<li><span class="math inline">\(z_{ndc}\)</span>
+NDC空间中坐标的z分量</li>
+<li><span class="math inline">\(z_{depth}\)</span> depth
+buffer中的深度值</li>
+<li><span class="math inline">\(z_{linear}\)</span> 视角空间（view
+space）中顶点坐标在远近裁剪平面之间的线性值，近裁剪面处值为0，远裁剪面处值为1</li>
+<li><span class="math inline">\(z_{linear2}\)</span> 视角空间（view
+space）中顶点坐标在相机和远裁剪平面之间的线性值，相机处值为0，远裁剪面处值为1</li>
+</ul>
+<h4 id="view-space">View Space</h4>
+<p><a
+target="_blank" rel="noopener" href="https://docs.unity3d.com/2021.3/Documentation/ScriptReference/Camera-worldToCameraMatrix.html">Camera.worldToCameraMatrix</a></p>
+<p>世界空间（world space）不必细说，Unity使用的view
+space是OpenGL-like的，为右手坐标系，相机看向z轴负方向。相机的
+worldToCameraMatrix 即空间变换中的 view matrix，将坐标从world
+space转换到view space。需要注意的是，OpenGL-like view space 中的 <span
+class="math inline">\(z_{eye}\)</span> 是负数。</p>
+<h4 id="clip-space">Clip Space</h4>
+<p><a
+target="_blank" rel="noopener" href="https://docs.unity3d.com/ScriptReference/GL.GetGPUProjectionMatrix.html">GL.GetGPUProjectionMatrix</a></p>
+<p>view space 中的坐标经过投影变换后就来到了裁剪空间（clip
+space），距离最后深度值还有几步操作。由于平台差异，变换使用的 projection
+matrix 也不尽相同。于是，Unity封装了函数 GL.GetGPUProjectionMatrix
+来处理平台差异。</p>
+<h3 id="perspective-projection">Perspective Projection</h3>
+<h4 id="opengl-like">OpenGL-like</h4>
+<p>我们先来看类OpenGL平台下的深度值推导，例如 OpenGL 和 OpenGL
+ES。OpenGL-like的投影矩阵推导这里不展开了，我们直接使用结果，推导过程可以看这篇文章<a
+target="_blank" rel="noopener" href="https://www.songho.ca/opengl/gl_projectionmatrix.html">OpenGL
+Projection Matrix</a>。</p>
+<p>文章中已经得到的 <span class="math inline">\(z_{eye}\)</span> 与
+<span class="math inline">\(z_{ndc}\)</span> 的关系式为：</p>
+<p><span class="math display">\[
+\begin{gather*}
+w_{clip} = -z_{eye} \\
+z_{clip} = \frac{f+n}{n-f}z_{eye} + \frac{2nf}{n-f} \\
+z_{ndc} = \frac{z_{clip}}{w_{clip}} = \frac{f+n}{f-n} +
+\frac{2fn}{(f-n)z_{eye}}
+\end{gather*}
+\]</span></p>
+<p>此时 <span class="math inline">\(z_{ndc}\)</span>
+范围为(-1,1)，要将其写入深度缓存还需要做一次映射到(0,1)：</p>
+<p><span class="math display">\[
+z_{depth} = \frac{z_{ndc}+1}{2} = \frac{f}{f-n} +
+\frac{fn}{(f-n)z_{eye}}
+\]</span></p>
+<p>那么，用 <span class="math inline">\(z_{depth}\)</span> 得到 <span
+class="math inline">\(z_{eye}\)</span> 公式如下：</p>
+<p><span class="math display">\[
+z_{eye} = \frac{1}{
+    z_{depth} \frac{f-n}{fn} - \frac{1}{n}
+}
+\]</span></p>
+<p>使用深度值 <span class="math inline">\(z_{depth}\)</span>
+计算剩余两个经常使用的值 <span class="math inline">\(z_{linear},
+z_{linear2}\)</span> 推到导为：</p>
+<p><span class="math display">\[
+\begin{gather*}
+z_{linear} = \frac{-z_{eye}-n}{f-n} =
+\frac{nz_{depth}}{(n-f)z_{depth}+f} = \frac{1}{
+    1-\frac{f}{n} + \frac{f}{nz_{depth}}
+} \\
+z_{linear2} = \frac{-z_{eye}}{f} = \frac{1}{
+    z_{depth}(1-\frac{f}{n}) + \frac{f}{n}
+}
+\end{gather*}
+\]</span></p>
+<h4 id="direct3d-like">Direct3D-like</h4>
+<p>类Direct3D平台的深度比类OpenGL复杂一点，其为了让深度缓存更有效率的利用进行了Reversed
+Z操作，所以我们要考虑两种情况。除此之外，类Direct3D平台的 <span
+class="math inline">\(z_{ndc}\)</span>
+范围就是(0,1)，不需要像类openGL一样做映射。注意，由于Unity中view
+space使用的是右手坐标系，所以和典型的Direct3D下的投影矩阵还是有所不同的，此时还有
+<span class="math inline">\(w_{clip} = -z_{eye}\)</span> 。</p>
+<p><strong>未应用 Reversed Z</strong></p>
+<p>还可以使用之前贴的文章里面的方法求得 <span
+class="math inline">\(z_{ndc}\)</span> 与 <span
+class="math inline">\(z_{eye}\)</span> 关系：</p>
+<p><span class="math display">\[
+\begin{gather*}
+w_{clip} = -z_{eye} \\
+z_{clip} = \frac{f}{n-f}z_{eye} + \frac{nf}{n-f} \\
+z_{ndc} = \frac{z_{clip}}{w_{clip}} = \frac{f}{f-n} +
+\frac{fn}{(f-n)z_{eye}}
+\end{gather*}
+\]</span></p>
+<p><span class="math inline">\(z_{ndc}\)</span>
+的范围已经是(0,1)了，可以直接写入深度缓存，所以 <span
+class="math inline">\(z_{depth} = z_{ndc}\)</span>。由于 <span
+class="math inline">\(z_{depth}\)</span> 和 <span
+class="math inline">\(z_{eye}\)</span> 的关系和类OpenGL平台相同，所以
+<span class="math inline">\(z_{linear}, z_{linear2}\)</span>
+的表达式也与之相同。</p>
+<p><strong>应用 Reversed Z</strong></p>
+<p>目前Unity上只有类Direct3D才会支持Reversed
+Z，其和普通情况下的主要区别是，近裁剪面处的深度值为1，远裁剪面处的深度值为0。投影矩阵的推导思路还与之前相同，
+<span class="math inline">\(z_{ndc}\)</span> 与 <span
+class="math inline">\(z_{eye}\)</span> 关系为：</p>
+<p><span class="math display">\[
+\begin{gather*}
+w_{clip} = -z_{eye} \\
+z_{clip} = \frac{n}{f-n}z_{eye} + \frac{nf}{f-n} \\
+z_{ndc} = \frac{z_{clip}}{w_{clip}} = \frac{n}{n-f} +
+\frac{nf}{(n-f)z_{eye}}
+\end{gather*}
+\]</span></p>
+<p><span class="math inline">\(z_{ndc}\)</span>
+虽然被映射到了(1,0)，但是也可以直接写入深度缓存，所以 <span
+class="math inline">\(z_{depth} = z_{ndc}\)</span>。此时<span
+class="math inline">\(z_{depth}\)</span> 和 <span
+class="math inline">\(z_{eye}\)</span> 的关系与之前不再相同:</p>
+<p><span class="math display">\[
+\begin{gather*}
+z_{depth} = z_{ndc} = \frac{n}{n-f} + \frac{nf}{(n-f)z_{eye}} \\
+z_{eye} = \frac{1}{
+    z_{depth}\frac{n-f}{nf} - \frac{1}{f}
+}
+\end{gather*}
+\]</span></p>
+<p><span class="math inline">\(z_{linear}, z_{linear2}\)</span>
+需要重新推导：</p>
+<p><span class="math display">\[
+\begin{gather*}
+z_{linear} = \frac{-z_{eye}-n}{f-n} = \frac{1}{
+    1-\frac{f}{n} + \frac{f}{n(1-z_{depth})}
+}\\
+z_{linear2} = \frac{-z_{eye}}{f} = \frac{1}{z_{depth} \frac{f-n}{n} + 1
+}
+\end{gather*}
+\]</span></p>
+<h3 id="unity-srp-工具函数">Unity SRP 工具函数</h3>
+<p>Unity推出的SRP中封装了很多工具函数，里面就有计算 <span
+class="math inline">\(z_{eye}, z_{linear}, z_{linear2}\)</span>
+的函数，刚好可以验证一下上文中的推导结果。计算过程中使用到了**_ZBufferParams**这个变量，我们先来简单看一下它，其在代码中拥有以下注释：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Values used to linearize the Z buffer (http://www.humus.name/temp/Linearize%20depth.txt)</span></span><br><span class="line"><span class="comment">// x = 1-far/near</span></span><br><span class="line"><span class="comment">// y = far/near</span></span><br><span class="line"><span class="comment">// z = x/far</span></span><br><span class="line"><span class="comment">// w = y/far</span></span><br><span class="line"><span class="comment">// or in case of a reversed depth buffer (UNITY_REVERSED_Z is 1)</span></span><br><span class="line"><span class="comment">// x = -1+far/near</span></span><br><span class="line"><span class="comment">// y = 1</span></span><br><span class="line"><span class="comment">// z = x/far</span></span><br><span class="line"><span class="comment">// w = 1/far</span></span><br><span class="line">float4 _ZBufferParams;</span><br></pre></td></tr></table></figure>
+<p>代码里面的注释基本已经把这个变量的含义写的清清楚楚，开发人员真贴心，它就是用来处理深度缓存的辅助变量。再去看一眼在渲染管线里面它被填入的具体内容，代码在
+ScriptableRenderer.cs 中：</p>
+<figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// in SetPerCameraShaderVariables</span></span><br><span class="line"><span class="built_in">float</span> near = camera.nearClipPlane;</span><br><span class="line"><span class="built_in">float</span> far = camera.farClipPlane;</span><br><span class="line"><span class="built_in">float</span> invNear = Mathf.Approximately(near, <span class="number">0.0f</span>) ? <span class="number">0.0f</span> : <span class="number">1.0f</span> / near;</span><br><span class="line"><span class="built_in">float</span> invFar = Mathf.Approximately(far, <span class="number">0.0f</span>) ? <span class="number">0.0f</span> : <span class="number">1.0f</span> / far;</span><br><span class="line"><span class="built_in">float</span> isOrthographic = camera.orthographic ? <span class="number">1.0f</span> : <span class="number">0.0f</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// From http://www.humus.name/temp/Linearize%20depth.txt</span></span><br><span class="line"><span class="comment">// But as depth component textures on OpenGL always return in 0..1 range (as in D3D), we have to use</span></span><br><span class="line"><span class="comment">// the same constants for both D3D and OpenGL here.</span></span><br><span class="line"><span class="comment">// OpenGL would be this:</span></span><br><span class="line"><span class="comment">// zc0 = (1.0 - far / near) / 2.0;</span></span><br><span class="line"><span class="comment">// zc1 = (1.0 + far / near) / 2.0;</span></span><br><span class="line"><span class="comment">// D3D is this:</span></span><br><span class="line"><span class="built_in">float</span> zc0 = <span class="number">1.0f</span> - far * invNear;</span><br><span class="line"><span class="built_in">float</span> zci = far * invNear;</span><br><span class="line"></span><br><span class="line">Vector4 zBufferParams = <span class="keyword">new</span> Vector4(zc0, zc1, zc0 * invFar, zc1 * invFar);</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span>(SystemInfo.usesReversedZBuffer)</span><br><span class="line">&#123;</span><br><span class="line">    zBufferParams.y += zBufferParamszBufferParam.x;</span><br><span class="line">    zBufferParams.x = -zBufferParamszBufferParam.x;</span><br><span class="line">    zBufferParams.w += zBufferParamszBufferParam.z;</span><br><span class="line">    zBufferParams.z = -zBufferParamszBufferParam.z;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>代码注释中说明，由于 OpenGL-like 和 D3D-like
+的z坐标最终都被映射到了深度缓存中的(0,1)范围，虽然过程中的投影矩阵不同，但正如我们上文中推导的结果表明
+<span class="math inline">\(z_{eye}\)</span> 与 <span
+class="math inline">\(z_{depth}\)</span>
+两者的转换关系是相同的，所以这里 OpenGL-like 和 D3D-like
+使用的参数都是相同的。当然，在 Reversed Z
+情况下，两者关系发生了变化，所以代码也做了差异处理。其最终填入的结果和变量声明的注释内容一致。</p>
+<p>在非 Reversed Z 情况下，zBufferParams中各分量为：</p>
+<p><span class="math display">\[
+zBufferParams = (\frac{n-f}{n}, \frac{f}{n}, \frac{n-f}{nf},
+\frac{1}{n})
+\]</span></p>
+<p>在 Reversed Z 情况下，zBufferParams中各分量为：</p>
+<p><span class="math display">\[
+zBufferParams = (\frac{f-n}{n}, 1, \frac{f-n}{nf}, \frac{1}{f})
+\]</span></p>
+<p>现在，对Common.hlsl中的工具函数做分析便不会有阻碍。先来看看其中的LinearEyeDepth函数，函数重载有不同的使用场景，至于为什么如此做下文慢慢分析。</p>
+<figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Z buffer to linear depth.</span></span><br><span class="line"><span class="comment">// Does NOT correctly handle oblique view frustums.</span></span><br><span class="line"><span class="comment">// Does NOT work with orthographic projection.</span></span><br><span class="line"><span class="comment">// zBufferParam = &#123;(f-n)/n, 1, (f-n)/n*f, 1/f&#125;</span></span><br><span class="line"><span class="function"><span class="built_in">float</span> <span class="title">LinearEyeDepth</span>(<span class="params"><span class="built_in">float</span> depth, float4 zBufferParam</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">1.0</span> / (zBufferParam.z * depth + zBufferParam.w);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>不知道开发人员写在注释中的zBufferParam是什么意思，按理zBufferParam应该有上文中的那两种情况，并不是固定值。而且两种情况下函数返回的值都是
+<span class="math inline">\(-z_{eye}\)</span> 。由于view space中的 <span
+class="math inline">\(z_{eye}\)</span> 是负值，所以函数返回的 <span
+class="math inline">\(-z_{eye}\)</span> 是一个正值，是像素点在view
+space中相对相机x-y平面的距离。公式推导如下：</p>
+<p><span class="math display">\[
+\begin{gather*}
+value = \frac{1}{
+    z_{depth}\frac{n-f}{nf} + \frac{1}{n}
+    } = -z_{eye} \\
+value_{reversedZ} = \frac{1}{
+    z_{depth}\frac{f-n}{nf} + \frac{1}{f}
+} = -z_{eye}
+\end{gather*}
+\]</span></p>
+<figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Z buffer to linear depth.</span></span><br><span class="line"><span class="comment">// Correctly handles oblique view frustums.</span></span><br><span class="line"><span class="comment">// Does NOT work with orthographic projection.</span></span><br><span class="line"><span class="comment">// Ref: An Efficient Depth Linearization Method for Oblique View Frustums, Eq. 6.</span></span><br><span class="line"><span class="function"><span class="built_in">float</span> <span class="title">LinearEyeDepth</span>(<span class="params">float2 positionNDC, <span class="built_in">float</span> deviceDepth, float4 invProjParam</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    float4 positionCS = float4(positionNDC * <span class="number">2.0</span> - <span class="number">1.0</span>, deviceDepth, <span class="number">1.0</span>);</span><br><span class="line">    <span class="built_in">float</span> viewSpaceZ = rcp(dot(positionCS, invProjParam));</span><br><span class="line"></span><br><span class="line">    <span class="comment">// If the matrix is right-handed, we have to flip the Z axis to get a position value.</span></span><br><span class="line">    <span class="keyword">return</span> abs(viewSpaceZ);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>LinearEyeDepth其中一个重载函数，适用于Oblique View
+Frustums，但不适用于正交投影。说实话，我没太看懂其中的逻辑，URP中也没有使用案例，就暂且搁置在这里了。</p>
+<figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Z buffer to linear depth.</span></span><br><span class="line"><span class="comment">// Works in all cases.</span></span><br><span class="line"><span class="comment">// Typically, this is the cheapest variant, provided you&#x27;ve already computed &#x27;positionWS&#x27;.</span></span><br><span class="line"><span class="comment">// Assumes that the &#x27;positionWS&#x27; is in front of the camera.</span></span><br><span class="line"><span class="function"><span class="built_in">float</span> <span class="title">LinearEyeDepth</span>(<span class="params">float3 positionWS, float4x4 viewMatrix</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">float</span> viewSpaceZ = mul(viewMatrix, float4(positionWS, <span class="number">1.0</span>)).z;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// If the matrix is right-handed, we have to flip the Z axis to get a position value.</span></span><br><span class="line">    <span class="keyword">return</span> abs(viewSpaceZ);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>LinearEyeDepth的另一个重载函数，适用于所有情况，因为他就是拿渲染管线流程来套的。使用视角矩阵变换世界坐标得到视角坐标，考虑到右手坐标系的负值情况，取绝对值就行。</p>
+<p>我们来看下一个函数
+Linear01DepthFromNear，其返回一个范围(0,1)的线性值，在近裁剪面处为0，远裁剪面处为1，也就是上文中的
+<span class="math inline">\(z_{linear}\)</span> 。</p>
+<figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Z buffer to linear 0..1 depth (0 at near plane, 1 at far plane).</span></span><br><span class="line"><span class="comment">// Does NOT correctly handle oblique view frustums.</span></span><br><span class="line"><span class="comment">// Does NOT work with orthographic projection.</span></span><br><span class="line"><span class="comment">// zBufferParam = &#123; (f-n)/n, 1, (f-n)/n*f, 1/f &#125;</span></span><br><span class="line"><span class="function"><span class="built_in">float</span> <span class="title">Linear01DepthFromNear</span>(<span class="params"><span class="built_in">float</span> depth, float4 zBufferParam</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">1.0</span> / (zBufferParam.x + zBufferParam.y / depth);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>将zBufferParam带入其中，在普通情况下，函数中公式与上文 <span
+class="math inline">\(z_{linear}\)</span> 推导结果一致。如下：</p>
+<p><span class="math display">\[
+value = \frac{1}{
+    \frac{n-f}{n} + \frac{f}{z_{depth}n}
+} = z_{linear}
+\]</span></p>
+<p>问题出现在 Reversed Z
+情况下，函数中公式和上文推导结果并不相同。也就是说，在 Reversed Z
+情况下，这个函数无法使用，其返回值并不是代码中注释那样。（去网上查了查好像只有本文的直接参考文献说指出了这个问题，也可能是查找方式不对，先不管了，相信以后自己的智慧）函数中代入参数结果如下：</p>
+<p><span class="math display">\[
+value_{reversedZ} = \frac{1}{
+    \frac{f-n}{n} + \frac{1}{z_{depth}}
+}
+\]</span></p>
+<p>下一个函数是
+Linear01Depth，其也返回一个范围(0,1)的线性值，但在相机处为0，远裁剪面处为1，也就是上文中的
+<span class="math inline">\(z_{linear2}\)</span> 。</p>
+<figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Z buffer to linear 0..1 depth (0 at camera position, 1 at far plane).</span></span><br><span class="line"><span class="comment">// Does NOT work with orthographic projections.</span></span><br><span class="line"><span class="comment">// Does NOT correctly handle oblique view frustums.</span></span><br><span class="line"><span class="comment">// zBufferParam = &#123; (f-n)/n, 1, (f-n)/n*f, 1/f &#125;</span></span><br><span class="line"><span class="function"><span class="built_in">float</span> <span class="title">Linear01Depth</span>(<span class="params"><span class="built_in">float</span> depth, float4 zBufferParam</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">1.0</span> / (zBufferParam.x * depth + zBufferParam.y);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>将zBufferParam带入其中，在普通和 Reversed Z
+两种情况下，函数中公式得到的结果都与对应情况下上文中的推导结果 <span
+class="math inline">\(z_{linear2}\)</span> 一致，如下：</p>
+<p><span class="math display">\[
+\begin{gather*}
+value = \frac{1}{
+    z_{depth}\frac{n-f}{n} + \frac{f}{n}
+    } = z_{linear2} \\
+value_{reversedZ} = \frac{1}{
+    z_{depth}\frac{f-n}{n} + 1
+    } = z_{linear2}
+\end{gather*}
+\]</span></p>
+<h3 id="小结">小结</h3>
+<p>这篇文章主要针对的是透视投影，正交投影中 <span
+class="math inline">\(z_{eye}\)</span> 和 <span
+class="math inline">\(z_{depth}\)</span>
+是线性关系，用的是另外的函数，涉及到 _ProjectionParams 和
+LinearDepthToEyeDepth函数。文章整体把透视投影下相关的函数都推导了一下，也留下了两个问题。</p>
+<p>一是 Reversed Z 情况下，Linear01DepthFromNear函数输出值和我们推导出的
+<span class="math inline">\(z_{linear}\)</span>
+并不一致。二是，开发人员留下的文档<a
+target="_blank" rel="noopener" href="http://www.humus.name/temp/Linearize%20depth.txt">LinearizeDepth</a>里面公式推导没给前提条件，我也没看懂怎么推出来的。</p>
+<p>就先这样吧，遗留的问题和正交投影等以后有需要的时候在细究。</p>
+<h3 id="参考文献">参考文献</h3>
+<p><a
+target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/393643084">Unity中深度值推导</a></p>
+<p><a
+target="_blank" rel="noopener" href="https://www.songho.ca/opengl/gl_projectionmatrix.html">OpenGL
+Projection Matrix</a></p>
+<p><a
+target="_blank" rel="noopener" href="https://learn.microsoft.com/en-us/windows/win32/direct3d9/projection-transform">Projection
+Transform(Direct3D 9)</a></p>
+<p><a
+target="_blank" rel="noopener" href="https://docs.unity3d.com/2021.3/Documentation/Manual/SL-PlatformDifferences.html">Writing
+shaders for different graphics APIs</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.cyanilux.com/tutorials/depth/">Depth |
+Cyanilux</a></p>
+<p><a target="_blank" rel="noopener" href="http://www.humus.name/temp/Linearize%20depth.txt">SRP
+developer math</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Unity/" rel="tag"># Unity</a>
+              <a href="/tags/Z-Buffer/" rel="tag"># Z-Buffer</a>
+              <a href="/tags/LinearDepth/" rel="tag"># LinearDepth</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2024/10/25/Game%20Development/Unity%E4%BB%8E%E6%B7%B1%E5%BA%A6%E7%BC%93%E5%AD%98%E9%87%8D%E5%BB%BA%E4%B8%96%E7%95%8C%E5%9D%90%E6%A0%87/" rel="prev" title="Unity从深度缓存重建世界坐标">
+                  <i class="fa fa-angle-left"></i> Unity从深度缓存重建世界坐标
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Rigel Aster</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+
+</body>
+</html>

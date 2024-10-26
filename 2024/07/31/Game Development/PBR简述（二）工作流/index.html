@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha256-5eIC48iZUHmSlSUz9XtjRyK2mzQkHScZY1WdMaoz74E=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"rigelaster.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.21.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"always","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="上篇文章对PBR相关的理论进行了简要阐述，本文主要对生产中应用的金属&#x2F;粗糙度工作流和高光&#x2F;光泽度工作流进行简要阐述。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PBR简述（二）工作流">
+<meta property="og:url" content="https://rigelaster.github.io/2024/07/31/Game%20Development/PBR%E7%AE%80%E8%BF%B0%EF%BC%88%E4%BA%8C%EF%BC%89%E5%B7%A5%E4%BD%9C%E6%B5%81/index.html">
+<meta property="og:site_name" content="Rigel&#39;s Blog">
+<meta property="og:description" content="上篇文章对PBR相关的理论进行了简要阐述，本文主要对生产中应用的金属&#x2F;粗糙度工作流和高光&#x2F;光泽度工作流进行简要阐述。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://rigelaster.github.io/images/PBR/2-1.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/PBR/2-2.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/PBR/2-3.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/PBR/2-4.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/PBR/2-5.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/PBR/2-6.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/PBR/2-7.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/PBR/2-8.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/PBR/2-9.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/PBR/2-10.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/PBR/2-11.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/PBR/2-12.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/PBR/2-13.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/PBR/2-14.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/PBR/2-15.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/PBR/2-16.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/PBR/2-17.png">
+<meta property="article:published_time" content="2024-07-31T03:28:15.000Z">
+<meta property="article:modified_time" content="2024-10-24T15:33:34.546Z">
+<meta property="article:author" content="Rigel Aster">
+<meta property="article:tag" content="Graphic">
+<meta property="article:tag" content="PBR">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://rigelaster.github.io/images/PBR/2-1.png">
+
+
+<link rel="canonical" href="https://rigelaster.github.io/2024/07/31/Game%20Development/PBR%E7%AE%80%E8%BF%B0%EF%BC%88%E4%BA%8C%EF%BC%89%E5%B7%A5%E4%BD%9C%E6%B5%81/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"https://rigelaster.github.io/2024/07/31/Game%20Development/PBR%E7%AE%80%E8%BF%B0%EF%BC%88%E4%BA%8C%EF%BC%89%E5%B7%A5%E4%BD%9C%E6%B5%81/","path":"2024/07/31/Game Development/PBR简述（二）工作流/","title":"PBR简述（二）工作流"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>PBR简述（二）工作流 | Rigel's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Rigel's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#gamma-correction-%E4%BC%BD%E9%A9%AC%E7%9F%AB%E6%AD%A3"><span class="nav-number">1.</span> <span class="nav-text">Gamma Correction
+伽马矫正</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#high-dynamic-range-%E9%AB%98%E5%8A%A8%E6%80%81%E8%8C%83%E5%9B%B4"><span class="nav-number">2.</span> <span class="nav-text">High Dynamic Range
+高动态范围</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#metalroughness-workflow-%E9%87%91%E5%B1%9E%E7%B2%97%E7%B3%99%E5%BA%A6%E5%B7%A5%E4%BD%9C%E6%B5%81"><span class="nav-number">3.</span> <span class="nav-text">Metal&#x2F;Roughness
+Workflow 金属&#x2F;粗糙度工作流</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#specularglossiness-workflow-%E9%AB%98%E5%85%89%E5%85%89%E6%B3%BD%E5%BA%A6%E8%B4%B4%E5%9B%BE"><span class="nav-number">4.</span> <span class="nav-text">Specular&#x2F;Glossiness
+Workflow 高光&#x2F;光泽度贴图</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#maps-common-to-both-workflows-%E4%B8%A4%E7%A7%8D%E5%B7%A5%E4%BD%9C%E6%B5%81%E4%B8%AD%E7%9A%84%E9%80%9A%E7%94%A8%E8%B4%B4%E5%9B%BE"><span class="nav-number">5.</span> <span class="nav-text">Maps
+Common To Both Workflows 两种工作流中的通用贴图</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#texel-density-%E7%BA%B9%E7%B4%A0%E5%AF%86%E5%BA%A6"><span class="nav-number">6.</span> <span class="nav-text">Texel Density 纹素密度</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#comparison-%E4%B8%A4%E7%A7%8D%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%9A%84%E5%AF%B9%E6%AF%94"><span class="nav-number">6.1.</span> <span class="nav-text">Comparison
+两种工作流的对比</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E7%8C%AE"><span class="nav-number">6.2.</span> <span class="nav-text">参考文献</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Rigel Aster"
+      src="/uploads/avatar.png">
+  <p class="site-author-name" itemprop="name">Rigel Aster</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">30</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://www.zhihu.com/people/ming-zi-13-35" title="Zhihu → https:&#x2F;&#x2F;www.zhihu.com&#x2F;people&#x2F;ming-zi-13-35" rel="noopener me" target="_blank"><i class="fab fa-zhihu fa-fw"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:remingzi7@gmail.com" title="E-Mail → mailto:remingzi7@gmail.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://github.com/MingZI-7" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;MingZI-7" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i></a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://rigelaster.github.io/2024/07/31/Game%20Development/PBR%E7%AE%80%E8%BF%B0%EF%BC%88%E4%BA%8C%EF%BC%89%E5%B7%A5%E4%BD%9C%E6%B5%81/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar.png">
+      <meta itemprop="name" content="Rigel Aster">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Rigel's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="PBR简述（二）工作流 | Rigel's Blog">
+      <meta itemprop="description" content="上篇文章对PBR相关的理论进行了简要阐述，本文主要对生产中应用的金属/粗糙度工作流和高光/光泽度工作流进行简要阐述。">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          PBR简述（二）工作流
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2024-07-31 11:28:15" itemprop="dateCreated datePublished" datetime="2024-07-31T11:28:15+08:00">2024-07-31</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2024-10-24 23:33:34" itemprop="dateModified" datetime="2024-10-24T23:33:34+08:00">2024-10-24</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Real-time-Rendering/" itemprop="url" rel="index"><span itemprop="name">Real-time Rendering</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+            <div class="post-description">上篇文章对PBR相关的理论进行了简要阐述，本文主要对生产中应用的金属/粗糙度工作流和高光/光泽度工作流进行简要阐述。</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>本文中所引用的图示均标识出处，参考文章将在文末给出。</p>
+<p>上篇文章对PBR相关的理论进行了简要阐述，本文主要对生产中应用的<strong>金属/粗糙度工作流</strong>和<strong>高光/光泽度工作流</strong>进行简要阐述。由于工作流涉及到贴图相关内容，有必要在开始之前对以下概念做简单介绍。</p>
+<h2 id="gamma-correction-伽马矫正"><strong>Gamma Correction
+伽马矫正</strong></h2>
+<p><strong>PBR的计算需要在线性空间下进行，以确保渲染结果的物理准确性。</strong></p>
+<p>有的游戏引擎会提供“Linear Color Space”与“Gamma Color
+Space”供使用者选择，以Unity为例，其默认使用Gamma Color
+Space。那么什么是Gamma呢？为什么Gamma总是和Linear一起出现？这三篇资料/视频可能会解答你的疑惑：<a
+target="_blank" rel="noopener" href="https://www.zhihu.com/question/27467127/answer/37555901">《Gamma是什么》</a>《<a
+target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1iQ4y1g7oX">视频图像中的Gamma校正有什么作用</a>》<a
+target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV15t411Y7cf">《Gamma校正与线性工作流入门讲解》</a></p>
+<p>下面做一些简单介绍：</p>
+<p>在图像领域中，Gamma通常指<strong>伽马矫正（Gamma
+Correction）</strong>。用wiki上的说法，伽马矫正是用于编码/解码视频或图像中的亮度值/三色值的<strong>非线性运算</strong>，其简化的表达式如下：
+<span class="math display">\[
+V_{out}=AV_{in}^ \gamma
+\]</span> 通常情况下A=1， 输入与输出范围都为[0,1]。 <span
+class="math inline">\(\gamma &lt; 1\)</span>
+时为<strong>编码伽马(encoding gamma)</strong>，<span
+class="math inline">\(\gamma &gt; 1\)</span>
+时为<strong>解码伽马(decoding gamma)</strong>。</p>
+<p>伽马矫正源于早期CRT设备的图像显示，由于早期显示器多为CRT设备，其电压值与显示亮度是非线性的（电压增大两倍时显示亮度增加小于两倍）。</p>
+<figure>
+<img src="/images/PBR/2-1.png"
+alt="CRT设备输入电压与亮度函数曲线 引自《视频图像中的Gamma校正有什么作用》" />
+<figcaption aria-hidden="true">CRT设备输入电压与亮度函数曲线
+引自《视频图像中的Gamma校正有什么作用》</figcaption>
+</figure>
+<p>为了让CRT设备正确显示图像，对输入的图像值做预处理使其亮度增大以抵消CRT设备亮度的弱化效果。当时人们通过目测实验取伽马值
+<span class="math inline">\(\gamma\)</span>
+为2.5，于是输入CRT设备图像值需要进行 <span
+class="math inline">\(y=x^{\frac{1}{2.5}}\)</span>
+运算。这样CRT设备显示时相当于对图象值进行了一次 <span
+class="math inline">\(y=x^{2.5}\)</span> 运算，整个系统的伽马值 <span
+class="math inline">\(\gamma\)</span>
+为1，可以尽量还原其他设备记录的原始图像亮度。这段是对CRT设备使用伽马矫正的简要描述，实际情况更加复杂一些，可见上述视频《视频图像中的Gamma校正有什么作用》。</p>
+<p>后面随着技术发展，显示器基本可以做到线性显示图像亮度，为何伽马矫正依然存在？兼容CRT设备是一方面，但这不是伽马矫正在现代图形系统的主要目的。现代图形系统中伽马矫正存在的主要意义是，<strong>合理利用存储空间以提高图像质量</strong>。原因有二，<strong>其一，人眼对亮度的感知是非线性的；其二，图像存储空间/传输带宽有限。</strong></p>
+<figure>
+<img src="/images/PBR/2-2.png"
+alt="感知亮度与物理亮度 引自《视频图像中的Gamma校正有什么作用》" />
+<figcaption aria-hidden="true">感知亮度与物理亮度
+引自《视频图像中的Gamma校正有什么作用》</figcaption>
+</figure>
+<p>相关实验表明，人眼对黑暗的变化更加敏感。如果使用[0,1]范围表示显示器的亮度，人眼感觉的中灰度的实际亮度大约是0.218。因此，对于图像存储，如果使用8bit均匀存储[0,1]亮度（下图左），图像中暗色部分会出现明显色阶断层。而如果对图像进行一次编码伽马存储，将人眼中灰度的亮度0.218映射到0.5（下图右），使用更多空间存储图像暗部，在显示图像时解码伽马，色阶断层现象会改善很多。（原视频会更明显，这里有些失真）</p>
+<figure>
+<img src="/images/PBR/2-3.png"
+alt="引自《Gamma校正与线性工作流入门讲解》" />
+<figcaption
+aria-hidden="true">引自《Gamma校正与线性工作流入门讲解》</figcaption>
+</figure>
+<p>因为伽马矫正的存在，微软联合爱普生、惠普提供了sRGB颜色空间标准，推荐显示器的显示伽马值为2.2，并配合0.45的编码伽马就可以保证最后伽马曲线之间可以相互抵消（因为
+2.2×0.45≈1
+）。所以，一些制图软件输出的材质贴图可能就使用了sRGB标准，也就是说这些材质贴图已经进行了<strong>编码伽马</strong>，其数值是非线性的，如果直接使用这些材质贴图的图像值进行PBR的物理运算会得到错误的结果。这就又回到了开始提到的线性颜色空间与伽马颜色空间，此处还以Unity为例。</p>
+<figure>
+<img src="/images/PBR/2-4.png" alt="Unity中Color Space的设置" />
+<figcaption aria-hidden="true">Unity中Color Space的设置</figcaption>
+</figure>
+<figure>
+<img src="/images/PBR/2-5.png" alt="Unity中导入sRGB图像的设置" />
+<figcaption aria-hidden="true">Unity中导入sRGB图像的设置</figcaption>
+</figure>
+<p>当处于<strong>伽马颜色空间</strong>时，Unity不会对着色器的输入和输出做任何处理，这意味着输出的亮度经过显示器的显示伽马（解码伽马）后可能得到非预期的亮度。当处于<strong>线性颜色空间</strong>下时，Unity在对设置为sRGB模式的材质贴图采样时会自动将其进行解码伽马转化到线性空间下，而且着色器在写入颜色缓冲前自动进行编码伽马。</p>
+<p>总的来说就是，因为伽马矫正的存在，我们需要注意材质贴图是否是sRGB，保证PBR运算是在线性空间下进行的，线性空间和伽马空间本质上来说都是帮助我们正确输出图像亮度的辅助工具。</p>
+<h2 id="high-dynamic-range-高动态范围"><strong>High Dynamic Range
+高动态范围</strong></h2>
+<p>高动态范围，简称HDR。通常显示设备使用的颜色缓冲每通道精度为8位，意味着只能使用256种不同亮度表示真实世界的亮度。而真实世界的亮度范围可以说是非常之大，用256个亮度表示肯定会丢失精度，而HDR可以使用远高于8位的精度记录亮度信息，更加准确的反应真实的光照环境。</p>
+<p>HDR经常和PBR配合使用，碍于本文重点在于PBR的工作流，这里就不在更多展开HDR相关内容，只是提一嘴，之后再写相关的文章仔细讲讲。</p>
+<p>在对上述概念有所了解之后，我们正式进入工作流部分。</p>
+<p>在PBR工作流中，输入着色器的或者说artist输出的材质贴图的每个通道都有明确定义。工作流中材质贴图可能是sRGB标准下的，也可能是线性的，这就是为什么前面要了解伽马矫正。下文首先阐述每个工作流的特点，然后再讲两个工作流的共同点，以及两者相对的优缺点。由于部分贴图的有多个名称，为避免混淆会使用某一特定名称。</p>
+<h2 id="metalroughness-workflow-金属粗糙度工作流">Metal/Roughness
+Workflow 金属/粗糙度工作流</h2>
+<p>以下简称为金属流。在金属工作流中有三张特定贴图：<strong>基础色贴图(base
+color)、金属度贴图(metallic)和粗糙度贴图(roughness)。</strong></p>
+<figure>
+<img src="/images/PBR/2-6.png"
+alt="金属工作流特有贴图 引自《The PBR Guide - Part 2》" />
+<figcaption aria-hidden="true">金属工作流特有贴图 引自《The PBR Guide -
+Part 2》</figcaption>
+</figure>
+<p><strong>Base Color (RGB - sRGB)</strong></p>
+<figure>
+<img src="/images/PBR/2-7.png"
+alt="基础色贴图 引自《The PBR Guide - Part 2》" />
+<figcaption aria-hidden="true">基础色贴图 引自《The PBR Guide - Part
+2》</figcaption>
+</figure>
+<p>在金属流中，基础色贴图存储了<strong>电介质的漫反射颜色</strong>和<strong>金属的反射率。</strong>正如上篇文章所述，电介质表面颜色大部分来源于漫反射，金属表面颜色来源于高光反射。于是，金属流就将决定两者表面颜色的数据都整合在基础色贴图中：存储电介质的漫反射颜色，在着色中使用0.04作为其基础反射率
+F0 的默认值；存储金属的反射率，因为金属没有漫反射。</p>
+<p><strong>Metallic (Grayscale - Linear)</strong></p>
+<figure>
+<img src="/images/PBR/2-8.png"
+alt="金属度贴图 引自《The PBR Guide - Part 2》" />
+<figcaption aria-hidden="true">金属度贴图 引自《The PBR Guide - Part
+2》</figcaption>
+</figure>
+<p>金属度贴图用于确定物体表面是否为金属，其作用类似于mask，决定了着色器如何处理基础色贴图中的数据。金属度贴图是线性灰度图，0.0（black
+- 0 sRGB）表示表面为电介质，1.0（white -
+255sRGB）表示表面为纯金属。为区分表面是否为金属，看起来金属度贴图应该是二元的黑白图。但实际上，大部分渲染器都允许金属图包含0-1之间的灰度值用来模拟生锈的金属或者镀层，此时可能需要手动调整基础色贴图中的颜色值以获得期望的渲染结果。物体的基础反射率F0计算公式为：</p>
+<p>F0=lerp(F0,baseColor,metallic)</p>
+<p><strong>Roughness （Grayscale - Linear）</strong></p>
+<figure>
+<img src="/images/PBR/2-9.png"
+alt="粗糙度贴图 引自《The PBR Guide - Part 2》" />
+<figcaption aria-hidden="true">粗糙度贴图 引自《The PBR Guide - Part
+2》</figcaption>
+</figure>
+<p>正如上篇文章所述，粗糙度贴图描述了物体表面的不规则度（Surface
+Irregularities）。粗糙度贴图也是线性灰度图，0.0（black）表示物体表面光滑，1.0（white）表示物体表面粗糙。</p>
+<h2 id="specularglossiness-workflow-高光光泽度贴图">Specular/Glossiness
+Workflow 高光/光泽度贴图</h2>
+<p>以下简称为高光流。在高光工作流中也有三张特定贴图：<strong>漫反射贴图(diffuse)、反射率贴图(specular)和光滑度贴图(glossiness)。</strong>高光工作流与金属工作流最明显的区别在于，高光工作流中的电介质基础反射率
+F0 不在默认取值为0.04，而是和金属的反射率一同存储于反射率贴图中。</p>
+<figure>
+<img src="/images/PBR/2-10.png"
+alt="高光工作流特有贴图 引自《The PBR Guide - Part 2》" />
+<figcaption aria-hidden="true">高光工作流特有贴图 引自《The PBR Guide -
+Part 2》</figcaption>
+</figure>
+<p><strong>Diffuse (RGB - sRGB)</strong></p>
+<figure>
+<img src="/images/PBR/2-11.png"
+alt="漫反射贴图 引自《The PBR Guide - Part 2》" />
+<figcaption aria-hidden="true">漫反射贴图 引自《The PBR Guide - Part
+2》</figcaption>
+</figure>
+<p>高光工作流中，漫反射贴图只存储电介质的漫反射值，对于金属表面，因为没有漫反射故存储为黑色（0，0，0）。</p>
+<p><strong>Specular (RGB - sRGB)</strong></p>
+<figure>
+<img src="/images/PBR/2-12.png"
+alt="反射率贴图 引自《The PBR Guide - Part 2》" />
+<figcaption aria-hidden="true">反射率贴图 引自《The PBR Guide - Part
+2》</figcaption>
+</figure>
+<p>高光流使用了一张独立贴图存储物体表面的反射率，相比于金属流中电介质默认的0.04基础反射率，高光流对电介质的基础反射率
+F0
+拥有更灵活的控制。由于电介质的反射率比金属低很多，所以贴图的电解质部分会比较暗。</p>
+<p><strong>Glossiness (Grayscale - Linear)</strong></p>
+<figure>
+<img src="/images/PBR/2-13.png"
+alt="光泽度贴图 引自《The PBR Guide - Part 2》" />
+<figcaption aria-hidden="true">光泽度贴图 引自《The PBR Guide - Part
+2》</figcaption>
+</figure>
+<p>于金属流相同，高光流的光泽度贴图描述了物体表面的不规则度（Surface
+Irregularities）。不同的是，贴图中black（0.0）代表粗糙表面，white（1.0）代表光滑表面，是金属流中的粗糙度贴图的inverse版本。（上图颜色应该是标反了）</p>
+<h2
+id="maps-common-to-both-workflows-两种工作流中的通用贴图"><strong>Maps
+Common To Both Workflows 两种工作流中的通用贴图</strong></h2>
+<p>这里只列举一些用于PBR的常见贴图，而且不做深入阐述。</p>
+<p><strong>Normal 法线贴图</strong></p>
+<p>法线贴图用于模拟物体表面细节，通常存储在切线空间中，是使用非常普遍的一张贴图。这里不再展开，具体可看文章<a
+target="_blank" rel="noopener" href="https://learnopengl.com/Advanced-Lighting/Normal-Mapping">《learnopengl
+- Normal Mapping》</a>。</p>
+<p><strong>Height 高度贴图</strong></p>
+<p>高度贴图通常被用来渲染Displacement效果，可以用来做视差映射（parallax
+mapping）给纹理增加深度细节。具体见文章<a
+target="_blank" rel="noopener" href="https://learnopengl.com/Advanced-Lighting/Parallax-Mapping">《learnopengl
+- Parallax Mapping》</a>。</p>
+<p><strong>Ambient Occlusion 环境光遮蔽贴图</strong></p>
+<p>AO贴图用于定义表面上点在环境光下的暴露程度，其应该只影响漫反射而不影响高光反射。</p>
+<figure>
+<img src="/images/PBR/2-14.png"
+alt="AO贴图 引自《The PBR Guide - Part 2》" />
+<figcaption aria-hidden="true">AO贴图 引自《The PBR Guide - Part
+2》</figcaption>
+</figure>
+<h2 id="texel-density-纹素密度">Texel Density 纹素密度</h2>
+<p>两种工作流中，如果贴图的纹素密度不合理都会产生<strong>边缘走样的现象（fringe）</strong>。</p>
+<p>在金属流中边缘走样现象表现为，在电介质表面和明亮的金属表面的交界处产生白边。这是由于金属流的基础色贴图（Base
+Color）中，同时存储电介质的漫反射颜色与金属的反射率。当纹素密度不合适时，因为金属反射率较高，两者插值(interpolated)会生成亮度较高的值从而导致白边。如下图：</p>
+<figure>
+<img src="/images/PBR/2-15.png"
+alt="金属流中的白边现象 引自《The PBR Guide - Part 2》" />
+<figcaption aria-hidden="true">金属流中的白边现象 引自《The PBR Guide -
+Part 2》</figcaption>
+</figure>
+<p>而在高光流中，在电介质表面和金属表面的交界处会产生黑边。相比于白边，黑边不易被观察到。高光流的边缘走样现象产生原因与金属流相同，只是由于高光流的漫反射贴图（diffuse）中金属漫反射为零，插值之后会生成颜色较暗的值。如下图：</p>
+<figure>
+<img src="/images/PBR/2-16.png"
+alt="高光流中的黑边现象 引自《The PBR Guide - Part 2》" />
+<figcaption aria-hidden="true">高光流中的黑边现象 引自《The PBR Guide -
+Part 2》</figcaption>
+</figure>
+<p>一张低分辨率的贴图，或是一高分辨率贴图局部UV面积太小，都可能导致纹素密度过低，从而出现边缘走样现象（如下图）。纹素的密度对边缘走样有着直接的影响，提供足够的纹素密度是缓解边缘走样现象最好的方法。</p>
+<figure>
+<img src="/images/PBR/2-17.png" alt="引自《The PBR Guide - Part 2》" />
+<figcaption aria-hidden="true">引自《The PBR Guide - Part
+2》</figcaption>
+</figure>
+<h3 id="comparison-两种工作流的对比">Comparison
+<strong>两种工作流的对比</strong></h3>
+<p><strong>金属/粗糙度工作流</strong></p>
+<p>优势：一张RGB贴图和两张灰度图，纹理缓存压力更小；</p>
+<p>劣势：固定的电介质基础反射率0.04；白色的边缘走样影响渲染表现；</p>
+<p><strong>高光/光泽度工作流</strong></p>
+<p>优势：更可控的电介质基础反射率 F0
+；黑色的边缘走样对渲染表现影响较小；</p>
+<p>劣势：两张RGB贴图和一张灰度图，纹理缓存压力大；</p>
+<h3 id="参考文献">参考文献</h3>
+<p><a
+target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Gamma_correction">wiki-Gamma-correction</a></p>
+<p><a
+target="_blank" rel="noopener" href="https://www.zhihu.com/question/27467127/answer/37555901">Gamma是什么</a></p>
+<p><a
+target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1iQ4y1g7oX">你所不了解的Gamma究竟有多神奇|视频图像中的Gamma校正有什么作用_哔哩哔哩_bilibili</a></p>
+<p><a
+target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV15t411Y7cf">Gamma校正与线性工作流入门讲解</a></p>
+<p><a
+target="_blank" rel="noopener" href="https://creativecloud.adobe.com/cc/learn/substance-3d-designer/web/the-pbr-guide-part-2?locale=en">The
+PBR Guide - Part2</a></p>
+<p><a target="_blank" rel="noopener" href="https://cloud.tencent.com/developer/article/1603068">The PBR
+Guide - Part2 中文版</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Graphic/" rel="tag"># Graphic</a>
+              <a href="/tags/PBR/" rel="tag"># PBR</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2024/07/26/Game%20Development/PBR%E7%AE%80%E8%BF%B0%EF%BC%88%E4%B8%80%EF%BC%89%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/" rel="prev" title="PBR简述（一）理论基础">
+                  <i class="fa fa-angle-left"></i> PBR简述（一）理论基础
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2024/09/26/Game%20Development/Real-time%20Hair%20Rendering/" rel="next" title="">
+                   <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Rigel Aster</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+
+</body>
+</html>
