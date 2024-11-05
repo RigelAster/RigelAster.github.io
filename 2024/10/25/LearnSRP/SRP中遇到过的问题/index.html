@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha256-5eIC48iZUHmSlSUz9XtjRyK2mzQkHScZY1WdMaoz74E=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"rigelaster.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.21.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"always","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="在使用Unity SRP中难免遇到一些问题，当时解决之后可能不久会遗忘掉，就记在这里吧。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SRP中遇到的问题">
+<meta property="og:url" content="https://rigelaster.github.io/2024/10/25/LearnSRP/SRP%E4%B8%AD%E9%81%87%E5%88%B0%E8%BF%87%E7%9A%84%E9%97%AE%E9%A2%98/index.html">
+<meta property="og:site_name" content="Rigel&#39;s Blog">
+<meta property="og:description" content="在使用Unity SRP中难免遇到一些问题，当时解决之后可能不久会遗忘掉，就记在这里吧。">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-10-25T05:42:52.000Z">
+<meta property="article:modified_time" content="2024-10-28T03:40:15.827Z">
+<meta property="article:author" content="Rigel Aster">
+<meta property="article:tag" content="Unity">
+<meta property="article:tag" content="SRP">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://rigelaster.github.io/2024/10/25/LearnSRP/SRP%E4%B8%AD%E9%81%87%E5%88%B0%E8%BF%87%E7%9A%84%E9%97%AE%E9%A2%98/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"https://rigelaster.github.io/2024/10/25/LearnSRP/SRP%E4%B8%AD%E9%81%87%E5%88%B0%E8%BF%87%E7%9A%84%E9%97%AE%E9%A2%98/","path":"2024/10/25/LearnSRP/SRP中遇到过的问题/","title":"SRP中遇到的问题"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>SRP中遇到的问题 | Rigel's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Rigel's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#confused-on-positionndc"><span class="nav-number">1.</span> <span class="nav-text">Confused on positionNDC</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#computescreenpos%E5%87%BD%E6%95%B0"><span class="nav-number">2.</span> <span class="nav-text">ComputeScreenPos函数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#unity-y-flipped"><span class="nav-number">3.</span> <span class="nav-text">Unity y-flipped</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Rigel Aster"
+      src="/uploads/avatar.png">
+  <p class="site-author-name" itemprop="name">Rigel Aster</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">33</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://www.zhihu.com/people/ming-zi-13-35" title="Zhihu → https:&#x2F;&#x2F;www.zhihu.com&#x2F;people&#x2F;ming-zi-13-35" rel="noopener me" target="_blank"><i class="fab fa-zhihu fa-fw"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:remingzi7@gmail.com" title="E-Mail → mailto:remingzi7@gmail.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://github.com/MingZI-7" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;MingZI-7" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i></a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://rigelaster.github.io/2024/10/25/LearnSRP/SRP%E4%B8%AD%E9%81%87%E5%88%B0%E8%BF%87%E7%9A%84%E9%97%AE%E9%A2%98/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar.png">
+      <meta itemprop="name" content="Rigel Aster">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Rigel's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="SRP中遇到的问题 | Rigel's Blog">
+      <meta itemprop="description" content="在使用Unity SRP中难免遇到一些问题，当时解决之后可能不久会遗忘掉，就记在这里吧。">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          SRP中遇到的问题
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2024-10-25 13:42:52" itemprop="dateCreated datePublished" datetime="2024-10-25T13:42:52+08:00">2024-10-25</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2024-10-28 11:40:15" itemprop="dateModified" datetime="2024-10-28T11:40:15+08:00">2024-10-28</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Real-time-Rendering/" itemprop="url" rel="index"><span itemprop="name">Real-time Rendering</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+            <div class="post-description">在使用Unity SRP中难免遇到一些问题，当时解决之后可能不久会遗忘掉，就记在这里吧。</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h4 id="confused-on-positionndc">Confused on positionNDC</h4>
+<p>阅读SRP源码时经常会遇到这个变量
+positionNDC，也会出现在参数中，根据代码感觉它与我们平时所说的 NDC
+不太一样。以函数 GetVertexPositionInputs(float3 positionOS) 为例，其
+positionNDC 相关代码为：</p>
+<figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">VertexPositionInputs <span class="title">GetVertexPositionInputs</span>(<span class="params">float3 positionOS</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    VertexPositionInputs input;</span><br><span class="line">    input.positionWS = TransformObjectToWorld(positionOS);</span><br><span class="line">    input.positionVS = TransformWorldToView(input.positionWS);</span><br><span class="line">    input.positionCS = TransformWorldToHClip(inpout.positionWS);</span><br><span class="line"></span><br><span class="line">    float4 ndc = input.positionCS * <span class="number">0.5f</span>;</span><br><span class="line">    input.positionNDC.xy = float2(ndc.x, ndc.y * _ProjectionParams.x) + ndc.w;</span><br><span class="line">    input.positionNDC.zw = input.positionCS.zw;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> input;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>函数中的 positionNDC 可以很明显看出与平时所说的 NDC
+不同，因为根本没有进行透视除法这一步运算。顺着代码逻辑进行运算得到的坐标范围如下：</p>
+<p><span class="math display">\[
+x_{positionNDC} = \frac{x_{clip}}{2} + \frac{w_{clip}}{2} \in [0,
+w_{clip}]
+\]</span></p>
+<p>至于代码为何这样写，可以看<a
+target="_blank" rel="noopener" href="https://discussions.unity.com/t/confused-on-ndc-space/821074">Confused
+on NDC
+space</a>里面的讨论。为了防止链接失效，我把里面bgolus大佬的回答贴在这里</p>
+<blockquote>
+<p>NDC is not just clipSpace.xy / clipSpace.w. Homogeneous clip space’s
+x &amp; y have a -w to w range (for what’s in view), but NDC’s x &amp; y
+have a 0.0 to 1.0 range. They’re essentially screen space UVs. Dividing
+homogeneous clip space by its w just makes it non-homogeneous clip
+space, not NDC. NDC is closer to (clipSpace.xy / clipSpace.w) * 0.5 +
+0.5. So the above code is basically solving that equation a little
+differently by doing:</p>
+<p>(clipSpace.xy * 0.5 + clipSpace.w * 0.5) / clipSpace.w Only, it’s not
+doing the divide by w, so it rescales the xy values to a 0.0 to w
+range.</p>
+<p>But why not divide by w?</p>
+<p>The key here is that “homogeneous” term. Note the comment for
+positionNDC refers to it as “Homogeneous normalized device coordinates”,
+and not just “normalized device coordinates”. That’s not a mistake. The
+term homogeneous here refers to the fact it’s a coordinate in a
+projective space. Essentially is the value multiplied by w, which for a
+perspective projection happens to be the linear depth. If you want to
+dig into exactly what homogeneous coordinates are, be my guest, I
+honestly still can’t chew through it. But the key thing is having values
+multiplied by the w allows those values to be correct when being
+linearly interpolated in a perspective projection space by dividing by w
+afterwards.</p>
+<p>Basically, if you divide by w in the vertex shader, then try to use
+the value to sample a screen space texture, it won’t line up any more
+and instead will warp mid triangle. If you’re familiar with
+non-perspective correct texture mapping, like the original PS1, that’s
+the kind of thing it’ll look like.</p>
+<p>So, if you dig deep enough in the shader code, you’ll find the few
+places it does actually use that float4 version of the positionNDC, it
+divides by w in the fragment shader, converting the value from
+homogeneous NDC to “regular” NDC.</p>
+</blockquote>
+<p>提取一下其中的重点。NDC并不是简单的
+clipSpace.xy/clipSpace.w，齐次裁剪空间中的xy范围都是-w到w，但是NDC中xy的范围是0.0到1.0。从齐次裁剪空间转换到NDC要做的运算是，<code>(clipSpace.xy / clipSpace.w) * 0.5 + 0.5</code>；上文代码中用了另外一个运算形式
+<code>(clipSpace.xy * 0.5 + clipSpace.w * 0.5) / clipSpace.w</code>，只是没有做最后的除法。那为什么没有做除法呢？</p>
+<p>这样可以先做线性插值在做透视除法，得到更正确的值；如果在顶点着色器中先做了透视除法，之后线性插值可能会出现一些显示问题。后面举的例子没太看懂，是我不了解的内容。总之，代码中的
+positionNDC 表示 “Homogeneous normalized device coordinates” 并不是
+“normalized device coordinates”，此时坐标还处于一个投影空间（a
+projective space），开发人员并没有写错。</p>
+<h4 id="computescreenpos函数">ComputeScreenPos函数</h4>
+<p>既然写到 positionNDC，正好可以看一下
+ComputeScreenPos。这个函数在BIRP中用的也是比较多了，在SRP中因为名称比较困惑，直接被开发人员打入冷宫标记为
+deprecated：</p>
+<figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Deprecated: A confusingly named and duplicate function that scales clipspace to unity NDC range. (-w &lt; x(-y) &lt; w --&gt; 0 &lt; x(-y) &lt; w)</span></span><br><span class="line"><span class="comment">// Use GetVertexPositionInputs().positionNDC instead for vertex shader</span></span><br><span class="line"><span class="comment">// Or a similar function in Common.hlsl, ComputeNormalizedDeviceCoordinatesWithZ()</span></span><br><span class="line"><span class="function">float4 <span class="title">ComputeScreenPos</span>(<span class="params">float4 positionCS</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    float4 o = positionCS * <span class="number">0.5f</span>;</span><br><span class="line">    o.xy = float2(o.x, o.y * _ProjectionParams.x) + o.w;</span><br><span class="line">    o.zw = positionCS.zw;</span><br><span class="line">    <span class="keyword">return</span> o;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>该函数中代码和SRP新增的GetVertexPositionInputs()函数中positionNDC代码完全一致，正如上个问题中所说的那样，该函数返回的是
+Homogeneous NDC，一般使用之前需要做齐次除法。</p>
+<h4 id="unity-y-flipped">Unity y-flipped</h4>
+<p>也不算是SRP有关的问题，是对Unity怎么处理平台差异的困惑，尤其是对Unity中rendering
+upsied-down的困惑。（未解决）</p>
+<p>起因是SRP开发人员的一句注释：</p>
+<blockquote>
+<p>Our world space, view space, screen space and NDC space are y-up. Our
+clip space is flipped upside-down due to poor legacy Unity design. The
+flip is baked into the projection matrix, so we only have to flip
+manually when going from CS to NDC and back.</p>
+</blockquote>
+<p>我们都知道类D3D
+纹理坐标top处是0，而类OpenGL纹理坐标bottom处是0，这是Unity rendering
+upside-down的源头。(Unity中 UNITY_UV_STARTS_AT_TOP
+，文档中描述为：D3D-like平台上值为1，OpenGL-like平台上值为0。SRP源码中与文档描述一致，在D3D11，Metal，Vulkan，Switch中其值都被定义为1。)</p>
+<p>然后我再查阅资料时，对于资料和讨论中的说法越来越困惑，感觉暂时无法想通，不能继续在这里浪费时间了，所以查阅过的资料放在这里，方便之后回来查看。</p>
+<p>Unity 文档：<a
+target="_blank" rel="noopener" href="https://docs.unity3d.com/Manual/SL-PlatformDifferences.html">Writing
+shaders for different graphics APIs</a>，<a
+target="_blank" rel="noopener" href="https://docs.unity3d.com/ScriptReference/GL.GetGPUProjectionMatrix.html">GL.GetGPUProjectionMatrix</a>以及其末尾的其他相关文档，Unity内置宏和其他变量<a
+target="_blank" rel="noopener" href="https://docs.unity3d.com/Manual/SL-UnityShaderVariables.html">UnityShaderVariables</a><a
+target="_blank" rel="noopener" href="https://docs.unity3d.com/Manual/shader-branching-platform.html">shader-branching-platform</a>。</p>
+<p>国内资料：<a
+target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/647820532">Unity坐标系转换遇到的坑</a>，<a
+target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/677941516">Vulkan/DirectX/OpenGL的坐标系差异以及实际工程中的处理方案</a>，<a
+target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/29228304">浅谈后处理技术中的各种坑</a></p>
+<p>国外资料：<a
+target="_blank" rel="noopener" href="https://discussions.unity.com/t/unity-flipping-render-textures/822383">Unity
+flipping render textures</a>，<a
+target="_blank" rel="noopener" href="https://discussions.unity.com/t/y-axis-direction-in-ndc-clip-space/912676">Y
+axis direction in NDC/clip space</a></p>
+<p><a
+target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/597918725">HLSL的SV_POSITION</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Unity/" rel="tag"># Unity</a>
+              <a href="/tags/SRP/" rel="tag"># SRP</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2024/10/24/LearnSRP/Custom%20Render%20Pipeline/" rel="prev" title="LearnSRP - Custom SRP">
+                  <i class="fa fa-angle-left"></i> LearnSRP - Custom SRP
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2024/10/25/Game%20Development/Unity%E4%BB%8E%E6%B7%B1%E5%BA%A6%E7%BC%93%E5%AD%98%E9%87%8D%E5%BB%BA%E4%B8%96%E7%95%8C%E5%9D%90%E6%A0%87/" rel="next" title="Unity从深度缓存重建世界坐标">
+                  Unity从深度缓存重建世界坐标 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Rigel Aster</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+
+</body>
+</html>

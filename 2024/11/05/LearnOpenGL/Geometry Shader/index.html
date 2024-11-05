@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha256-5eIC48iZUHmSlSUz9XtjRyK2mzQkHScZY1WdMaoz74E=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"rigelaster.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.21.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"always","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="OpenGL中的几何着色器 Geometry Shader">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LearnOpenGL - Geometry Shader">
+<meta property="og:url" content="https://rigelaster.github.io/2024/11/05/LearnOpenGL/Geometry%20Shader/index.html">
+<meta property="og:site_name" content="Rigel&#39;s Blog">
+<meta property="og:description" content="OpenGL中的几何着色器 Geometry Shader">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-11-05T07:30:35.000Z">
+<meta property="article:modified_time" content="2024-11-05T09:59:23.187Z">
+<meta property="article:author" content="Rigel Aster">
+<meta property="article:tag" content="Shader">
+<meta property="article:tag" content="OpenGL">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://rigelaster.github.io/2024/11/05/LearnOpenGL/Geometry%20Shader/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"https://rigelaster.github.io/2024/11/05/LearnOpenGL/Geometry%20Shader/","path":"2024/11/05/LearnOpenGL/Geometry Shader/","title":"LearnOpenGL - Geometry Shader"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>LearnOpenGL - Geometry Shader | Rigel's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Rigel's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86"><span class="nav-number">1.</span> <span class="nav-text">基础知识</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#using-geometry-shaders"><span class="nav-number">2.</span> <span class="nav-text">Using geometry shaders</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#lets-build-houses"><span class="nav-number">3.</span> <span class="nav-text">Let&#39;s build houses</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#exploding-object-visualizing-normal-vectors"><span class="nav-number">4.</span> <span class="nav-text">Exploding object
+&amp; Visualizing normal vectors</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E7%8C%AE"><span class="nav-number">5.</span> <span class="nav-text">参考文献</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Rigel Aster"
+      src="/uploads/avatar.png">
+  <p class="site-author-name" itemprop="name">Rigel Aster</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">33</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://www.zhihu.com/people/ming-zi-13-35" title="Zhihu → https:&#x2F;&#x2F;www.zhihu.com&#x2F;people&#x2F;ming-zi-13-35" rel="noopener me" target="_blank"><i class="fab fa-zhihu fa-fw"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:remingzi7@gmail.com" title="E-Mail → mailto:remingzi7@gmail.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://github.com/MingZI-7" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;MingZI-7" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i></a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://rigelaster.github.io/2024/11/05/LearnOpenGL/Geometry%20Shader/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar.png">
+      <meta itemprop="name" content="Rigel Aster">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Rigel's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="LearnOpenGL - Geometry Shader | Rigel's Blog">
+      <meta itemprop="description" content="OpenGL中的几何着色器 Geometry Shader">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          LearnOpenGL - Geometry Shader
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+      
+
+      <time title="Created: 2024-11-05 15:30:35 / Modified: 17:59:23" itemprop="dateCreated datePublished" datetime="2024-11-05T15:30:35+08:00">2024-11-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Real-time-Rendering/" itemprop="url" rel="index"><span itemprop="name">Real-time Rendering</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+            <div class="post-description">OpenGL中的几何着色器 Geometry Shader</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h3 id="基础知识">基础知识</h3>
+<p>在顶点着色器和片元着色器之间有一个可选的着色阶段，它就是几何着色器（geometry
+shader），其输入是一个图元（如点或三角形）的一组顶点。在这组顶点被传输到下个着色阶段之前，几何着色器可以随意处理它们。几何着色器有趣的地方在于，它可以将原始图元（一组顶点）变换为完全不同的图元，或者生成更多的顶点。下面通过展示一个几何着色器的例子，让你更深入的了解它：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#version 330 core</span></span><br><span class="line">layout (points) in;</span><br><span class="line">layout (line_strip, max_vertices = <span class="number">2</span>) out;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">main</span><span class="params">()</span>&#123;</span><br><span class="line">    gl_Position = gl_in[<span class="number">0</span>].gl_Position + vec4(<span class="number">-0.1</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>);</span><br><span class="line">    EmitVertex();</span><br><span class="line"></span><br><span class="line">    gl_Position = gl_in[<span class="number">0</span>].gl_Position + vec4(<span class="number">0.1</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>);</span><br><span class="line">    EmitVertex();</span><br><span class="line"></span><br><span class="line">    EndPrimitive();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在几何着色器的起始处，我们需要声明从顶点着色器中接收的图元类型（type
+of promitive）。其可以是以下值：</p>
+<ul>
+<li>points : when drawing <strong>GL_POINTS</strong> primitive(1).</li>
+<li>lines : when drawing <strong>GL_LINES</strong> or
+<strong>GL_LINE_STRIP</strong>(2).</li>
+<li>lines_adjacency : <strong>GL_LINES_ADJACENCY</strong> or
+<strong>GL_LINE_STRIP_ADJACENCY</strong>(4).</li>
+<li>triangles : <strong>GL_TRIANGLES</strong>,
+<strong>GL_TRIANGLE_STRIP</strong> or
+<strong>GL_TRIANGLE_FAN</strong>(3).</li>
+<li>triangles_adjacency : <strong>GL_TRIANGLES_ADJACENCY</strong> or
+<strong>GL_TRIANGLE_STRIP_ADJACENCY</strong>(6).</li>
+</ul>
+<p>这些便是我们可以用作参数调用类似 glDrawArrays
+函数的几乎所有的渲染图元了。如果我们使用 GL_TRIANGLES
+来渲染顶点，我们需要把输入修饰符变为
+triangles，括号中的数字表示一个图元包含的最小顶点数。此外，我还需要为几何着色器的输出指定图元类型，可以从以下几种类型中进行选择：</p>
+<ul>
+<li>points</li>
+<li>line_strip</li>
+<li>triangle_strip</li>
+</ul>
+<p>通过这三种输出修饰符，我们几乎可以使用输入的图元来创建几乎任何形状。我们可以将输出定义为
+triangle_strip，并输出三个顶点，来生成一个三角形。</p>
+<p>几何着色器还需要我们去设定一个输出的最大顶点数，OpenGL不会绘制多出的顶点，这个也可以在
+out 关键字的修饰符中设置。在例子中，我们将输出一个
+line_strip，并将最大顶点数设置为2。所谓
+line_strip，是指线条，线条链接了一组点，形成了一条连续的线，它最少由两个点来组成。在渲染函数中每多加一个点，就会在这个点与前一个点之间形成一条新的线。在下面这张图中，有5个顶点：</p>
+<figure>
+<img
+src="%22/images/LearnOpenGL/Advanced%20OpenGL/geometry_shader_1.png%22"
+alt="line strip" />
+<figcaption aria-hidden="true">line strip</figcaption>
+</figure>
+<p>为了生成更有意义的结果，我们需要一些方法拿到前着色阶段的输出。GLSL提供了一个名为
+gl_in 的内置变量，其构成可能如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">in gl_Vertex</span><br><span class="line">&#123;</span><br><span class="line">    vec4 gl_Position;</span><br><span class="line">    <span class="type">float</span> gl_PointSize;</span><br><span class="line">    <span class="type">float</span> gl_ClipDistance[];</span><br><span class="line">&#125; gl_in[];</span><br></pre></td></tr></table></figure>
+<p>其被声明为一个数组，因为大多数渲染图元包含多个顶点，几何着色器的输入是一个图元的所有顶点。有了顶点数据，我们就可以使用几何着色器的两个函数，EmitVertex
+和
+EndPrimitive，来生成新数据了。几何着色器需要你生成并输出至少一个定义为输出的图元。在我们的例子中，我们需要至少生成一个line
+strip。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#version 330 core</span></span><br><span class="line">layout (points) in;</span><br><span class="line">layout (line_strip, max_vertices = <span class="number">2</span>) out;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">main</span><span class="params">()</span>&#123;</span><br><span class="line">    gl_Position = gl_in[<span class="number">0</span>].gl_Position + vec4(<span class="number">-0.1</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>);</span><br><span class="line">    EmitVertex();</span><br><span class="line"></span><br><span class="line">    gl_Position = gl_in[<span class="number">0</span>].gl_Position + vec4(<span class="number">0.1</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>);</span><br><span class="line">    EmitVertex();</span><br><span class="line"></span><br><span class="line">    EndPrimitive();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>每次我们调用函数 EmitVertex
+时，gl_Position中的向量会被添加到图元中。然后，当函数
+EndPrimitive被调用时，此图元中所有被 emitted
+的顶点都会被联结成为输出的渲染图元。在调用多次 EmitVertex 函数后调用函数
+EndPrimitive，重复多次便能生成多个图元。在上面的例子中，我们将点偏移两次然后联结为线条图元。其效果，如下图：</p>
+<figure>
+<img
+src="%22/images/LearnOpenGL/Advanced%20OpenGL/geometry_shader_2.png%22"
+alt="lines" />
+<figcaption aria-hidden="true">lines</figcaption>
+</figure>
+<p>虽然目前并没有令人惊叹的效果，但考虑到这个函数是调用下面的渲染函数得到的，还是很有意思的：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">glDrawArrays(GL_POINTS, <span class="number">0</span>, <span class="number">4</span>);</span><br></pre></td></tr></table></figure>
+<p>虽然这是一个简单的例子，但是它向你展示了如何使用几何着色器来动态生成新形状。在之后我们会利用几何着色器创建出更有意思的效果，但仍将从创建一个简单的几何着色器开始。</p>
+<h3 id="using-geometry-shaders">Using geometry shaders</h3>
+<p>为了展示几何着色器的用法，我们将渲染一个非常简单的场景，在NDC空间的z平面上绘制四个点。它们的坐标为：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">float</span> points[] = &#123;</span><br><span class="line">    <span class="number">-0.5f</span>,  <span class="number">0.5f</span>, <span class="comment">// top-left</span></span><br><span class="line">     <span class="number">0.5f</span>,  <span class="number">0.5f</span>, <span class="comment">// top-right</span></span><br><span class="line">     <span class="number">0.5f</span>, <span class="number">-0.5f</span>, <span class="comment">// bottom-right</span></span><br><span class="line">    <span class="number">-0.5f</span>, <span class="number">-0.5f</span>  <span class="comment">// bottom-left</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>顶点着色器需要将顶点绘制在z平面上，所以我们创建一个基础的顶点着色器。其次，我们会将所有顶点在片元着色器中输出为绿色。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// vertex shader</span></span><br><span class="line"><span class="meta">#version 330 core</span></span><br><span class="line">layout (location = <span class="number">0</span>) in vec2 aPos;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    gl_Postion = vec4(aPos.x, aPos.y, <span class="number">0.0</span>, <span class="number">1.0</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// fragment shader</span></span><br><span class="line"><span class="meta">#version 330 core</span></span><br><span class="line">out vec4 FragColor;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    FragColor = vec4(<span class="number">0.0</span>, <span class="number">1.0</span>, <span class="number">0.0</span>, <span class="number">1.0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>为点的顶点数据生成一个VAO和一个VBO，然后使用 glDrawArrays
+进行绘制：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">shader.use();</span><br><span class="line">glBindVertexArray(VAO);</span><br><span class="line">glDrawArrays(GL_POINTS, <span class="number">0</span>, <span class="number">4</span>);</span><br></pre></td></tr></table></figure>
+<p>结果是在黑暗的场景中出现四个绿色的点：</p>
+<figure>
+<img
+src="%22/images/LearnOpenGL/Advanced%20OpenGL/geometry_shader_3.png%22"
+alt="points" />
+<figcaption aria-hidden="true">points</figcaption>
+</figure>
+<p>现在我们将添加一个几何着色器，为场景增添活力。出于学习目的，我们将会创建一个传递（Pass-through）几何着色器，它会接收一个点图元，并直接将它传递（Pass）到下一个着色阶段：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#version 330 core</span></span><br><span class="line">layout (points) in;</span><br><span class="line">layout (points, max_vertices = <span class="number">1</span>) out;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">main</span><span class="params">()</span>&#123;</span><br><span class="line">    gl_Position = gl_in[<span class="number">0</span>].gl_Position;</span><br><span class="line">    EmitVertex();</span><br><span class="line">    EndPrimitive();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>现在这个几何着色器应该非常容易理解，它只是简单的提交了接收到的顶点位置生成了一个点图元。几何着色器需要像顶点着色器、片元着色器一样被编译链接到程序中，但是这次在创建着色器时我们将会使用
+GL_GEOMETRY_SHADER 作为着色器类型：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">geometryShader = glCreateShader(GL_GEOMETRY_SHADER);</span><br><span class="line">glShaderSource(geometryShader, <span class="number">1</span>, &amp;gShaderCode, <span class="literal">NULL</span>);</span><br><span class="line">glCompileShader(geometryShader);</span><br><span class="line">...</span><br><span class="line">glAttachShader(program, geometryShader);</span><br><span class="line">glLinkProgram(program);</span><br></pre></td></tr></table></figure>
+<p>目前渲染的结果还是和没有加入几何着色器前一样，只要没有编译和链接错误就好。</p>
+<h3 id="lets-build-houses">Let's build houses</h3>
+<p>绘制点和线多少有点无趣了，现在我们要使用几何着色器在每个点的位置绘制一个房子。我们需要将几何着色器的输出类型改为
+triangle_strip，然后每个点处画三个三角形：两个作为方形，一个作为屋顶。</p>
+<p>OpenGL中，三角形带（triangle
+strip）是高效地绘制三角形的方式，使用的顶点少。在第一个三角形绘制完之后，每个后续顶点将会在上一个三角形边上生成另一个三角形：每三个相邻的顶点将会形成一个三角形。如果我们一共有6个构成三角形带的顶点，那么我们会得到这些三角形：（1,2,3）（2,3,4）（3,4,5）和（4,5,6），共四个三角形。一个三角形带至少需要3个顶点，并会生成
+N-2 个三角形。下图可以很好展现这点：</p>
+<figure>
+<img
+src="%22/images/LearnOpenGL/Advanced%20OpenGL/geometry_shader_4.png%22"
+alt="triangle strip" />
+<figcaption aria-hidden="true">triangle strip</figcaption>
+</figure>
+<p>通过是使用三角形带作为几何着色器的输出，我们可以很容易的创建需要的房子形状，只需要以正确的顺序生成3个相连的三角形即可。下面这幅图展示了顶点绘制的顺序，蓝点表示输入点：</p>
+<figure>
+<img
+src="%22/images/LearnOpenGL/Advanced%20OpenGL/geometry_shader_5.png%22"
+alt="house" />
+<figcaption aria-hidden="true">house</figcaption>
+</figure>
+<p>将图片转换为代码如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#version 330 core</span></span><br><span class="line">layout (points) in;</span><br><span class="line">layout (triangle_strip, max_vertices = <span class="number">5</span>) out;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">build_house</span><span class="params">(vec4 position)</span></span><br><span class="line">&#123;</span><br><span class="line">    gl_Position = position + vec4(<span class="number">-0.2</span>, <span class="number">-0.2</span>, <span class="number">0.0</span>, <span class="number">0.0</span>); <span class="comment">// 1:bottom-left</span></span><br><span class="line">    EmitVertex();</span><br><span class="line">    gl_Position = position + vec4( <span class="number">0.2</span>, <span class="number">-0.2</span>, <span class="number">0.0</span>, <span class="number">0.0</span>); <span class="comment">// 2:bottom-right</span></span><br><span class="line">    EmitVertex();</span><br><span class="line">    gl_Position = position + vec4(<span class="number">-0.2</span>,  <span class="number">0.2</span>, <span class="number">0.0</span>, <span class="number">0.0</span>); <span class="comment">// 3:top-left</span></span><br><span class="line">    EmitVertex();</span><br><span class="line">    gl_Position = position + vec4( <span class="number">0.2</span>,  <span class="number">0.2</span>, <span class="number">0.0</span>, <span class="number">0.0</span>); <span class="comment">// 4:top-left</span></span><br><span class="line">    EmitVertex();</span><br><span class="line">    gl_Position = position + vec4( <span class="number">0.2</span>,  <span class="number">0.4</span>, <span class="number">0.0</span>, <span class="number">0.0</span>); <span class="comment">// 5:top</span></span><br><span class="line">    EmitVertex();</span><br><span class="line">    EndPrimitive();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">main</span><span class="params">()</span>&#123;</span><br><span class="line">    build_house(gl_in[<span class="number">0</span>].gl_Position);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这个几何着色器生成了5个顶点，每个顶点都是原始点的位置加上一个偏移量，来组成一个大的三角带。最终的图元会被光栅化，然后片段着色器处理整个三角形带，最终在每个绘制的点处生成绿色的房子：</p>
+<figure>
+<img
+src="%22/images/LearnOpenGL/Advanced%20OpenGL/geometry_shader_6.png%22"
+alt="house" />
+<figcaption aria-hidden="true">house</figcaption>
+</figure>
+<p>可以看到每个房子都是由三个三角形组成的，而且都是通过空间中的一点生成的。现在，我们给每个房子一个独特的颜色。为此我们需要在顶点着色器中添加一个额外的顶点属性，将其传递至几何着色器，并再次传递到片段着色器。下面是更新后的顶点数据：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">float</span> points[] = &#123;</span><br><span class="line">    <span class="number">-0.5f</span>,  <span class="number">0.5f</span>, <span class="number">1.0f</span>, <span class="number">0.0f</span>, <span class="number">0.0f</span>, <span class="comment">// 左上</span></span><br><span class="line">     <span class="number">0.5f</span>,  <span class="number">0.5f</span>, <span class="number">0.0f</span>, <span class="number">1.0f</span>, <span class="number">0.0f</span>, <span class="comment">// 右上</span></span><br><span class="line">     <span class="number">0.5f</span>, <span class="number">-0.5f</span>, <span class="number">0.0f</span>, <span class="number">0.0f</span>, <span class="number">1.0f</span>, <span class="comment">// 右下</span></span><br><span class="line">    <span class="number">-0.5f</span>, <span class="number">-0.5f</span>, <span class="number">1.0f</span>, <span class="number">1.0f</span>, <span class="number">0.0f</span>  <span class="comment">// 左下</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>然后更新顶点着色器，使用一个接口块将颜色属性发送到几何着色器中：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#version 330 core</span></span><br><span class="line">layout (location = <span class="number">0</span>) in vec2 aPos;</span><br><span class="line">layout (location = <span class="number">1</span>) in vec3 aColor;</span><br><span class="line"></span><br><span class="line">out VS_OUT &#123;</span><br><span class="line">    vec3 color;</span><br><span class="line">&#125; vs_out;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    gl_Position = vec4(aPos.x, aPos.y, <span class="number">0.0</span>, <span class="number">1.0</span>); </span><br><span class="line">    vs_out.color = aColor;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>接下来我们还需要在几何着色器中声明相同的接口块（使用一个不同的接口名）：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">in VS_OUT &#123;</span><br><span class="line">    vec3 color;</span><br><span class="line">&#125; gs_in[];</span><br></pre></td></tr></table></figure>
+<p>接下来还需要为下个片段着色器声明一个输出颜色变量：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">out vec3 fColor;</span><br></pre></td></tr></table></figure>
+<p>因为片段着色器只需要一个插值过的颜色，传输多个颜色值是没有意义的。所以
+fColor 不是一个数组，而是一个向量。当提交（emit）一个顶点时，会储存
+fColor 中的值作为顶点输出值。我们可以在第一个顶点提交之前先填充 fColor
+一次，这样绘制出的房子就会被填充上 fColor 最后存储的颜色。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">fColor = gs_in[<span class="number">0</span>].color; <span class="comment">// gs_in[0] since there&#x27;s only one input vertex</span></span><br><span class="line">gl_Position = position + vec4(<span class="number">-0.2</span>, <span class="number">-0.2</span>, <span class="number">0.0</span>, <span class="number">0.0</span>);    <span class="comment">// 1:bottom-left   </span></span><br><span class="line">EmitVertex();   </span><br><span class="line">gl_Position = position + vec4( <span class="number">0.2</span>, <span class="number">-0.2</span>, <span class="number">0.0</span>, <span class="number">0.0</span>);    <span class="comment">// 2:bottom-right</span></span><br><span class="line">EmitVertex();</span><br><span class="line">gl_Position = position + vec4(<span class="number">-0.2</span>,  <span class="number">0.2</span>, <span class="number">0.0</span>, <span class="number">0.0</span>);    <span class="comment">// 3:top-left</span></span><br><span class="line">EmitVertex();</span><br><span class="line">gl_Position = position + vec4( <span class="number">0.2</span>,  <span class="number">0.2</span>, <span class="number">0.0</span>, <span class="number">0.0</span>);    <span class="comment">// 4:top-right</span></span><br><span class="line">EmitVertex();</span><br><span class="line">gl_Position = position + vec4( <span class="number">0.0</span>,  <span class="number">0.4</span>, <span class="number">0.0</span>, <span class="number">0.0</span>);    <span class="comment">// 5:top</span></span><br><span class="line">EmitVertex();</span><br><span class="line">EndPrimitive();</span><br></pre></td></tr></table></figure>
+<figure>
+<img
+src="%22/images/LearnOpenGL/Advanced%20OpenGL/geometry_shader_6.png%22"
+alt="houses colored" />
+<figcaption aria-hidden="true">houses colored</figcaption>
+</figure>
+<h3 id="exploding-object-visualizing-normal-vectors">Exploding object
+&amp; Visualizing normal vectors</h3>
+<p>几何着色器除了绘制小房子外，当然还有其他应用。可以看看原文中的其他两个例子，当然这两个例子也不是用的很多就是了，但是可以作为参考。</p>
+<h3 id="参考文献">参考文献</h3>
+<p><a
+target="_blank" rel="noopener" href="https://learnopengl.com/Advanced-OpenGL/Geometry-Shader">Geometry
+Shader</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Shader/" rel="tag"># Shader</a>
+              <a href="/tags/OpenGL/" rel="tag"># OpenGL</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2024/10/28/Game%20Development/%E6%AF%9B%E5%8F%91%E6%B8%B2%E6%9F%93/" rel="prev" title="毛发渲染">
+                  <i class="fa fa-angle-left"></i> 毛发渲染
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Rigel Aster</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+
+</body>
+</html>
