@@ -27,12 +27,20 @@
 <meta property="og:site_name" content="Rigel&#39;s Blog">
 <meta property="og:description" content="OpenGL中的几何着色器 Geometry Shader">
 <meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://rigelaster.github.io/images/LearnOpenGL/Advanced%20OpenGL/geometry_shader_1.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/LearnOpenGL/Advanced%20OpenGL/geometry_shader_2.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/LearnOpenGL/Advanced%20OpenGL/geometry_shader_3.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/LearnOpenGL/Advanced%20OpenGL/geometry_shader_4.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/LearnOpenGL/Advanced%20OpenGL/geometry_shader_5.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/LearnOpenGL/Advanced%20OpenGL/geometry_shader_6.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/LearnOpenGL/Advanced%20OpenGL/geometry_shader_6.png">
 <meta property="article:published_time" content="2024-11-05T07:30:35.000Z">
-<meta property="article:modified_time" content="2024-11-05T09:59:23.187Z">
+<meta property="article:modified_time" content="2024-11-05T10:05:05.624Z">
 <meta property="article:author" content="Rigel Aster">
 <meta property="article:tag" content="Shader">
 <meta property="article:tag" content="OpenGL">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://rigelaster.github.io/images/LearnOpenGL/Advanced%20OpenGL/geometry_shader_1.png">
 
 
 <link rel="canonical" href="https://rigelaster.github.io/2024/11/05/LearnOpenGL/Geometry%20Shader/">
@@ -209,7 +217,7 @@
       <span class="post-meta-item-text">Posted on</span>
       
 
-      <time title="Created: 2024-11-05 15:30:35 / Modified: 17:59:23" itemprop="dateCreated datePublished" datetime="2024-11-05T15:30:35+08:00">2024-11-05</time>
+      <time title="Created: 2024-11-05 15:30:35 / Modified: 18:05:05" itemprop="dateCreated datePublished" datetime="2024-11-05T15:30:35+08:00">2024-11-05</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -265,8 +273,7 @@ out 关键字的修饰符中设置。在例子中，我们将输出一个
 line_strip，并将最大顶点数设置为2。所谓
 line_strip，是指线条，线条链接了一组点，形成了一条连续的线，它最少由两个点来组成。在渲染函数中每多加一个点，就会在这个点与前一个点之间形成一条新的线。在下面这张图中，有5个顶点：</p>
 <figure>
-<img
-src="%22/images/LearnOpenGL/Advanced%20OpenGL/geometry_shader_1.png%22"
+<img src="/images/LearnOpenGL/Advanced%20OpenGL/geometry_shader_1.png"
 alt="line strip" />
 <figcaption aria-hidden="true">line strip</figcaption>
 </figure>
@@ -284,8 +291,7 @@ EndPrimitive被调用时，此图元中所有被 emitted
 的顶点都会被联结成为输出的渲染图元。在调用多次 EmitVertex 函数后调用函数
 EndPrimitive，重复多次便能生成多个图元。在上面的例子中，我们将点偏移两次然后联结为线条图元。其效果，如下图：</p>
 <figure>
-<img
-src="%22/images/LearnOpenGL/Advanced%20OpenGL/geometry_shader_2.png%22"
+<img src="/images/LearnOpenGL/Advanced%20OpenGL/geometry_shader_2.png"
 alt="lines" />
 <figcaption aria-hidden="true">lines</figcaption>
 </figure>
@@ -302,8 +308,7 @@ alt="lines" />
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">shader.use();</span><br><span class="line">glBindVertexArray(VAO);</span><br><span class="line">glDrawArrays(GL_POINTS, <span class="number">0</span>, <span class="number">4</span>);</span><br></pre></td></tr></table></figure>
 <p>结果是在黑暗的场景中出现四个绿色的点：</p>
 <figure>
-<img
-src="%22/images/LearnOpenGL/Advanced%20OpenGL/geometry_shader_3.png%22"
+<img src="/images/LearnOpenGL/Advanced%20OpenGL/geometry_shader_3.png"
 alt="points" />
 <figcaption aria-hidden="true">points</figcaption>
 </figure>
@@ -320,15 +325,13 @@ triangle_strip，然后每个点处画三个三角形：两个作为方形，一
 strip）是高效地绘制三角形的方式，使用的顶点少。在第一个三角形绘制完之后，每个后续顶点将会在上一个三角形边上生成另一个三角形：每三个相邻的顶点将会形成一个三角形。如果我们一共有6个构成三角形带的顶点，那么我们会得到这些三角形：（1,2,3）（2,3,4）（3,4,5）和（4,5,6），共四个三角形。一个三角形带至少需要3个顶点，并会生成
 N-2 个三角形。下图可以很好展现这点：</p>
 <figure>
-<img
-src="%22/images/LearnOpenGL/Advanced%20OpenGL/geometry_shader_4.png%22"
+<img src="/images/LearnOpenGL/Advanced%20OpenGL/geometry_shader_4.png"
 alt="triangle strip" />
 <figcaption aria-hidden="true">triangle strip</figcaption>
 </figure>
 <p>通过是使用三角形带作为几何着色器的输出，我们可以很容易的创建需要的房子形状，只需要以正确的顺序生成3个相连的三角形即可。下面这幅图展示了顶点绘制的顺序，蓝点表示输入点：</p>
 <figure>
-<img
-src="%22/images/LearnOpenGL/Advanced%20OpenGL/geometry_shader_5.png%22"
+<img src="/images/LearnOpenGL/Advanced%20OpenGL/geometry_shader_5.png"
 alt="house" />
 <figcaption aria-hidden="true">house</figcaption>
 </figure>
@@ -336,8 +339,7 @@ alt="house" />
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#version 330 core</span></span><br><span class="line">layout (points) in;</span><br><span class="line">layout (triangle_strip, max_vertices = <span class="number">5</span>) out;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">build_house</span><span class="params">(vec4 position)</span></span><br><span class="line">&#123;</span><br><span class="line">    gl_Position = position + vec4(<span class="number">-0.2</span>, <span class="number">-0.2</span>, <span class="number">0.0</span>, <span class="number">0.0</span>); <span class="comment">// 1:bottom-left</span></span><br><span class="line">    EmitVertex();</span><br><span class="line">    gl_Position = position + vec4( <span class="number">0.2</span>, <span class="number">-0.2</span>, <span class="number">0.0</span>, <span class="number">0.0</span>); <span class="comment">// 2:bottom-right</span></span><br><span class="line">    EmitVertex();</span><br><span class="line">    gl_Position = position + vec4(<span class="number">-0.2</span>,  <span class="number">0.2</span>, <span class="number">0.0</span>, <span class="number">0.0</span>); <span class="comment">// 3:top-left</span></span><br><span class="line">    EmitVertex();</span><br><span class="line">    gl_Position = position + vec4( <span class="number">0.2</span>,  <span class="number">0.2</span>, <span class="number">0.0</span>, <span class="number">0.0</span>); <span class="comment">// 4:top-left</span></span><br><span class="line">    EmitVertex();</span><br><span class="line">    gl_Position = position + vec4( <span class="number">0.2</span>,  <span class="number">0.4</span>, <span class="number">0.0</span>, <span class="number">0.0</span>); <span class="comment">// 5:top</span></span><br><span class="line">    EmitVertex();</span><br><span class="line">    EndPrimitive();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">main</span><span class="params">()</span>&#123;</span><br><span class="line">    build_house(gl_in[<span class="number">0</span>].gl_Position);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>这个几何着色器生成了5个顶点，每个顶点都是原始点的位置加上一个偏移量，来组成一个大的三角带。最终的图元会被光栅化，然后片段着色器处理整个三角形带，最终在每个绘制的点处生成绿色的房子：</p>
 <figure>
-<img
-src="%22/images/LearnOpenGL/Advanced%20OpenGL/geometry_shader_6.png%22"
+<img src="/images/LearnOpenGL/Advanced%20OpenGL/geometry_shader_6.png"
 alt="house" />
 <figcaption aria-hidden="true">house</figcaption>
 </figure>
@@ -355,8 +357,7 @@ fColor 中的值作为顶点输出值。我们可以在第一个顶点提交之�
 一次，这样绘制出的房子就会被填充上 fColor 最后存储的颜色。</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">fColor = gs_in[<span class="number">0</span>].color; <span class="comment">// gs_in[0] since there&#x27;s only one input vertex</span></span><br><span class="line">gl_Position = position + vec4(<span class="number">-0.2</span>, <span class="number">-0.2</span>, <span class="number">0.0</span>, <span class="number">0.0</span>);    <span class="comment">// 1:bottom-left   </span></span><br><span class="line">EmitVertex();   </span><br><span class="line">gl_Position = position + vec4( <span class="number">0.2</span>, <span class="number">-0.2</span>, <span class="number">0.0</span>, <span class="number">0.0</span>);    <span class="comment">// 2:bottom-right</span></span><br><span class="line">EmitVertex();</span><br><span class="line">gl_Position = position + vec4(<span class="number">-0.2</span>,  <span class="number">0.2</span>, <span class="number">0.0</span>, <span class="number">0.0</span>);    <span class="comment">// 3:top-left</span></span><br><span class="line">EmitVertex();</span><br><span class="line">gl_Position = position + vec4( <span class="number">0.2</span>,  <span class="number">0.2</span>, <span class="number">0.0</span>, <span class="number">0.0</span>);    <span class="comment">// 4:top-right</span></span><br><span class="line">EmitVertex();</span><br><span class="line">gl_Position = position + vec4( <span class="number">0.0</span>,  <span class="number">0.4</span>, <span class="number">0.0</span>, <span class="number">0.0</span>);    <span class="comment">// 5:top</span></span><br><span class="line">EmitVertex();</span><br><span class="line">EndPrimitive();</span><br></pre></td></tr></table></figure>
 <figure>
-<img
-src="%22/images/LearnOpenGL/Advanced%20OpenGL/geometry_shader_6.png%22"
+<img src="/images/LearnOpenGL/Advanced%20OpenGL/geometry_shader_6.png"
 alt="houses colored" />
 <figcaption aria-hidden="true">houses colored</figcaption>
 </figure>
@@ -455,7 +456,7 @@ Shader</a></p>
 
   
 
-  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
 <script src="/js/third-party/math/mathjax.js"></script>
 
 
