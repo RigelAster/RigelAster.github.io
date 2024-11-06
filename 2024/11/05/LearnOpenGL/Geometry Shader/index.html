@@ -33,12 +33,12 @@
 <meta property="og:image" content="https://rigelaster.github.io/images/LearnOpenGL/Advanced%20OpenGL/geometry_shader_4.png">
 <meta property="og:image" content="https://rigelaster.github.io/images/LearnOpenGL/Advanced%20OpenGL/geometry_shader_5.png">
 <meta property="og:image" content="https://rigelaster.github.io/images/LearnOpenGL/Advanced%20OpenGL/geometry_shader_6.png">
-<meta property="og:image" content="https://rigelaster.github.io/images/LearnOpenGL/Advanced%20OpenGL/geometry_shader_6.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/LearnOpenGL/Advanced%20OpenGL/geometry_shader_7.png">
 <meta property="article:published_time" content="2024-11-05T07:30:35.000Z">
-<meta property="article:modified_time" content="2024-11-05T10:05:05.624Z">
+<meta property="article:modified_time" content="2024-11-05T10:06:29.466Z">
 <meta property="article:author" content="Rigel Aster">
-<meta property="article:tag" content="Shader">
 <meta property="article:tag" content="OpenGL">
+<meta property="article:tag" content="Shader">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://rigelaster.github.io/images/LearnOpenGL/Advanced%20OpenGL/geometry_shader_1.png">
 
@@ -138,7 +138,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">33</span>
+          <span class="site-state-item-count">34</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -149,7 +149,7 @@
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-count">18</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
@@ -217,7 +217,7 @@
       <span class="post-meta-item-text">Posted on</span>
       
 
-      <time title="Created: 2024-11-05 15:30:35 / Modified: 18:05:05" itemprop="dateCreated datePublished" datetime="2024-11-05T15:30:35+08:00">2024-11-05</time>
+      <time title="Created: 2024-11-05 15:30:35 / Modified: 18:06:29" itemprop="dateCreated datePublished" datetime="2024-11-05T15:30:35+08:00">2024-11-05</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -357,7 +357,7 @@ fColor 中的值作为顶点输出值。我们可以在第一个顶点提交之�
 一次，这样绘制出的房子就会被填充上 fColor 最后存储的颜色。</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">fColor = gs_in[<span class="number">0</span>].color; <span class="comment">// gs_in[0] since there&#x27;s only one input vertex</span></span><br><span class="line">gl_Position = position + vec4(<span class="number">-0.2</span>, <span class="number">-0.2</span>, <span class="number">0.0</span>, <span class="number">0.0</span>);    <span class="comment">// 1:bottom-left   </span></span><br><span class="line">EmitVertex();   </span><br><span class="line">gl_Position = position + vec4( <span class="number">0.2</span>, <span class="number">-0.2</span>, <span class="number">0.0</span>, <span class="number">0.0</span>);    <span class="comment">// 2:bottom-right</span></span><br><span class="line">EmitVertex();</span><br><span class="line">gl_Position = position + vec4(<span class="number">-0.2</span>,  <span class="number">0.2</span>, <span class="number">0.0</span>, <span class="number">0.0</span>);    <span class="comment">// 3:top-left</span></span><br><span class="line">EmitVertex();</span><br><span class="line">gl_Position = position + vec4( <span class="number">0.2</span>,  <span class="number">0.2</span>, <span class="number">0.0</span>, <span class="number">0.0</span>);    <span class="comment">// 4:top-right</span></span><br><span class="line">EmitVertex();</span><br><span class="line">gl_Position = position + vec4( <span class="number">0.0</span>,  <span class="number">0.4</span>, <span class="number">0.0</span>, <span class="number">0.0</span>);    <span class="comment">// 5:top</span></span><br><span class="line">EmitVertex();</span><br><span class="line">EndPrimitive();</span><br></pre></td></tr></table></figure>
 <figure>
-<img src="/images/LearnOpenGL/Advanced%20OpenGL/geometry_shader_6.png"
+<img src="/images/LearnOpenGL/Advanced%20OpenGL/geometry_shader_7.png"
 alt="houses colored" />
 <figcaption aria-hidden="true">houses colored</figcaption>
 </figure>
@@ -377,8 +377,8 @@ Shader</a></p>
 
     <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/Shader/" rel="tag"># Shader</a>
               <a href="/tags/OpenGL/" rel="tag"># OpenGL</a>
+              <a href="/tags/Shader/" rel="tag"># Shader</a>
           </div>
 
         
@@ -390,6 +390,9 @@ Shader</a></p>
                 </a>
             </div>
             <div class="post-nav-item">
+                <a href="/2024/11/05/Game%20Development/GeometryGrass/" rel="next" title="Unity Geometry Shader Grass">
+                  Unity Geometry Shader Grass <i class="fa fa-angle-right"></i>
+                </a>
             </div>
           </div>
     </footer>

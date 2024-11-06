@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha256-5eIC48iZUHmSlSUz9XtjRyK2mzQkHScZY1WdMaoz74E=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"rigelaster.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.21.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"always","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="使用Unity的内置管线复现 roystan 文章 Grass Shader 中的草地，当作学习 Geometry Shader 的资料，顺便加深对渲染管线的理解。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Unity Geometry Shader Grass">
+<meta property="og:url" content="https://rigelaster.github.io/2024/11/05/Game%20Development/GeometryGrass/index.html">
+<meta property="og:site_name" content="Rigel&#39;s Blog">
+<meta property="og:description" content="使用Unity的内置管线复现 roystan 文章 Grass Shader 中的草地，当作学习 Geometry Shader 的资料，顺便加深对渲染管线的理解。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://rigelaster.github.io/images/RoystanGeometryShaderGrass/d3d11-pipeline-stages.jpg">
+<meta property="og:image" content="https://rigelaster.github.io/images/RoystanGeometryShaderGrass/MGeometryGrass-1.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/RoystanGeometryShaderGrass/MGeometryGrass-2.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/RoystanGeometryShaderGrass/MGeometryGrass-3.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/RoystanGeometryShaderGrass/grass-uv.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/RoystanGeometryShaderGrass/MGeometryGrass-4.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/RoystanGeometryShaderGrass/MGeometryGrass-5.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/RoystanGeometryShaderGrass/shader-programs.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/RoystanGeometryShaderGrass/hull-shader.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/RoystanGeometryShaderGrass/MGeometryGrass-6.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/RoystanGeometryShaderGrass/DistortionTexture.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/RoystanGeometryShaderGrass/blade-intersection-error.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/RoystanGeometryShaderGrass/grass-construction.gif">
+<meta property="og:image" content="https://rigelaster.github.io/images/RoystanGeometryShaderGrass/MGeometryGrass-7.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/RoystanGeometryShaderGrass/MGeometryGrass-8.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/RoystanGeometryShaderGrass/MGeometryGrass-9.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/RoystanGeometryShaderGrass/MGeometryGrass-10.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/RoystanGeometryShaderGrass/MGeometryGrass-11.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/RoystanGeometryShaderGrass/MGeometryGrass-12.png">
+<meta property="article:published_time" content="2024-11-05T13:33:18.000Z">
+<meta property="article:modified_time" content="2024-11-06T10:56:21.513Z">
+<meta property="article:author" content="Rigel Aster">
+<meta property="article:tag" content="Unity">
+<meta property="article:tag" content="Geometry Shader">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://rigelaster.github.io/images/RoystanGeometryShaderGrass/d3d11-pipeline-stages.jpg">
+
+
+<link rel="canonical" href="https://rigelaster.github.io/2024/11/05/Game%20Development/GeometryGrass/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"https://rigelaster.github.io/2024/11/05/Game%20Development/GeometryGrass/","path":"2024/11/05/Game Development/GeometryGrass/","title":"Unity Geometry Shader Grass"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Unity Geometry Shader Grass | Rigel's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Rigel's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#geometry-shaders"><span class="nav-number">2.</span> <span class="nav-text">Geometry shaders</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#tangent-space"><span class="nav-number">3.</span> <span class="nav-text">Tangent space</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#grass-look"><span class="nav-number">4.</span> <span class="nav-text">Grass look</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#color-gradient"><span class="nav-number">4.1.</span> <span class="nav-text">Color gradient</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#random-facing-direction-forward-bend-width-and-height"><span class="nav-number">4.2.</span> <span class="nav-text">Random
+facing direction &amp; forward bend &amp; Width and height</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#tessellation"><span class="nav-number">5.</span> <span class="nav-text">Tessellation</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#unity-custom-shader-tessellation"><span class="nav-number">5.1.</span> <span class="nav-text">Unity Custom Shader
+Tessellation</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#hull-shaders"><span class="nav-number">5.2.</span> <span class="nav-text">Hull Shaders</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#domain-shaders"><span class="nav-number">5.3.</span> <span class="nav-text">Domain Shaders</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#different-tessellation-factors"><span class="nav-number">5.4.</span> <span class="nav-text">Different Tessellation
+Factors</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#tessellation-grass"><span class="nav-number">5.5.</span> <span class="nav-text">Tessellation Grass</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#wind"><span class="nav-number">6.</span> <span class="nav-text">Wind</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#blade-curvature"><span class="nav-number">7.</span> <span class="nav-text">Blade curvature</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#lighting-and-shadows"><span class="nav-number">8.</span> <span class="nav-text">Lighting and shadows</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#casting-shadows"><span class="nav-number">8.1.</span> <span class="nav-text">Casting shadows</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#receiving-shadows"><span class="nav-number">8.2.</span> <span class="nav-text">Receiving shadows</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#lighting"><span class="nav-number">8.3.</span> <span class="nav-text">Lighting</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#conclusion"><span class="nav-number">9.</span> <span class="nav-text">Conclusion</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E7%8C%AE"><span class="nav-number">10.</span> <span class="nav-text">参考文献</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Rigel Aster"
+      src="/uploads/avatar.png">
+  <p class="site-author-name" itemprop="name">Rigel Aster</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">34</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://www.zhihu.com/people/ming-zi-13-35" title="Zhihu → https:&#x2F;&#x2F;www.zhihu.com&#x2F;people&#x2F;ming-zi-13-35" rel="noopener me" target="_blank"><i class="fab fa-zhihu fa-fw"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:remingzi7@gmail.com" title="E-Mail → mailto:remingzi7@gmail.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://github.com/MingZI-7" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;MingZI-7" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i></a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://rigelaster.github.io/2024/11/05/Game%20Development/GeometryGrass/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar.png">
+      <meta itemprop="name" content="Rigel Aster">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Rigel's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Unity Geometry Shader Grass | Rigel's Blog">
+      <meta itemprop="description" content="使用Unity的内置管线复现 roystan 文章 Grass Shader 中的草地，当作学习 Geometry Shader 的资料，顺便加深对渲染管线的理解。">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Unity Geometry Shader Grass
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2024-11-05 21:33:18" itemprop="dateCreated datePublished" datetime="2024-11-05T21:33:18+08:00">2024-11-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2024-11-06 18:56:21" itemprop="dateModified" datetime="2024-11-06T18:56:21+08:00">2024-11-06</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Real-time-Rendering/" itemprop="url" rel="index"><span itemprop="name">Real-time Rendering</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+            <div class="post-description">使用Unity的内置管线复现 roystan 文章 Grass Shader 中的草地，当作学习 Geometry Shader 的资料，顺便加深对渲染管线的理解。</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h3 id="前言">前言</h3>
+<p>看别人项目的时候突然看到Geometry
+Shader，之前也接触过，不过过了有好一段时间没用忘的差不多了，就又来看看，顺便记录一下，方便后续查看。好像Geometry
+Shader在商业中用的不是很广泛，有一些性能和平台的原因，有的平台不支持Geometry
+Shader，查阅时找到的资料比较少，Unity官方的资料更是少中又少，总之先学习一下。</p>
+<p>原文章就是一篇手把手的教学，写的非常详细，跟着做下来就会得到和案例相同的效果。本文主要还是记录一下其中用到的知识，以及过程中遇到的问题。</p>
+<p>文章中生成草的大致过程为：向着色器中输入一个网格，使用几何着色器在网格的定点上生成草地的面片；然后，再调整面片的形状、朝向、和风的交互运动等；最后，为了更具真实性，让面片具有光影属性。</p>
+<p>开始之前还是要提一嘴，文章作者提供了一个初始项目，里面Grass.shader中的代码用到了
+<code>CGINCLUDE</code>，这个东西是直接放在Shader块中的，根据文章作者以及Unity论坛中的说法，其可以将块中的内容自动
+include 到本着色器的所有pass中。其中实例代码中有开发人员的注释：</p>
+<blockquote>
+<p>Shader code pasted into all further CGPROGRAM blocks</p>
+</blockquote>
+<h3 id="geometry-shaders">Geometry shaders</h3>
+<p>几何着色器(Geometry
+Shader)是渲染管线中可配置部分，位于顶点着色器(Vertex
+Shader)之后（或者如果用到了曲面细分着色器 Tessellation
+Shader，就会在它的后面），在片元着色器(Fragment
+Shader)之前。可以看下面Direct3D 11 图像管线的图：</p>
+<figure>
+<img src="/images/RoystanGeometryShaderGrass/d3d11-pipeline-stages.jpg"
+alt="d3d11 pipeline" />
+<figcaption aria-hidden="true">d3d11 pipeline</figcaption>
+</figure>
+<p>为了对几何着色器有个基本认知，可以先看看LearnOpenGL的<a
+target="_blank" rel="noopener" href="https://learnopengl.com/Advanced-OpenGL/Geometry-Shader">这篇文章</a>。</p>
+<p>让我们来看一下，Unity中如何使用几何着色器。和顶点着色器类似，需要先在pass中做编辑声明，然后再依照格式实现，声明的函数：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// inside CGPROGRAM block</span></span><br><span class="line"><span class="meta">#<span class="keyword">pragma</span> geometry geom</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">geometryOutput</span>&#123;</span></span><br><span class="line">    float4 pos : SV_POSITION;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">[maxvertexcount(<span class="number">3</span>)]</span><br><span class="line"><span class="type">void</span> <span class="title function_">geom</span><span class="params">(triangle float4 IN[<span class="number">3</span>] : SV_POSITION, inout TriangleStream&lt;geometryOutput&gt; triStream)</span></span><br><span class="line">&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>几何着色器有两个参数，其中 <code>triangle float4 IN[3]</code>
+表示将一个三角形的三个顶点作为输入，第二个参数
+<code>TriangleStream</code>
+表示着色器将输出一个三角形流，其中每个顶点数据使用结构
+<code>geometryOutput</code>
+来存储。而且，函数还有最后一个参数位于函数上方
+<code>[maxvertexcount(3)]</code>，它告诉GPU我们每个图元最多提交3个顶点，多余的顶点会被忽略。</p>
+<p>还有一个问题就是，我们之前提到在每个顶点处生成一个草地面片，为什么不使用点图元作为输入，而是用三角形图元？用点图元也是可以的，可以这样写：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">geom</span><span class="params">(point vertexOutput IN[<span class="number">1</span>], inout TriangleStream&lt;geometryOutput&gt; triStream)</span></span><br></pre></td></tr></table></figure>
+<p>但是，就目前状况来看，我们输入的网格是三角形拓扑的(has a triangle
+mesh
+topology)，上述的写法会产生输入的网格拓扑和要求输入的图元不适配的情况。这在DirectX
+HLSL中是允许的，但是在OpenGL中是不允许的。（多平台考虑问题还是要细心）</p>
+<p>另外一个需要注意的问题就是，<strong>现在几何着色器要承担通常由顶点着色器承担的职责
+——
+输出顶点的裁剪空间位置信息</strong>。处理好上述问题之后，就可以正常得到使用几何着色器绘制的三角形：</p>
+<p><img src="/images/RoystanGeometryShaderGrass/MGeometryGrass-1.png" width="400" alt="Geometry Grass 1"></p>
+<p>几何着色器对于每个输入的图元都会执行一次，上图只出现了一个三角形是因为在几何着色器中直接使用常量作为位置信息，所有图元产生的三角形被绘制到了一起，只需要考虑输入图元的位置信息就可以将三角形分开来：</p>
+<p><img src="/images/RoystanGeometryShaderGrass/MGeometryGrass-2.png" width="400" alt="Geometry Grass 2"></p>
+<p>目前绘制的三角形只适用于水平面，当网格变为球形时，它的样子就变的很奇怪。为了能让三角形适用于任意网格，需要使用到一种技术叫做切线空间。</p>
+<h3 id="tangent-space">Tangent space</h3>
+<p>如果你不了解切线空间，请看LearnOpenGL的<a
+target="_blank" rel="noopener" href="https://learnopengl.com/Advanced-Lighting/Normal-Mapping">这篇文章</a>。</p>
+<p>在切线空间绘制三角形便可以使其任意模型表面都保持正确的朝向，如下图：</p>
+<p><img src="/images/RoystanGeometryShaderGrass/MGeometryGrass-3.png" width="400" alt="Geometry Grass 3"></p>
+<h3 id="grass-look">Grass look</h3>
+<p>目前绘制的三角形只是白色的面片，要让其称为叶片，需要增加一些颜色和形态。我们从增加叶片渐变颜色开始。</p>
+<h4 id="color-gradient">Color gradient</h4>
+<p>对于叶片的颜色，我们允许设置顶部和底部的颜色，中间的部分使用插值。可以使用uv来实现这个效果，这样我们就需要把uv传递给片元着色器。对于uv，设置为下图的样式：</p>
+<p><img src="/images/RoystanGeometryShaderGrass/grass-uv.png" width="200" alt="Geometry Grass uv"></p>
+<p>几何着色器也要承担起传递uv的责任：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// add to the geometryOutput struct</span></span><br><span class="line">float2 uv : TEXCOORD0;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Modify the function signature of the fragment shader</span></span><br><span class="line">float4 <span class="title function_">frag</span><span class="params">(geometryOutput i, fixed facing : VFACE)</span> : SV_Target</span><br></pre></td></tr></table></figure>
+<p><img src="/images/RoystanGeometryShaderGrass/MGeometryGrass-4.png" width="400" alt="Geometry Grass 4"></p>
+<h4 id="random-facing-direction-forward-bend-width-and-height">Random
+facing direction &amp; forward bend &amp; Width and height</h4>
+<p>目前草地还是整齐排列的三角形面片，通过增加一些随机变量来使其看起来杂乱一些。这时会用到两个函数
+rand() 和
+AngleAxis3x3()。rand会根据输入的三维变量产生随机数，AngleAxis3x3根据输入的弧度角和旋转轴返回一个渲染矩阵。因为与几何着色器无关，函数具体实现不在这里展开，一般都会有先人实现的工具函数，这里使用的两个函数可以看文章<a
+target="_blank" rel="noopener" href="https://forum.unity.com/threads/am-i-over-complicating-this-random-function.454887/#post-2949326">rand</a>和<a
+target="_blank" rel="noopener" href="https://gist.github.com/keijiro/ee439d5e7388f3aafc5296005c8c3f33">AngleAxis3x3</a></p>
+<p>在将变换融入之前的矩阵中之后，可以得到更像草地的东西：</p>
+<p><img src="/images/RoystanGeometryShaderGrass/MGeometryGrass-5.png" width="400" alt="Geometry Grass 5"></p>
+<p>显然，草地还是有些稀疏了，因为输入的几何网格三角形并不会特别密集，而每个图元只会产生一片草叶。为了使草地更密集，需要用到曲面细分着色器，其可以将三角形进一步划分。</p>
+<h3 id="tessellation">Tessellation</h3>
+<p>曲面细分也是渲染管线中可配置的渲染阶段，还记得之前那张渲染管线流程图吗？曲面细分位于顶点着色器之后，几何着色器之前，它的工作是将输入的表面细分为更多的图元。曲面细分通过两个可编程的阶段来实现：<strong>hull</strong>
+和 <strong>domain</strong>。</p>
+<p>对于Unity的表面着色器(Surface
+Shaders，个人认为是一个错误的设计，隐藏了一些内容，开放了一些接口)，Unity提供了BIRP下细分曲面的案例，但是我们现在没有使用表面着色器，所以需要自己去实现hull
+shader 和 domain
+shader。文章中作者并未展开这部分内容，但是我还是打算在这里详细写一下。这部分内容参考的是
+CatlikeCoding 的文章，链接放在文末。</p>
+<h4 id="unity-custom-shader-tessellation">Unity Custom Shader
+Tessellation</h4>
+<p>我们首先来看下数据流向图：</p>
+<p><img src="/images/RoystanGeometryShaderGrass/shader-programs.png" width="400" alt="Shader Programs"></p>
+<p>被处理的数据依次流过 hull program -&gt; Tessellation -&gt; dimain
+program，最后才流入几何着色器，我们依次说明。注意，只有4.6以上的着色器才能编程曲面细分。着色器编译声明都是要加的：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">pragma</span> hull hullProgramName</span></span><br><span class="line"><span class="meta">#<span class="keyword">pragma</span> domain domainProgramName</span></span><br></pre></td></tr></table></figure>
+<h4 id="hull-shaders">Hull Shaders</h4>
+<p>一个基础的hull函数应该具有以下结构：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">TessellationFactors</span>&#123;</span></span><br><span class="line">    <span class="type">float</span> edge[<span class="number">3</span>] : SV_TessFactor;</span><br><span class="line">    <span class="type">float</span> inside : SV_InsideTessFactor;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">TessellationFactors <span class="title function_">patchConstantFunction</span><span class="params">(InputPatch&lt;VertexInput, <span class="number">3</span>&gt; patch)</span></span><br><span class="line">&#123;</span><br><span class="line">    TessellationFactors f;</span><br><span class="line">    f.edge[<span class="number">0</span>] = <span class="number">1</span>;</span><br><span class="line">    f.edge[<span class="number">1</span>] = <span class="number">1</span>;</span><br><span class="line">    f.edge[<span class="number">2</span>] = <span class="number">1</span>;</span><br><span class="line">    f.inside = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">return</span> f;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">[UNITY_domain(<span class="string">&quot;tri&quot;</span>)]</span><br><span class="line">[UNITY_outputcontrolpoints(<span class="number">3</span>)]</span><br><span class="line">[UNITY_outputtopology(<span class="string">&quot;triangle_cw&quot;</span>)]</span><br><span class="line">[UNITY_partitioning(<span class="string">&quot;integer&quot;</span>)]</span><br><span class="line">[UNITY_patchconstantfunc(<span class="string">&quot;patchConstantFunction&quot;</span>)]</span><br><span class="line">VertexInput <span class="title function_">hull</span><span class="params">(InputPatch&lt;VertexInput, <span class="number">3</span>&gt; patch, uint id : SV_OutputControlPointID)</span>&#123;</span><br><span class="line">    <span class="keyword">return</span> patch[id];</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>hull
+program的任务就是把需要的顶点数据传递给细分曲面阶段。hull函数肯定是必须的，其具有两个参数：InputPatch&lt;VertexInput,
+3&gt; patch 和 SV_OutputControlPointID
+id。patch是网格顶点集，VertexInput代表其数据格式，数字表示每个patch包含的顶点个数。SV_OutputControlPointID语义可以当作顶点在patch中的索引，其传递当前函数在哪个顶点运行的信息。这里就要提到，虽然hull函数输入了整个patch，但是函数还会在每个顶点上调用(<strong>get
+invoked once per vertex in the patch</strong>)，输出一个顶点信息。</p>
+<p>函数上方的属性信息给hull函数设定了一些属性，含义如下：</p>
+<ul>
+<li><code>UNITY_domain("tri")</code> 函数运行在三角形上</li>
+<li><code>UNITY_outputcontrolpoints(3)</code>
+每个patch会输出3个控制点</li>
+<li><code>UNITY_outputtopology("triangle_cw")</code>
+GPU创建三角形时需要知道是顺时针(clockwise)还是逆时针(counterclockwise)，Unity中是顺时针</li>
+<li><code>UNITY_partitioning("integer")</code>
+GPU需要知道如何分割patch，有几种类型，这里先使用integer</li>
+<li><code>UNITY_patchconstantfunc("patchConstantFunction")</code>
+GPU还需要知道要将patch分为几份，并不是一个定值，需要使用函数来返回值，这里使用的函数名称为
+patchConstantFunction</li>
+</ul>
+<p>每个patch如何被细分只需要确认一次就够了，所以patch constant
+function在每个patch上只会调用一次(only invoked once per
+patch)。为了效率，此函数和hull函数是并行调用的，示意图如下：</p>
+<p><img src="/images/RoystanGeometryShaderGrass/hull-shader.png" width="400" alt="inside a hull shader"></p>
+<p>GPU需要四个因子来确定如何细分一个三角形，三角形每个边具有一个，还有一个因子在三角形内部。边因子使用语义
+SV_TessFactor，中心因子使用语义
+SV_InsideTessFactor，正如上述代码中所写的
+TessellationFactors结构体。</p>
+<h4 id="domain-shaders">Domain Shaders</h4>
+<p>一个domain函数具有一个结构：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">vertexOutput <span class="title function_">tessVert</span><span class="params">(vertexInput v)</span></span><br><span class="line">&#123;</span><br><span class="line">	vertexOutput o;</span><br><span class="line">	<span class="comment">// Note that the vertex is NOT transformed to clip</span></span><br><span class="line">	<span class="comment">// space here; this is done in the grass geometry shader.</span></span><br><span class="line">	o.vertex = v.vertex;</span><br><span class="line">	o.normal = v.normal;</span><br><span class="line">	o.tangent = v.tangent;</span><br><span class="line">	<span class="keyword">return</span> o;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">[UNITY_domain(<span class="string">&quot;tri&quot;</span>)]</span><br><span class="line">vertexOutput <span class="title function_">domain</span><span class="params">(TessellationFactors factors, OutputPatch&lt;VertexInput, <span class="number">3</span>&gt; patch, float3 barycentricCoordinates : SV_DomainLocation)</span></span><br><span class="line">&#123;</span><br><span class="line">    vertexInput v;</span><br><span class="line">	<span class="meta">#<span class="keyword">define</span> MY_DOMAIN_PROGRAM_INTERPOLATE(fieldName) v.fieldName = \</span></span><br><span class="line"><span class="meta">		patch[0].fieldName * barycentricCoordinates.x + \</span></span><br><span class="line"><span class="meta">		patch[1].fieldName * barycentricCoordinates.y + \</span></span><br><span class="line"><span class="meta">		patch[2].fieldName * barycentricCoordinates.z;</span></span><br><span class="line"></span><br><span class="line">	MY_DOMAIN_PROGRAM_INTERPOLATE(vertex)</span><br><span class="line">	MY_DOMAIN_PROGRAM_INTERPOLATE(normal)</span><br><span class="line">	MY_DOMAIN_PROGRAM_INTERPOLATE(tangent)</span><br><span class="line">    <span class="keyword">return</span> tessVert(v);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>domain函数看起来比hull函数简单些，只有一个属性和三个参数。factors便是我们上面提到的曲面细分因子，patch和hull函数的参数相同，最后一个参数barycentricCoordinates表示重心坐标。</p>
+<p>流程图中，曲面细分阶段在domain
+program之前，它之决定了patch如何细分，但是并没有生成新的顶点，而是作为替代生成了这些新顶点的重心坐标。所以，domain函数的任务就是通过这些重心坐标生成最终的顶点数据。如果我没理解错的话，domain函数会在每个新顶点上调用一次(invoked
+once per vertex)，通过语义 SV_DomainLocation
+提供重心坐标。新顶点的数据都是通过插值获得的。</p>
+<h4 id="different-tessellation-factors">Different Tessellation
+Factors</h4>
+<p>在Unity中使用曲面细分的基础就是上面那些了，平时手动调整的也就是曲面细分因子factors了。此外还有一些进阶的用处，这里便不细说了，推荐看原文，这里放几张不同因子的对比图：</p>
+<div data-align="center">
+<p><img src = "/images/RoystanGeometryShaderGrass/tessellation-factors-2.png" width="200"/>
+<img src = "/images/RoystanGeometryShaderGrass/tessellation-factors-5.png" width="200"/>
+<img src = "/images/RoystanGeometryShaderGrass/tessellation-factors-1-inside-7-outside.png" width="200"/>
+<img src = "/images/RoystanGeometryShaderGrass/tessellation-factors-7-inside-1-outside.png" width="200"/></p>
+</div>
+<h4 id="tessellation-grass">Tessellation Grass</h4>
+<p>了解完Unity中曲面细分如何使用之后，我们回到草地渲染中。将曲面细分加入草地渲染流程，然后调整曲面细分的因子，使三角形面增多，生成的草叶也就越密集。如图因子为7时：</p>
+<p><img src="/images/RoystanGeometryShaderGrass/MGeometryGrass-6.png" width="400" alt="Shader Programs-6"></p>
+<h3 id="wind">Wind</h3>
+<p>风模拟是通过一张扰动贴图(distortion
+texture)实现的，和法线贴图类似，但是只有xy两通道包含数据。我们会使用这两个值表示风的水平方向，不考虑风力的竖直方向。然后设定风力的强度<code>_WindStrength</code>和频率<code>_WindFrequency</code>，配合Unity内置时间变量<code>_Time</code>制作草地动画。使用的贴图如下（如果风力效果不对，可以尝试将图片导入设置中的sRGB勾选去掉，这是一个和伽马矫正有关的设置）：</p>
+<p><img src="/images/RoystanGeometryShaderGrass/DistortionTexture.png" width="300" alt="Shader Programs-6"></p>
+<p>这部分整体还是容易理解的，这里只提两个比较容易产生困扰的点。</p>
+<p>第一点，我们需要一个uv来采样贴图，使用position坐标来采样贴图非常常见，这没有问题。但是文章作者说用<code>pos.xz</code>采样就可以在场景中有多个草地mesh时使它们看起来使用了同一个风力系统，这里的pos是物体空间的，要达成作者所说的效果需要使用世界坐标空间的position，个人判断这里作者写错了。</p>
+<p>第二点，是一连串的矩阵乘法
+<code>float3x3 transformationMatrix = mul(mul(mul(tangentToLocal, windRotation), facingRotationMatrix), bendRotationMatrix)</code>，正确理解这里很重要。Unity用的是矩阵右乘，所以在外侧的矩阵变换是最先作用到顶点的。也就是说，这串矩阵乘法做的变换是：在切线空间中沿x轴给叶片一个旋转使叶片有一个前后的倾角，沿z轴旋转叶片使其有一个随机的朝向，让叶片随风方向摇摆，最后从切线空间变换到物体空间。</p>
+<p>然后再看一下作者文章提到的叶片底部脱离地面的问题：</p>
+<p><img src="/images/RoystanGeometryShaderGrass/blade-intersection-error.png" width="300" alt="blade intersection error"></p>
+<p>在理解上面提到的那一串矩阵乘法之后很容易看出问题，因为叶片的三个顶点在随风摇摆时，底部顶点可能就会离开地面。所以，通过只让随机方向矩阵作用于底部顶点即可，并不会影响整体的表现。</p>
+<h3 id="blade-curvature">Blade curvature</h3>
+<p>目前的叶片由一个三角形组成，在动画时显然会表现的很僵硬。现在要做的就是将叶片划分成多个三角形，再用曲线模拟叶片的形状。我们打算将每个叶片(blade)划分为几个片段(segment)，每个片段是一个矩形，由两个三角形构成，除了叶尖还是用一个三角表示。Triangle
+Strip可以让我们很方便的构建一个三角形带，它先使用最前面的3个点构成一个三角形，随后每个点都会和之前的两个点构成一个新三角形，可以看如下动画演示：</p>
+<p><img src="/images/RoystanGeometryShaderGrass/grass-construction.gif" width="300" alt="grass construction"></p>
+<p>现在需要输出更多的顶点，不要忘记将几何着色器的属性<code>maxvertexcount</code>调大。通过宏定义<code>BLADE_SEGMENTS</code>来构建叶片的片段，越靠近底部叶片越宽，越靠近顶部叶片越尖，直接上代码可能更直观：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">[loop]<span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; BLADE_SEGMENTS; i++)</span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">float</span> t = i / (<span class="type">float</span>)BLADE_SEGMENTS;</span><br><span class="line">	<span class="type">float</span> segmentHeight = height * t;</span><br><span class="line">	<span class="type">float</span> segmentWidth = width * (<span class="number">1</span>-t);</span><br><span class="line"></span><br><span class="line">	float3x3 transformMatrix = i == <span class="number">0</span> ? transformationMatrixFacing : transformationMatrix;</span><br><span class="line">	</span><br><span class="line">	triStream.Append(GenerateGrassVertex(pos, segmentWidth, segmentHeight, float2(<span class="number">0</span>,t), transformMatrix));</span><br><span class="line">	triStream.Append(GenerateGrassVertex(pos, -segmentWidth, segmentHeight, float2(<span class="number">1</span>,t), transformMatrix));</span><br><span class="line">&#125;</span><br><span class="line">triStream.Append(GenerateGrassVertex(pos, <span class="number">0</span>, height, float2(<span class="number">0.5</span>,<span class="number">1</span>), transformationMatrix));</span><br></pre></td></tr></table></figure>
+<p>画出来的叶片是这个样子：</p>
+<p><img src="/images/RoystanGeometryShaderGrass/MGeometryGrass-7.png" width="400" alt="Shader Programs-7"/></p>
+<p>再给画出来的叶片加一个前倾属性，将形态画成曲线，这样草地会显得更加自然：</p>
+<p><img src="/images/RoystanGeometryShaderGrass/MGeometryGrass-8.png" width="400" alt="Shader Programs-8"/></p>
+<h3 id="lighting-and-shadows">Lighting and shadows</h3>
+<p>现在的草地形状已经基本完成了，之后要做的就是光影部分。</p>
+<h4 id="casting-shadows">Casting shadows</h4>
+<p>在Unity中想要投射阴影的话需要增加一个ShadowCaster
+Pass，这样才能在光源生成shadow
+map时写入深度，从而投射阴影。有一点需要注意，我们需要在这个pass中绘制出和之前相同的形状，也要使用geometry
+shader。这样，我们之前将vertex shader和geometry shader写入
+<code>CGINCLUDE</code> 块就有好处了，直接复用就可以。</p>
+<p><img src="/images/RoystanGeometryShaderGrass/MGeometryGrass-9.png" width="300" alt="Shader Programs-9"/></p>
+<h4 id="receiving-shadows">Receiving shadows</h4>
+<p>Unity在将一个灯光的阴影渲染到shadow
+map中后，会运行一个阴影收集(shadow
+collecting)函数将阴影写入一个屏幕空间的贴图(screen space
+texture)。为了采样这个贴图，需要计算顶点的屏幕空间坐标。这个过程Unity已经帮我们做了大部分工作，使用内置的数据和函数可以比较简单的完成阴影接收。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// geometryOutput struct</span></span><br><span class="line">unityShadowCoord4 _ShadowCoord : TEXCOORD1;</span><br><span class="line"></span><br><span class="line"><span class="comment">// VertexOutput function</span></span><br><span class="line">o._ShadowCoord = ComputeScreenPos(o.pos);</span><br><span class="line"></span><br><span class="line"><span class="comment">// forwardbase pass fragment shader</span></span><br><span class="line"><span class="keyword">return</span> SHADOW_ATTENUATIO(i);</span><br></pre></td></tr></table></figure>
+<p><img src="/images/RoystanGeometryShaderGrass/MGeometryGrass-10.png" width="400" alt="Shader Programs-10"/></p>
+<p>此时，叶片会存在自阴影线性，一般都是通过bias来解决。MSAA造成的阴影问题这里也不展开讨论了。Unity也提供了函数：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">if</span> UNITY_PASS_SHADOWCASTER</span></span><br><span class="line">    o.pos = UnityApplyLinearShadowBias(o.pos);</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+<h4 id="lighting">Lighting</h4>
+<p>光照部分也不复杂，只给了一个符合兰伯特定律的漫反射光<span
+class="math inline">\(I=N \cdot
+L\)</span>。L表示世界空间下指向主光源的向量，Unity内置变量中有提供。N是表面法线，我们之前并未考虑，需要在几何着色器中从切线空间从头开始计算一个。</p>
+<p>考虑最简单的情况，当叶片是一个三角形时，其切线空间的法向量的指向y轴负方向，即
+<code>float3(0,-1,0)</code>。因为叶片是双面都渲染的，所以两面的法向量是不同的，在渲染时应该考虑到。片段着色器的<code>VFACE</code>语义可以用来处理这中差异：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">float4 <span class="title function_">frag</span><span class="params">(geometryOutput i, fixed facing : VFACE)</span> : SV_Target</span><br><span class="line">&#123;</span><br><span class="line">    float3 normal = facing &gt; <span class="number">0</span> ? i.normal : -i.normal;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>当叶片的片段数大于1时，叶片会根据<code>forward</code>向前倾，让法向量产生一个z轴的值。我们可以直接用<code>forward</code>近似法向量产生的z轴值。让法线可视化：</p>
+<p><img src="/images/RoystanGeometryShaderGrass/MGeometryGrass-11.png" width="400" alt="Shader Programs-11"/></p>
+<p>至此，我们已经有了所有需要的变量，将灯光和阴影都考虑进去，便可以得到最后的颜色值。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">float</span> shadow = SHADOW_ATTENUATION(i);</span><br><span class="line"><span class="type">float</span> NdotL = saturate(saturate(dot(normal, _WorldSpaceLightPos0)) + _TranslucentGain) * shadow;</span><br><span class="line"></span><br><span class="line">float3 ambient = ShadeSH9(float4(normal, <span class="number">1</span>));</span><br><span class="line">float4 lightIntensity = NdotL * _LightColor0 + float4(ambient, <span class="number">1</span>);</span><br><span class="line">float4 col = lerp(_BottomColor, _TopColor * lightIntensity, i.uv.y);</span><br><span class="line"></span><br><span class="line"><span class="keyword">return</span> col;</span><br></pre></td></tr></table></figure>
+<p>绿色看习惯了，调整一个颜色值，灯光太简单产生的效果影响不大：</p>
+<p><img src="/images/RoystanGeometryShaderGrass/MGeometryGrass-12.png" width="500" alt="Shader Programs-12"/></p>
+<h3 id="conclusion">Conclusion</h3>
+<p>算是跟着教程走了一篇，基本清楚了Unity几何着色器的基本流程，甚至还顺便学了曲面细分着色器。正如开头说的一样，这种制作草地的方法在商业游戏中用的不多，商业游戏中还是倾向于使用面片草地，但也不是没有。之前看到对马岛之魂的草地好像就不是面片渲染的，而且美术效果还特别不错，就是不清楚是不是用到了几何着色器，之后有机会学习一下。</p>
+<h3 id="参考文献">参考文献</h3>
+<p><a target="_blank" rel="noopener" href="https://roystan.net/articles/grass-shader/">Grass
+Shader</a></p>
+<p><a
+target="_blank" rel="noopener" href="https://learnopengl.com/Advanced-OpenGL/Geometry-Shader">OpenGL
+Geometry Shader</a></p>
+<p><a
+target="_blank" rel="noopener" href="https://learnopengl.com/Advanced-Lighting/Normal-Mapping">OpenGL
+Normal Mapping</a></p>
+<p><a
+target="_blank" rel="noopener" href="https://catlikecoding.com/unity/tutorials/advanced-rendering/tessellation/">CatlikeCoding
+Tessellation</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/keijiro/StandardGeometryShader">Standard
+Geometry Shader</a></p>
+<p><a
+target="_blank" rel="noopener" href="https://discussions.unity.com/t/what-is-the-command-of-cginclude/556404">what
+is the command of CGINCLUDE</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Unity/" rel="tag"># Unity</a>
+              <a href="/tags/Geometry-Shader/" rel="tag"># Geometry Shader</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2024/11/05/LearnOpenGL/Geometry%20Shader/" rel="prev" title="LearnOpenGL - Geometry Shader">
+                  <i class="fa fa-angle-left"></i> LearnOpenGL - Geometry Shader
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Rigel Aster</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+
+</body>
+</html>
