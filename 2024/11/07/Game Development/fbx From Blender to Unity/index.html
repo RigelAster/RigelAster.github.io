@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha256-5eIC48iZUHmSlSUz9XtjRyK2mzQkHScZY1WdMaoz74E=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"rigelaster.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.21.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"always","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="DCC软件与游戏引擎之间模型导入导出的一些问题">
+<meta property="og:type" content="article">
+<meta property="og:title" content="fbx From Blender to Unity">
+<meta property="og:url" content="https://rigelaster.github.io/2024/11/07/Game%20Development/fbx%20From%20Blender%20to%20Unity/index.html">
+<meta property="og:site_name" content="Rigel&#39;s Blog">
+<meta property="og:description" content="DCC软件与游戏引擎之间模型导入导出的一些问题">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://rigelaster.github.io/images/BlenderToUnity/BlenderUnitSystem.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/BlenderToUnity/dragon-scale-1.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/BlenderToUnity/dragon-scale-with3-local.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/BlenderToUnity/dragon-scale-with3-unitsScale.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/BlenderToUnity/dragon-scale-with3-customScale.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/BlenderToUnity/dragon-scale-with3-all.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/BlenderToUnity/blender_fbx_export_settings.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/BlenderToUnity/Unity-fbx-import-settings.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/BlenderToUnity/Unity-disable-convertUnits.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/BlenderToUnity/bunny.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/BlenderToUnity/bunny-in-blender.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/BlenderToUnity/bunny-in-unity.png">
+<meta property="article:published_time" content="2024-11-07T06:29:39.000Z">
+<meta property="article:modified_time" content="2024-11-08T10:58:58.237Z">
+<meta property="article:author" content="Rigel Aster">
+<meta property="article:tag" content="Unity">
+<meta property="article:tag" content="Blender">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://rigelaster.github.io/images/BlenderToUnity/BlenderUnitSystem.png">
+
+
+<link rel="canonical" href="https://rigelaster.github.io/2024/11/07/Game%20Development/fbx%20From%20Blender%20to%20Unity/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"https://rigelaster.github.io/2024/11/07/Game%20Development/fbx%20From%20Blender%20to%20Unity/","path":"2024/11/07/Game Development/fbx From Blender to Unity/","title":"fbx From Blender to Unity"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>fbx From Blender to Unity | Rigel's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Rigel's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#fbx-from-blender3.4-to-unity2022"><span class="nav-number">2.</span> <span class="nav-text">fbx From Blender3.4 to
+Unity2022</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#scale"><span class="nav-number">2.1.</span> <span class="nav-text">Scale</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#axis"><span class="nav-number">2.2.</span> <span class="nav-text">Axis</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B0%8F%E7%BB%93"><span class="nav-number">2.3.</span> <span class="nav-text">小结</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">2.4.</span> <span class="nav-text">参考资料</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Rigel Aster"
+      src="/uploads/avatar.png">
+  <p class="site-author-name" itemprop="name">Rigel Aster</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">35</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">19</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://www.zhihu.com/people/ming-zi-13-35" title="Zhihu → https:&#x2F;&#x2F;www.zhihu.com&#x2F;people&#x2F;ming-zi-13-35" rel="noopener me" target="_blank"><i class="fab fa-zhihu fa-fw"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:remingzi7@gmail.com" title="E-Mail → mailto:remingzi7@gmail.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://github.com/MingZI-7" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;MingZI-7" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i></a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://rigelaster.github.io/2024/11/07/Game%20Development/fbx%20From%20Blender%20to%20Unity/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar.png">
+      <meta itemprop="name" content="Rigel Aster">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Rigel's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="fbx From Blender to Unity | Rigel's Blog">
+      <meta itemprop="description" content="DCC软件与游戏引擎之间模型导入导出的一些问题">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          fbx From Blender to Unity
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2024-11-07 14:29:39" itemprop="dateCreated datePublished" datetime="2024-11-07T14:29:39+08:00">2024-11-07</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2024-11-08 18:58:58" itemprop="dateModified" datetime="2024-11-08T18:58:58+08:00">2024-11-08</time>
+    </span>
+
+  
+</div>
+
+            <div class="post-description">DCC软件与游戏引擎之间模型导入导出的一些问题</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="前言">前言</h2>
+<p>模型的导入导出在游戏开发中可谓是非常频繁的一件事情，也是经常出现问题的地方。因为各文件格式的封装和软件对某一格式文件导入导出处理不同，可能产生模型各种表现上的问题。最好的解决办法就是，问题出现时搞清楚原因避免之后出现同样的问题从而浪费时间。由于市面上的软件不断增多及版本不断更新，这样的问题遇到的只会越来越频繁。努力搞清楚遇到的问题吧。</p>
+<h2 id="fbx-from-blender3.4-to-unity2022">fbx From Blender3.4 to
+Unity2022</h2>
+<p><strong>多图预警</strong></p>
+<h3 id="scale">Scale</h3>
+<p>首先做的事情就是让两者的单位系统保持一致，Unity中单位长度为1m，Blender中默认情况也是如此，以防万一还是检查一下。其中的<code>Unit Scale</code>让它保持默认就好了，它会关联到导出设置时的<code>Apply Unit</code>。</p>
+<figure>
+<img src="/images/BlenderToUnity/BlenderUnitSystem.png"
+alt="blender unit system" />
+<figcaption aria-hidden="true">blender unit system</figcaption>
+</figure>
+<p>在开始测试之前，我们需要了解一下有关fbx scale的知识。根据<a
+target="_blank" rel="noopener" href="https://forums.autodesk.com/t5/fbx-forum/fbx-units-and-scaling/td-p/9761576">官方人员的说法</a>，fbx文件是<code>unitless</code>的，只是默认其单位为厘米(centimeter)。因为，文件中只记录了数据例如25.4，其只代表25.4个单位长度，至于其具体含义是读取文件的应用赋予的，可以是25.4厘米，也可以是25.4米。后来为了避免这种“武断”的解释，fbx引入了变量<code>UnitScaleFactor</code>，其用来将“隐式的”厘米转换为我们需要的单位。例如，fbx中有一个数据25.4，此时UnitScaleFactor为0.1，那么其表示的就是25.4毫米，也就是2.54厘米。有个这些观念，我们开始实验。</p>
+<p>将stanford-dragon.ply导入blender中，什么也不操作。其是一个尺寸很小的，上方指向y轴正方向的中国龙模型。我们先测试缩放的问题，给模型的xyz缩放都赋予5。导出设置上，在<code>Transform</code>标签下，将<code>Scale</code>设为3.0，然后对<code>Apply Scalings</code>进行测试。</p>
+<p><img src="/images/BlenderToUnity/dragon-scale-1.png" alt="xyz scaled 5.0" /></p>
+<p>先使用<code>All Local</code>，将其导入Unity中如图：</p>
+<blockquote>
+<p>Apply custom scaling and units scaling to each object transformation,
+FBX scale remains at 1.0.</p>
+</blockquote>
+<p><img src="/images/BlenderToUnity/dragon-scale-with3-local.png" alt="all local" /></p>
+<p>可以看到，在Unity中，模型不再是躺着的，其上方也是指向y轴正方向的，方向问题我们之后再聊。此时Unity场景中的模型大小比Blender中大一些，大约是3倍左右，应该导出时设置的<code>Scale</code>影响的。而且它在xyz上有一个1500的缩放。这个缩放是怎么来的呢？我们先回到Blender将导出设置中的Apply
+Scalings改为<code>FBX Units Scale</code>，其他配置不变，然后再导入Unity中：</p>
+<blockquote>
+<p>Apply custom scaling to each object transformation, and units scaling
+to FBX scale.</p>
+</blockquote>
+<p><img src="/images/BlenderToUnity/dragon-scale-with3-unitsScale.png" alt="fbx units scale" /></p>
+<p>此时的模型和前面大小相同，但是其缩放从1500变为15，有趣，我们继续回到Blender将Apply
+Scalings改为<code>FBX Custom Scale</code>再导入Unity：</p>
+<blockquote>
+<p>Apply custom scaling to FBX scale, and units scaling to each object
+transformation.</p>
+</blockquote>
+<p><img src="/images/BlenderToUnity/dragon-scale-with3-customScale.png" alt="fbx custom scale" /></p>
+<p>此时模型大小仍未改变，只是缩放又变为了500，好吧，我们还有最后一组，将Apply
+Scalings改为<code>FBX All</code>：</p>
+<blockquote>
+<p>Apply custom scaling and units scaling to FBX scale.</p>
+</blockquote>
+<p><img src="/images/BlenderToUnity/dragon-scale-with3-all.png" alt="fbx all" /></p>
+<p>现在可以回过头来分析一下这四种情况，它们拖入到Unity场景中时的大小都是相同的，只是xyz轴缩放不同。所以，我们导出时的设置一部分影响到了模型的源数据，一部分影响到了模型的变换值，这两种数据都会被导入到最后的fbx文件中。综合分析一下其实不难得出，相关的因素是这三者：</p>
+<p><img src="/images/BlenderToUnity/blender_fbx_export_settings.png" alt="export settings"></p>
+<p>之前文章官方描述中的<code>custom scaling</code>指的是导出设置中的<code>Transform/Scale</code>，<code>units scaling</code>指的是文章一开始设定的场景Units，object
+transformation就是物体的Tranform。如此，我们就可以分析出每种情况下Unity中的缩放值来源。注意，由于fbx默认单位为厘米，我们设置的场景单位为米，所以米到厘米的缩放因子为100。</p>
+<ul>
+<li>当导出设置为<code>All Local</code>时，fbx文件的UnitScaleFactor为1.0，其他缩放因子都应用于物体的Transform上，scale
+= 5.0 * 3.0 * 100 = 1500;</li>
+<li>当导出设置为<code>FBX Units Scale</code>时，场景缩放因子会被写入UnitScaleFactor为100.0，其他缩放因子作用物体上，scale
+= 5.0 * 3.0 = 15;</li>
+<li>当导出设置为<code>FBX Custom Scale</code>时，导出设置的缩放因子会被写入UnitScaleFactor为3.0，其他缩放因子作用于物体上，scale
+= 5.0 * 100 = 500;</li>
+<li>当导出设置为<code>FBX All</code>时，导出设置和场景的缩放因子都会影响UnitScaleFactor为300.0，其他缩放因子作用于物体上，scale
+= 5;</li>
+</ul>
+<p>推导出的数值和实际数值都符合，所以导出设置中的<code>Apply Scaling</code>作用为何已经明了。然后就来到了Unity这边，Unity在导入资源时都会有一个Importing
+Settings开放给开发者，这次我们只关注其中的<code>Convert Units</code>项：</p>
+<p><img src="/images/BlenderToUnity/Unity-fbx-import-settings.png" alt="unity fbx import settings"></p>
+<p>在Convert Units后面有一句话，“1 custom unit(File) to
+0.03m(Unity)”，不必说这肯定是Unity为了处理fbx单位问题的设置。上述测试的四个模型这里的提示是不同的，分别是：</p>
+<ul>
+<li>Export with All Local : lcm(File) to 0.01m(Unity)</li>
+<li>Export with FBX Units Scale : 1m(File) to 1m(Unity)</li>
+<li>Export with FBX Custom Scale : 1 custom unit(File) to
+0.003m(Unity)</li>
+<li>Export with FBX All : 1 custom unit(File) to 3m(Unity)</li>
+</ul>
+<p>这里结合我们文章开始提到的官方人员那段话就可以很好的理解，Unity默认fbx数据的单位为厘米，然后结合<code>UnitScaleFactor</code>去解读fbx文件的具体单位含义，然后将其再转换为Unity中的单位米。以我们最后一个导出设置为例，文件的<code>UnitScaleFactor</code>为300，此时fbx文件单位长度具体为
+1cm * 300 = 300cm = 3m。也就是说，Unity会把文件中的数据以
+3倍的比例在Unity中绘制。例如，文件中一个点的坐标为(1,1,1)，Unity在绘制它的时候就会使用(3,3,3)。也就是说，我们如果把这个勾选去掉，模型会变为原来的1/3大小。</p>
+<p><img src="/images/BlenderToUnity/Unity-disable-convertUnits.png" alt="Convert Units"></p>
+<p>到这里，我们就把导出导入过程中和缩放有关的问题说完了，下面是坐标系的问题。</p>
+<h3 id="axis">Axis</h3>
+<p>坐标轴的转换问题要更复杂（也可能是我想的太多了），花了一些时间缕了一下思路。由于一些资料的不足，不保证所有的依据完全准确，但实际使用下来应该没太大问题。有了上面Scaling的经验，我们这次先从FBX文件本身下手，搞情况其结构，而后就方便查找导入导出时产生的问题了。</p>
+<p>FBX文件是Autodesk为3D模型开发的，有两种格式，二进制格式和ASCII格式。两者之间可以通过<a
+target="_blank" rel="noopener" href="https://aps.autodesk.com/developer/overview/fbx-converter-archives">官方提供的工具FBX
+Converter</a>来进行相互转换。其二进制模式更适合开发，ASCII模式是可以看到其内部数据的，只是数据会变大一些。我们就通过FBX的ASCII模式来一窥其内部结构，其中包含很多信息，我们将用到的也就是GlobalSettings块和Vertices块。我们先建一个8顶点的模型用来进行测试，其内部数据为：</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">GlobalSettings:  &#123;</span><br><span class="line">	Version: <span class="number">1000</span></span><br><span class="line">	Properties70:  &#123;</span><br><span class="line">		P: <span class="string">&quot;UpAxis&quot;</span>, <span class="string">&quot;int&quot;</span>, <span class="string">&quot;Integer&quot;</span>, <span class="string">&quot;&quot;</span>,<span class="number">1</span></span><br><span class="line">		P: <span class="string">&quot;UpAxisSign&quot;</span>, <span class="string">&quot;int&quot;</span>, <span class="string">&quot;Integer&quot;</span>, <span class="string">&quot;&quot;</span>,<span class="number">1</span></span><br><span class="line">		P: <span class="string">&quot;FrontAxis&quot;</span>, <span class="string">&quot;int&quot;</span>, <span class="string">&quot;Integer&quot;</span>, <span class="string">&quot;&quot;</span>,<span class="number">0</span></span><br><span class="line">		P: <span class="string">&quot;FrontAxisSign&quot;</span>, <span class="string">&quot;int&quot;</span>, <span class="string">&quot;Integer&quot;</span>, <span class="string">&quot;&quot;</span>,<span class="number">1</span></span><br><span class="line">		P: <span class="string">&quot;CoordAxis&quot;</span>, <span class="string">&quot;int&quot;</span>, <span class="string">&quot;Integer&quot;</span>, <span class="string">&quot;&quot;</span>,<span class="number">2</span></span><br><span class="line">		P: <span class="string">&quot;CoordAxisSign&quot;</span>, <span class="string">&quot;int&quot;</span>, <span class="string">&quot;Integer&quot;</span>, <span class="string">&quot;&quot;</span>,<span class="number">-1</span></span><br><span class="line">		P: <span class="string">&quot;OriginalUpAxis&quot;</span>, <span class="string">&quot;int&quot;</span>, <span class="string">&quot;Integer&quot;</span>, <span class="string">&quot;&quot;</span>,<span class="number">-1</span></span><br><span class="line">		P: <span class="string">&quot;OriginalUpAxisSign&quot;</span>, <span class="string">&quot;int&quot;</span>, <span class="string">&quot;Integer&quot;</span>, <span class="string">&quot;&quot;</span>,<span class="number">1</span></span><br><span class="line">		P: <span class="string">&quot;UnitScaleFactor&quot;</span>, <span class="string">&quot;double&quot;</span>, <span class="string">&quot;Number&quot;</span>, <span class="string">&quot;&quot;</span>,<span class="number">100</span></span><br><span class="line">		P: <span class="string">&quot;OriginalUnitScaleFactor&quot;</span>, <span class="string">&quot;double&quot;</span>, <span class="string">&quot;Number&quot;</span>, <span class="string">&quot;&quot;</span>,<span class="number">100</span></span><br><span class="line">		P: <span class="string">&quot;AmbientColor&quot;</span>, <span class="string">&quot;ColorRGB&quot;</span>, <span class="string">&quot;Color&quot;</span>, <span class="string">&quot;&quot;</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span></span><br><span class="line">		P: <span class="string">&quot;DefaultCamera&quot;</span>, <span class="string">&quot;KString&quot;</span>, <span class="string">&quot;&quot;</span>, <span class="string">&quot;&quot;</span>, <span class="string">&quot;Producer Perspective&quot;</span></span><br><span class="line">		P: <span class="string">&quot;TimeMode&quot;</span>, <span class="string">&quot;enum&quot;</span>, <span class="string">&quot;&quot;</span>, <span class="string">&quot;&quot;</span>,<span class="number">11</span></span><br><span class="line">		P: <span class="string">&quot;TimeSpanStart&quot;</span>, <span class="string">&quot;KTime&quot;</span>, <span class="string">&quot;Time&quot;</span>, <span class="string">&quot;&quot;</span>,<span class="number">0</span></span><br><span class="line">		P: <span class="string">&quot;TimeSpanStop&quot;</span>, <span class="string">&quot;KTime&quot;</span>, <span class="string">&quot;Time&quot;</span>, <span class="string">&quot;&quot;</span>,<span class="number">46186158000</span></span><br><span class="line">		P: <span class="string">&quot;CustomFrameRate&quot;</span>, <span class="string">&quot;double&quot;</span>, <span class="string">&quot;Number&quot;</span>, <span class="string">&quot;&quot;</span>,<span class="number">24</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Vertices: *<span class="number">24</span> &#123;</span><br><span class="line">	a: <span class="number">0.100000001490116</span>,<span class="number">0.200000002980232</span>,<span class="number">0.300000011920929</span>,<span class="number">0.5</span>,<span class="number">0.600000023841858</span>,<span class="number">-0.699999988079071</span>,<span class="number">0.400000005960464</span>,<span class="number">-0.5</span>,<span class="number">0.600000023841858</span>,<span class="number">0.800000011920929</span>,<span class="number">-0.899999976158142</span>,<span class="number">-1</span>,<span class="number">-0.200000002980232</span>,<span class="number">0.300000011920929</span>,<span class="number">0.400000005960464</span>,<span class="number">-0.600000023841858</span>,<span class="number">0.699999988079071</span>,<span class="number">-0.800000011920929</span>,<span class="number">-0.300000011920929</span>,<span class="number">-0.400000005960464</span>,<span class="number">0.5</span>,<span class="number">-0.699999988079071</span>,<span class="number">-0.800000011920929</span>,<span class="number">-0.899999976158142</span></span><br><span class="line">&#125; </span><br></pre></td></tr></table></figure>
+<p>在Settings里面可以一眼看到我们的老朋友<code>UnitScaleFactor</code>，有兴趣的可以去验证一下Scaling部分内容，这里不多说了。随后和Axis有关的部分有：UpAxis,
+UpAxisSign, FrontAxis, FrontAxisSign, CoordAxis, CoordAxisSign,
+OriginalUpAxis,
+OriginalUpAxisSign。由于最后的<code>OriginalUpAxis</code>没查到有啥作用，所以我们只关心前三组属性。</p>
+<p>下面Vertices块中有24个数据，分别来自8个顶点，第一个顶点为(0.1, 0.2,
+0.3)，然后依次类推。我们这里只用来分析导出设置中的Up和Forward变化时，对他有没有影响。因为不适合放图，所以，我直接说结论：<strong>更改fbx
+Export
+Settings里面的forward和up对这里的数据没有影响</strong>。其值便是顶点在Blender中的坐标，只是不确定每个软件导出时都会使用自己的坐标系，还是说fbx默认使用的坐标系与Blender相同，在目前的讨论前提下我们就不纠结这个问题了。现在，已经可以确定影响轴转换的就是FBX
+GlobalSettings里面的那三组属性了。</p>
+<p>然后需要搞清楚的是，Blender Fbx
+Export的设置如何影响Axis数据写入fbx文件的。可以分别组合尝试导入，打开ASCII文件直接查看里面的内容记录，当然，这里已经有<a
+target="_blank" rel="noopener" href="https://projects.blender.org/blender/blender-addons/issues/43935">来自Blender官方的数据</a>:</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">RIGHT_HAND_AXES = &#123;</span><br><span class="line">    # Up, Forward -&gt; FBX values (tuples of (axis, sign), Up, Front, Coord).</span><br><span class="line">    ( <span class="string">&#x27;X&#x27;</span>, <span class="string">&#x27;-Y&#x27;</span>): ((<span class="number">0</span>,  <span class="number">1</span>), (<span class="number">1</span>,  <span class="number">1</span>), (<span class="number">2</span>,  <span class="number">1</span>)),</span><br><span class="line">    ( <span class="string">&#x27;X&#x27;</span>,  <span class="string">&#x27;Y&#x27;</span>): ((<span class="number">0</span>,  <span class="number">1</span>), (<span class="number">1</span>, <span class="number">-1</span>), (<span class="number">2</span>, <span class="number">-1</span>)),</span><br><span class="line">    ( <span class="string">&#x27;X&#x27;</span>, <span class="string">&#x27;-Z&#x27;</span>): ((<span class="number">0</span>,  <span class="number">1</span>), (<span class="number">2</span>,  <span class="number">1</span>), (<span class="number">1</span>, <span class="number">-1</span>)),</span><br><span class="line">    ( <span class="string">&#x27;X&#x27;</span>,  <span class="string">&#x27;Z&#x27;</span>): ((<span class="number">0</span>,  <span class="number">1</span>), (<span class="number">2</span>, <span class="number">-1</span>), (<span class="number">1</span>,  <span class="number">1</span>)),</span><br><span class="line">    (<span class="string">&#x27;-X&#x27;</span>, <span class="string">&#x27;-Y&#x27;</span>): ((<span class="number">0</span>, <span class="number">-1</span>), (<span class="number">1</span>,  <span class="number">1</span>), (<span class="number">2</span>, <span class="number">-1</span>)),</span><br><span class="line">    (<span class="string">&#x27;-X&#x27;</span>,  <span class="string">&#x27;Y&#x27;</span>): ((<span class="number">0</span>, <span class="number">-1</span>), (<span class="number">1</span>, <span class="number">-1</span>), (<span class="number">2</span>,  <span class="number">1</span>)),</span><br><span class="line">    (<span class="string">&#x27;-X&#x27;</span>, <span class="string">&#x27;-Z&#x27;</span>): ((<span class="number">0</span>, <span class="number">-1</span>), (<span class="number">2</span>,  <span class="number">1</span>), (<span class="number">1</span>,  <span class="number">1</span>)),</span><br><span class="line">    (<span class="string">&#x27;-X&#x27;</span>,  <span class="string">&#x27;Z&#x27;</span>): ((<span class="number">0</span>, <span class="number">-1</span>), (<span class="number">2</span>, <span class="number">-1</span>), (<span class="number">1</span>, <span class="number">-1</span>)),</span><br><span class="line">    ( <span class="string">&#x27;Y&#x27;</span>, <span class="string">&#x27;-X&#x27;</span>): ((<span class="number">1</span>,  <span class="number">1</span>), (<span class="number">0</span>,  <span class="number">1</span>), (<span class="number">2</span>, <span class="number">-1</span>)),</span><br><span class="line">    ( <span class="string">&#x27;Y&#x27;</span>,  <span class="string">&#x27;X&#x27;</span>): ((<span class="number">1</span>,  <span class="number">1</span>), (<span class="number">0</span>, <span class="number">-1</span>), (<span class="number">2</span>,  <span class="number">1</span>)),</span><br><span class="line">    ( <span class="string">&#x27;Y&#x27;</span>, <span class="string">&#x27;-Z&#x27;</span>): ((<span class="number">1</span>,  <span class="number">1</span>), (<span class="number">2</span>,  <span class="number">1</span>), (<span class="number">0</span>,  <span class="number">1</span>)),</span><br><span class="line">    ( <span class="string">&#x27;Y&#x27;</span>,  <span class="string">&#x27;Z&#x27;</span>): ((<span class="number">1</span>,  <span class="number">1</span>), (<span class="number">2</span>, <span class="number">-1</span>), (<span class="number">0</span>, <span class="number">-1</span>)),</span><br><span class="line">    (<span class="string">&#x27;-Y&#x27;</span>, <span class="string">&#x27;-X&#x27;</span>): ((<span class="number">1</span>, <span class="number">-1</span>), (<span class="number">0</span>,  <span class="number">1</span>), (<span class="number">2</span>,  <span class="number">1</span>)),</span><br><span class="line">    (<span class="string">&#x27;-Y&#x27;</span>,  <span class="string">&#x27;X&#x27;</span>): ((<span class="number">1</span>, <span class="number">-1</span>), (<span class="number">0</span>, <span class="number">-1</span>), (<span class="number">2</span>, <span class="number">-1</span>)),</span><br><span class="line">    (<span class="string">&#x27;-Y&#x27;</span>, <span class="string">&#x27;-Z&#x27;</span>): ((<span class="number">1</span>, <span class="number">-1</span>), (<span class="number">2</span>,  <span class="number">1</span>), (<span class="number">0</span>, <span class="number">-1</span>)),</span><br><span class="line">    (<span class="string">&#x27;-Y&#x27;</span>,  <span class="string">&#x27;Z&#x27;</span>): ((<span class="number">1</span>, <span class="number">-1</span>), (<span class="number">2</span>, <span class="number">-1</span>), (<span class="number">0</span>,  <span class="number">1</span>)),</span><br><span class="line">    ( <span class="string">&#x27;Z&#x27;</span>, <span class="string">&#x27;-X&#x27;</span>): ((<span class="number">2</span>,  <span class="number">1</span>), (<span class="number">0</span>,  <span class="number">1</span>), (<span class="number">1</span>,  <span class="number">1</span>)),</span><br><span class="line">    ( <span class="string">&#x27;Z&#x27;</span>,  <span class="string">&#x27;X&#x27;</span>): ((<span class="number">2</span>,  <span class="number">1</span>), (<span class="number">0</span>, <span class="number">-1</span>), (<span class="number">1</span>, <span class="number">-1</span>)),</span><br><span class="line">    ( <span class="string">&#x27;Z&#x27;</span>, <span class="string">&#x27;-Y&#x27;</span>): ((<span class="number">2</span>,  <span class="number">1</span>), (<span class="number">1</span>,  <span class="number">1</span>), (<span class="number">0</span>, <span class="number">-1</span>)),</span><br><span class="line">    ( <span class="string">&#x27;Z&#x27;</span>,  <span class="string">&#x27;Y&#x27;</span>): ((<span class="number">2</span>,  <span class="number">1</span>), (<span class="number">1</span>, <span class="number">-1</span>), (<span class="number">0</span>,  <span class="number">1</span>)),  # Blender system!</span><br><span class="line">    (<span class="string">&#x27;-Z&#x27;</span>, <span class="string">&#x27;-X&#x27;</span>): ((<span class="number">2</span>, <span class="number">-1</span>), (<span class="number">0</span>,  <span class="number">1</span>), (<span class="number">1</span>, <span class="number">-1</span>)),</span><br><span class="line">    (<span class="string">&#x27;-Z&#x27;</span>,  <span class="string">&#x27;X&#x27;</span>): ((<span class="number">2</span>, <span class="number">-1</span>), (<span class="number">0</span>, <span class="number">-1</span>), (<span class="number">1</span>,  <span class="number">1</span>)),</span><br><span class="line">    (<span class="string">&#x27;-Z&#x27;</span>, <span class="string">&#x27;-Y&#x27;</span>): ((<span class="number">2</span>, <span class="number">-1</span>), (<span class="number">1</span>,  <span class="number">1</span>), (<span class="number">0</span>,  <span class="number">1</span>)),</span><br><span class="line">    (<span class="string">&#x27;-Z&#x27;</span>,  <span class="string">&#x27;Y&#x27;</span>): ((<span class="number">2</span>, <span class="number">-1</span>), (<span class="number">1</span>, <span class="number">-1</span>), (<span class="number">0</span>, <span class="number">-1</span>)),</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>前半部分是导出时的设置，后半部分是三组属性对应的值。在继续下去之前，我们要了解到以下两个前提。第一，Blender使用的是<strong>Z-up
+Y-forward Right-hand</strong>坐标系，Unity使用的是<strong>Y-up Z-forward
+Left-hand</strong>坐标系。第二，在目前的讨论中<code>front</code>和<code>forward</code>的含义是有区别的，具体可以看前一个链接中的说法。我的理解是，<code>front</code>指的是模型的前方，比如说一个人体模型，它的<code>front</code>就是面朝的方向。而<code>forward</code>多指的是开发者的前方，从屏幕表面指向屏幕内部的方向。</p>
+<p>看回之前的数据，其中备注有
+<code>Blender system!</code>这行的含义为：当Blender FBX Export设置为
+Z-up Y-forward时，会将 UpAxis = 2, UpAxisSign = 1, FrontAxis = 1,
+FrontAxisSing = -1, CoordAxis = 0, CoordAxisSign = 1
+写入fbx的GlobalSettings中。这三组属性定义了fbx存储模型的空间特征，其他软件导入fbx时据此来处理模型的顶点数据。其中Axis有<code>0,1,2</code>三个值，分别对应存储数据的<code>x,y,z</code>轴。Sign有<code>1,-1</code>两个值，代表正向和反向。<code>up, front, coord</code>代表了模型的上、前、侧三个方向。这样fbx文件就包含了模型的方位信息，方便其他软件导入时转换为对应的坐标系。</p>
+<p>文字说有点抽象，拿一个实际例子来说吧。现在我有一个模型如下：</p>
+<p><img src="/images/BlenderToUnity/bunny.png" alt="bunny"></p>
+<p>现在规定兔子上方为Up，兔子所看方向为前方Forward，然后以Blender的坐标系为基准，上方为Z轴正方向，前方为Y轴负方向。当这个fbx模型导入Unity时，Unity会先找到模型的上方Up是fbx记录数据的Z轴，而Unity自己的上方是Y轴，于是将数据中的Z当作Y使用。模型前方同理，fbx记录的是Y轴负方向，Unity自己是Z轴负方向，所以直接将数据中的Y当作Z使用。这样，即使不同软件的坐标系不同，也还是能够正确展示出模型。</p>
+<p>你问我为什么没讨论Coord方向，因为我通过现在的资料不足以确定Coord是如何生效的，这涉及到左右手坐标系，我也还没搞清楚。</p>
+<p>来到Unity端，其Import
+Settings提供了一个和轴转换有关的选项<code>Bake Axis Conversion</code>，为了测试这个选项作用，做了一组实验，建一个简单的模型，其上有一点(1,2,3)，导出为fbx，测试不同导出和导入选项对点的影响：</p>
+<table>
+<colgroup>
+<col style="width: 9%" />
+<col style="width: 7%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 38%" />
+<col style="width: 23%" />
+</colgroup>
+<thead>
+<tr>
+<th>实验序号</th>
+<th>UpAxis</th>
+<th>FrontAxis</th>
+<th>CoordAxis</th>
+<th>Not Bake Axis Conversion</th>
+<th>Bake Axis Conversion</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Y</td>
+<td>Z</td>
+<td>X</td>
+<td>(-1, 2, 3)</td>
+<td>(1, 2, -3)</td>
+</tr>
+<tr>
+<td>2</td>
+<td>X</td>
+<td>-Z</td>
+<td>Y</td>
+<td>(-1, 2, 3) with rot(0, -180, -90)</td>
+<td>(2, 1, 3)</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Z</td>
+<td>-Y</td>
+<td>X</td>
+<td>(-1, 2, 3) with rot(-90, 0, 0)</td>
+<td>(1, 3, 2)</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Y</td>
+<td>X</td>
+<td>-Z</td>
+<td>(-1, 2, 3) with rot(0 90, 0)</td>
+<td>(-3, 2, -1)</td>
+</tr>
+</tbody>
+</table>
+<p>可以看到，未勾选<code>Bake Axis Conversion</code>选项时，Unity只会对fbx的源数据进行x轴翻转，然后通过Transform旋转来控制模型方向。x轴翻转取负可能是为了转换坐标系属性（右手到左手），这我不太确定Unity怎么处理的。而且之后自动赋予的初始旋转也不名所以，展示出的模型方向不统一。</p>
+<p>勾选<code>Bake Axis Conversion</code>选项时，Unity应该会直接将fbx
+Global
+Settings中的轴相关属性烘焙到顶点数据上，烘培的原理应该和我上面提到的差不多，然后可能会再处理一下坐标系属性。</p>
+<p>最后，说一下结论，当Blender的导出设置为<code>Z-up Y-forward</code>，Unity勾选<code>Bake Axis Conversion</code>时，模型在两者中的展示效果相同。</p>
+<p><img src="/images/BlenderToUnity/bunny-in-blender.png" alt="bunny"></p>
+<p><img src="/images/BlenderToUnity/bunny-in-unity.png" alt="bunny"></p>
+<h3 id="小结">小结</h3>
+<p>市面上繁多的软件就是会造成这种情况，个人的建议是，遇到相关问题解决并记录解决方案，等下次再遇到问题是会有更好的切入思路。也别太想搞明白底层的原理，有的软件源码没放开不知道具体操作理解起来还是有点难度的，而且网上也一直在争论，不影响开发进度的前提下，留下一些疑惑也是可以的。希望文章对你有些帮助，因为参考资料大多是各论坛上的东西，所以本文就算是个人的记录，请酌情参考。</p>
+<p>我看到过的一些问答：</p>
+<p><a
+target="_blank" rel="noopener" href="https://forums.autodesk.com/t5/fbx-forum/max-unity-and-fbx-question/td-p/7772482">Max
+Unity and fbx question.</a></p>
+<p><a
+target="_blank" rel="noopener" href="https://forums.autodesk.com/t5/fbx-forum/how-to-change-the-fbx-file-settings-to-fix-file-axis-direction/m-p/9405614">How
+to change the FBX file settings to fix File Axis Direction?</a></p>
+<p><a
+target="_blank" rel="noopener" href="https://projects.blender.org/blender/blender-addons/issues/60090">FBX
+Exporter Coordinate System options don't appear to do anything in
+Blender</a></p>
+<p><a
+target="_blank" rel="noopener" href="https://discussions.unity.com/t/what-does-really-mean-the-forward-direction/842678">What
+does really mean the “forward” direction?</a></p>
+<h3 id="参考资料">参考资料</h3>
+<p><a
+target="_blank" rel="noopener" href="https://forums.autodesk.com/t5/fbx-forum/fbx-units-and-scaling/td-p/9761576">FBX
+Units and Scaling</a></p>
+<p><a
+target="_blank" rel="noopener" href="https://discussions.unity.com/t/imported-models-from-blender-2-77-are-scaled-x100-in-unity-5-3/167005">Imported
+models from Blender 2.77 are scaled x100 in Unity 5.3</a></p>
+<p><a
+target="_blank" rel="noopener" href="https://banexdevblog.wordpress.com/2014/06/23/a-quick-tutorial-about-the-fbx-ascii-format/">A
+quick tutorial about the FBX ASCII format</a></p>
+<p><a
+target="_blank" rel="noopener" href="https://help.autodesk.com/view/FBX/2015/ENU/?guid=__cpp_ref_class_fbx_global_settings_html">FbxGlobalSettings
+Class Reference</a></p>
+<p><a
+target="_blank" rel="noopener" href="https://help.autodesk.com/view/FBX/2015/ENU/?guid=__cpp_ref_class_fbx_axis_system_html">FbxAxisSystem
+Class Reference</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Unity/" rel="tag"># Unity</a>
+              <a href="/tags/Blender/" rel="tag"># Blender</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2024/11/05/Game%20Development/Geometry%20Grass/" rel="prev" title="Unity Geometry Shader Grass">
+                  <i class="fa fa-angle-left"></i> Unity Geometry Shader Grass
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Rigel Aster</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+
+</body>
+</html>
