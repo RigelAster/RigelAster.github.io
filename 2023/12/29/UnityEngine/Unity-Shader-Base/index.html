@@ -28,7 +28,7 @@
 <meta property="og:description" content="记录关于Unity Shader的一些基础知识">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2023-12-29T14:22:28.000Z">
-<meta property="article:modified_time" content="2024-10-02T14:52:01.910Z">
+<meta property="article:modified_time" content="2024-11-14T04:29:31.378Z">
 <meta property="article:author" content="Rigel Aster">
 <meta property="article:tag" content="Unity">
 <meta property="article:tag" content="Shader">
@@ -115,7 +115,9 @@
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
             <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%AD%E4%B9%89-semantics"><span class="nav-number">1.</span> <span class="nav-text">语义 Semantics</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E7%A1%80%E8%AF%AD%E4%B9%89"><span class="nav-number">1.1.</span> <span class="nav-text">基础语义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B3%BB%E7%BB%9F%E6%95%B0%E5%80%BC%E8%AF%AD%E4%B9%89-system-value-semantics"><span class="nav-number">1.2.</span> <span class="nav-text">系统数值语义 system-value
-semantics</span></a></li></ol></li></ol></div>
+semantics</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A0%87%E7%AD%BE-tags"><span class="nav-number">2.</span> <span class="nav-text">标签 Tags</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#subshader-tags-in-shaderlab-reference"><span class="nav-number">2.1.</span> <span class="nav-text">SubShader tags in
+ShaderLab reference</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#renderpipeline"><span class="nav-number">2.1.1.</span> <span class="nav-text">RenderPipeline</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#queue"><span class="nav-number">2.1.2.</span> <span class="nav-text">Queue</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#rendertype"><span class="nav-number">2.1.3.</span> <span class="nav-text">RenderType</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#forcenoshadowcasting"><span class="nav-number">2.1.4.</span> <span class="nav-text">ForceNoShadowCasting</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#disablebatching"><span class="nav-number">2.1.5.</span> <span class="nav-text">DisableBatching</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ignoreprojector"><span class="nav-number">2.1.6.</span> <span class="nav-text">IgnoreProjector</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#previewtype"><span class="nav-number">2.1.7.</span> <span class="nav-text">PreviewType</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#pass-tags-in-shaderlab-reference"><span class="nav-number">2.2.</span> <span class="nav-text">Pass tags in ShaderLab
+reference</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#lightmode"><span class="nav-number">2.2.1.</span> <span class="nav-text">LightMode</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#universalmaterialtype"><span class="nav-number">2.2.2.</span> <span class="nav-text">UniversalMaterialType</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#passflags"><span class="nav-number">2.2.3.</span> <span class="nav-text">PassFlags</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#requireoptions"><span class="nav-number">2.2.4.</span> <span class="nav-text">RequireOptions</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">2.3.</span> <span class="nav-text">参考资料</span></a></li></ol></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -130,18 +132,18 @@ semantics</span></a></li></ol></li></ol></div>
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">35</span>
+          <span class="site-state-item-count">39</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-count">9</span>
         <span class="site-state-item-name">categories</span></a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">19</span>
+        <span class="site-state-item-count">22</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
@@ -215,7 +217,7 @@ semantics</span></a></li></ol></li></ol></div>
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">Edited on</span>
-      <time title="Modified: 2024-10-02 22:52:01" itemprop="dateModified" datetime="2024-10-02T22:52:01+08:00">2024-10-02</time>
+      <time title="Modified: 2024-11-14 12:29:31" itemprop="dateModified" datetime="2024-11-14T12:29:31+08:00">2024-11-14</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -256,6 +258,85 @@ semantics)。这类语义以SV开头，SV代表的含义就是系统数值(syste
 <p>Unity并没有支持cg/HLSL提供的所有语义，可通过Unity官方文档查看<a
 target="_blank" rel="noopener" href="https://docs.unity3d.com/Manual/SL-ShaderSemantics.html">Shader
 semantics</a></p>
+<h2 id="标签-tags">标签 Tags</h2>
+<p>标签Tags是键值对数据(key-value pairs of
+data)，Unity使用这些预定义的键值对定义着色器subShader或通道Pass如何使用。除了使用提供的Tags，我们也可以使用自定义的键值对。</p>
+<h3 id="subshader-tags-in-shaderlab-reference">SubShader tags in
+ShaderLab reference</h3>
+<h4 id="renderpipeline">RenderPipeline</h4>
+<p>用于URP和HDRP的标签，告诉Unity着色器适用于哪种渲染管线。<code>UniversalPipeline</code>和<code>HDRenderPipeline</code>可作为其值，当然也可以使用其他值。</p>
+<h4 id="queue">Queue</h4>
+<p>定义渲染队列，Unity提供了一些内置值如<code>Background</code>、<code>Geometry</code>等，可以使用如"Queue"
+= "[queue name]" 和 "Queue" = "[queue name] +
+[offset]"格式。在SRP中此值和DrawingSettings与SortingCriteria有关。</p>
+<h4 id="rendertype">RenderType</h4>
+<p>此标签没有固定值，是用于替换着色器的键值对。直接贴官方文档以及一篇博客：</p>
+<p><a
+target="_blank" rel="noopener" href="https://docs.unity3d.com/Manual/SL-ShaderReplacement.html">Replace
+shaders at runtime in the Built-In Render Pipeline</a></p>
+<p><a
+target="_blank" rel="noopener" href="https://blog.csdn.net/wpapa/article/details/51319434">https://blog.csdn.net/wpapa/article/details/51319434</a></p>
+<p>这里说一下重点。Unity提供了函数<code>Camera.RenderWithShader()</code>以及<code>Camera.SetReplacementShader()</code>来实现运行时替换物体着色器的功能。两者都具有两个参数：</p>
+<ul>
+<li><code>Shader shader</code>：替换的Shader</li>
+<li><code>string replacementTag</code>：替换使用到的Tag</li>
+</ul>
+<p>如果replacementTag为空""，场景中的所有物体都使用给定着色器进行渲染。如果replacementTag不为空，则又分为两种情况：如果场景物体使用的着色器没有与replacementTag相同的Tag，则不渲染；如果场景物体有与其相同的Tag则使用当前着色器Tag对应的值value去函数提供的着色器中寻找相同的值，如果没有则不渲染，如果有则使用找到的子着色器进行渲染。</p>
+<p>Unity中内置的着色器提供了<code>RenderType</code>键值对来实现此功能，所以如果我们要在运行时替换着色器一般使用此标签。</p>
+<h4 id="forcenoshadowcasting">ForceNoShadowCasting</h4>
+<p>控制着色器是否禁止向其他物体投射（有时是接收，因不同渲染管线及渲染路径不同）阴影，有<code>True</code>和<code>False</code>两种状态。</p>
+<h4 id="disablebatching">DisableBatching</h4>
+<p>控制着色器是否禁止动态合批(Dynamic
+Batching)，有三种状态<code>True``False</code>和<code>LODFading</code>，默认值为<code>False</code>。</p>
+<h4 id="ignoreprojector">IgnoreProjector</h4>
+<p>着色器是否忽略Projectors的影响。默认值为<code>False</code>。</p>
+<h4 id="previewtype">PreviewType</h4>
+<p>是Unity
+Editor有关的标签，决定材质的预览状态，有球体、平面、天空盒。</p>
+<h3 id="pass-tags-in-shaderlab-reference">Pass tags in ShaderLab
+reference</h3>
+<h4 id="lightmode">LightMode</h4>
+<p>Unity中最常用的Tags便是<code>LightMode</code>，所有的渲染管线都会使用它，而其他Tags可能只用于特定管线。</p>
+<p>在UPR中，如果没有为Pass设置LightMode标签，其会使用<code>SRPDefaultUnlit</code>作为默认值。如果想为Pass设置LightMode标签，URP提供了以下选项：</p>
+<ul>
+<li><p>UniversalForward：使用此Tags的Pass用于渲染物体几何以及评估所有光照的贡献，URP在正向渲染路径中使用此标签。</p></li>
+<li><p>UniversalGBuffer：此Pass用于渲染物体几何，但不会评估任何光照贡献，URP在延迟渲染路径中使用此标签。</p></li>
+<li><p>UniversalForwardOnly：此Pass用于渲染物体几何以及评估所有光照贡献，与UniversalForward标签类似。其与UniversalForward不同之处在于，不仅可以用于前向渲染路径，还可以用于延迟渲染路径。</p></li>
+</ul>
+<p>当URP在使用延迟渲染路径时，如果一个Pass必须使用前向渲染路径来渲染物体，那么它就可以使用UniversalForwardOnly作为LightMode值。例如，URP使用延迟渲染路径渲染一个场景，而场景包含使用不适用于GBuffer的数据的物体（比如Clear
+Coat normals），此物体的Pass便可以使用Only值。</p>
+<p>如果一个着色器必须在前向和延迟渲染路径中都渲染，它可以声明两个Pass然后分别使用<code>UniversalForward</code>标签和<code>UniversalGBuffer</code>标签。如果一个着色器不管URP使用的渲染路径是什么，必须使用前向渲染路径，可以声明一个Pass使用<code>UniversalForwardOnly</code>做为LightMode标签的值。</p>
+<ul>
+<li><p>Universal2D：此Pass用于渲染物体以及评估2D灯光的贡献，URP在渲染2D场景时使用它。</p></li>
+<li><p>ShaderCaster：此Pass用于从灯光视线将物体深度值渲染到阴影图Shadow
+Map或者深度贴图Depth Texture。</p></li>
+<li><p>DepthOnly：从相机的视角仅将深度信息渲染到深度贴图。</p></li>
+<li><p>Meta：专门用于Unity
+Editor中烘焙光照贴图lightmaps，在打包时会自动剔除此Pass。</p></li>
+<li><p>SRPDefaultUnlit：渲染物体时可以使用此Tags绘制一个额外的通道(extra
+Pass)，例如绘制一个物体的描边。此Tags值可以用于前向渲染路径和延迟渲染路径。</p></li>
+</ul>
+<p><strong>NOTE</strong>: UPR does not support the following LightMode
+tags: Always, ForwardAdd, PrepassBase, PrepassFinal, Vertex,
+VertexLMRGBM, VertexLM.</p>
+<h4 id="universalmaterialtype">UniversalMaterialType</h4>
+<p>Unity在延迟渲染路径中使用此标签，具有<code>Lit</code>和<code>SimpleLit</code>两个值，默认使用Lit。</p>
+<ul>
+<li>Lit：在G-buffer
+Pass期间，Unity使用模板stencil来标记此像素使用Lit着色器类型（高光模型使用PBR）。</li>
+<li>SimpleLit：在G-buffer
+Pass期间，Unity使用模板stencil来标记此像素使用Simple着色器模型（高光模型使用
+Blinn-Phong）。</li>
+</ul>
+<h4 id="passflags">PassFlags</h4>
+<p>在内置渲染管线中，使用此标签决定Unity提供给Pass何种数据。</p>
+<h4 id="requireoptions">RequireOptions</h4>
+<p>在内置渲染管线中，通过此标签以及project
+settings决定是否启用此Pass。只有一个值<code>SoftVegetation</code>。</p>
+<h3 id="参考资料">参考资料</h3>
+<p><a
+target="_blank" rel="noopener" href="https://docs.unity3d.com/Manual/writing-shader-tags-introduction.html">Introduction
+to shader tags</a></p>
 
     </div>
 

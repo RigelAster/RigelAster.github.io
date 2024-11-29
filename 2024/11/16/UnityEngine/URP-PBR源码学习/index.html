@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha256-5eIC48iZUHmSlSUz9XtjRyK2mzQkHScZY1WdMaoz74E=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"rigelaster.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.21.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"always","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="学习URP v12.1.10下PBR的源码，了解其结构及具体实现。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="URP-PBR源码学习">
+<meta property="og:url" content="https://rigelaster.github.io/2024/11/16/UnityEngine/URP-PBR%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0/index.html">
+<meta property="og:site_name" content="Rigel&#39;s Blog">
+<meta property="og:description" content="学习URP v12.1.10下PBR的源码，了解其结构及具体实现。">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-11-16T05:22:18.000Z">
+<meta property="article:modified_time" content="2024-11-28T03:06:13.015Z">
+<meta property="article:author" content="Rigel Aster">
+<meta property="article:tag" content="Unity">
+<meta property="article:tag" content="PBR">
+<meta property="article:tag" content="SRP">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://rigelaster.github.io/2024/11/16/UnityEngine/URP-PBR%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"https://rigelaster.github.io/2024/11/16/UnityEngine/URP-PBR%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0/","path":"2024/11/16/UnityEngine/URP-PBR源码学习/","title":"URP-PBR源码学习"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>URP-PBR源码学习 | Rigel's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Rigel's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%93%E6%9E%84"><span class="nav-number">2.</span> <span class="nav-text">结构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E5%B0%81%E8%A3%85"><span class="nav-number">2.1.</span> <span class="nav-text">数据封装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B5%81%E7%A8%8B%E6%8E%A7%E5%88%B6"><span class="nav-number">2.2.</span> <span class="nav-text">流程控制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#clearcoat-%E6%B8%85%E6%BC%86"><span class="nav-number">2.3.</span> <span class="nav-text">ClearCoat 清漆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#shadowmask"><span class="nav-number">2.4.</span> <span class="nav-text">shadowMask</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ssao"><span class="nav-number">2.5.</span> <span class="nav-text">SSAO</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B7%B7%E5%90%88bakegi%E5%92%8C%E5%AE%9E%E6%97%B6%E9%98%B4%E5%BD%B1"><span class="nav-number">2.6.</span> <span class="nav-text">混合BakeGI和实时阴影</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#pbr%E5%85%89%E7%85%A7%E8%AE%A1%E7%AE%97"><span class="nav-number">3.</span> <span class="nav-text">PBR光照计算</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%97%B4%E6%8E%A5%E5%85%89%E6%BA%90%E8%AE%A1%E7%AE%97"><span class="nav-number">3.1.</span> <span class="nav-text">间接光源计算</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%BC%AB%E5%8F%8D%E5%B0%84"><span class="nav-number">3.1.1.</span> <span class="nav-text">漫反射</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%AB%98%E5%85%89%E5%8F%8D%E5%B0%84"><span class="nav-number">3.1.2.</span> <span class="nav-text">高光反射</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BB%E5%85%89%E6%BA%90%E8%AE%A1%E7%AE%97"><span class="nav-number">3.2.</span> <span class="nav-text">主光源计算</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%BB%E5%85%89%E6%BC%AB%E5%8F%8D%E5%B0%84"><span class="nav-number">3.2.1.</span> <span class="nav-text">主光漫反射</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%BB%E5%85%89%E9%AB%98%E5%85%89%E5%8F%8D%E5%B0%84"><span class="nav-number">3.2.2.</span> <span class="nav-text">主光高光反射</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%9D%E5%A4%96%E5%85%89%E6%BA%90%E8%AE%A1%E7%AE%97"><span class="nav-number">3.3.</span> <span class="nav-text">额外光源计算</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%80%90%E5%83%8F%E7%B4%A0%E5%85%89%E6%BA%90"><span class="nav-number">3.3.1.</span> <span class="nav-text">逐像素光源</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%80%90%E9%A1%B6%E7%82%B9%E5%85%89%E6%BA%90"><span class="nav-number">3.3.2.</span> <span class="nav-text">逐顶点光源</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#clearcoatpbr%E5%85%89%E7%85%A7%E8%AE%A1%E7%AE%97"><span class="nav-number">4.</span> <span class="nav-text">ClearCoatPBR光照计算</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#final-color"><span class="nav-number">5.</span> <span class="nav-text">Final Color</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">6.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Rigel Aster"
+      src="/uploads/avatar.png">
+  <p class="site-author-name" itemprop="name">Rigel Aster</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">39</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://www.zhihu.com/people/ming-zi-13-35" title="Zhihu → https:&#x2F;&#x2F;www.zhihu.com&#x2F;people&#x2F;ming-zi-13-35" rel="noopener me" target="_blank"><i class="fab fa-zhihu fa-fw"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:remingzi7@gmail.com" title="E-Mail → mailto:remingzi7@gmail.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://github.com/MingZI-7" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;MingZI-7" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i></a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://rigelaster.github.io/2024/11/16/UnityEngine/URP-PBR%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar.png">
+      <meta itemprop="name" content="Rigel Aster">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Rigel's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="URP-PBR源码学习 | Rigel's Blog">
+      <meta itemprop="description" content="学习URP v12.1.10下PBR的源码，了解其结构及具体实现。">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          URP-PBR源码学习
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2024-11-16 13:22:18" itemprop="dateCreated datePublished" datetime="2024-11-16T13:22:18+08:00">2024-11-16</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2024-11-28 11:06:13" itemprop="dateModified" datetime="2024-11-28T11:06:13+08:00">2024-11-28</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Game-Development/" itemprop="url" rel="index"><span itemprop="name">Game Development</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+            <div class="post-description">学习URP v12.1.10下PBR的源码，了解其结构及具体实现。</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="前言">前言</h2>
+<p>PBR绝对是使用最广泛的光照模型，有很多种不同的变体，了解其原理对发展有莫大的帮助。本文学习版本为URP@12.1.10。本文只注重PBR部分内容，其他内容说的比较简单。</p>
+<h2 id="结构">结构</h2>
+<h3 id="数据封装">数据封装</h3>
+<p>Unity将物体表面相关属性的数据封装在BRDFData结构中，片元的属性封装在InputData结构中，让代码整洁一些。</p>
+<h3 id="流程控制">流程控制</h3>
+<p>Unity使用的PBR分为高光流和金属流两部分，使用关键字<code>_SPECULAR_SETUP</code>控制其开关。两者本质原理相同，所以对输入数据进行处理之后，会使用相同的渲染逻辑。</p>
+<p>Unity采用的非电解质基础反射率为0.04，为方便后续使用将(1.0-0.04)值存储于alpha位。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// BRDF.hlsl</span></span><br><span class="line"><span class="comment">// standard dielectric reflectivity coef at incident angle (= 4%)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> kDielectricSpec half4(0.04, 0.04, 0.04, 1.0 - 0.04)</span></span><br></pre></td></tr></table></figure>
+<p>对于两个工作流Unity都会计算出反射率reflectivity，漫反射brdfDiffuse，高光反射brdfSpecular，这部分过程也是两个工作流主要区别的部分。</p>
+<p>高光流中，反射率直接取三分量中的最大值（OpenGL
+ES取r分量，因为大多数金属要么是单色，要么带有微红或淡黄色）。高光颜色直接使用高光贴图中的specular，因为高光流相比与金属流就是使用更多的通道存储高光反射信息，包括非电解质材质。漫反射颜色来自漫反射贴图的albedo，根据能量守恒定律，除去反射的剩余部分即是漫反射，所以乘以oneMinusReflectivity。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">half reflectivity = ReflectivitySpecular(specular);</span><br><span class="line">half oneMinusReflectivity = half(<span class="number">1.0</span>) - reflectivity;</span><br><span class="line">half3 brdfDiffuse = albedo * oneMinusReflectivity;</span><br><span class="line">half3 brdfSpecular = specular;</span><br></pre></td></tr></table></figure>
+<p>金属流中，反射率根据金属度得出，范围为[0.04,
+1]，Unity选择先计算出oneMinusReflectivity，随后求得反射率。当物体表面为金属时，其高光颜色存储于漫反射贴图中；当物体表面为非金属时，高光颜色为前文提到的预定值，是暗灰色(0.04,
+0.04,
+0.04)。所以，金属流虽然贴图通道少，但表现上限低于高光流。漫反射颜色与高光流中的处理相同。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">half <span class="title function_">OneMinusReflectivityMetallic</span><span class="params">(half metallic)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// We&#x27;ll need oneMinusReflectivity, so</span></span><br><span class="line">    <span class="comment">//   1-reflectivity = 1-lerp(dielectricSpec, 1, metallic) = lerp(1-dielectricSpec, 0, metallic)</span></span><br><span class="line">    <span class="comment">// store (1-dielectricSpec) in kDielectricSpec.a, then</span></span><br><span class="line">    <span class="comment">//   1-reflectivity = lerp(alpha, 0, metallic) = alpha + metallic*(0 - alpha) =</span></span><br><span class="line">    <span class="comment">//                  = alpha - metallic * alpha</span></span><br><span class="line">    half oneMinusDielectricSpec = kDielectricSpec.a;</span><br><span class="line">    <span class="keyword">return</span> oneMinusDielectricSpec - metallic * oneMinusDielectricSpec;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// in InitializeBRDFData</span></span><br><span class="line">half oneMinusReflectivity = OneMinusReflectivityMetallic(metallic);</span><br><span class="line">half reflectivity = half(<span class="number">1.0</span>) - oneMinusReflectivity;</span><br><span class="line">half3 brdfDiffuse = albedo * oneMinusReflectivity;</span><br><span class="line">half3 brdfSpecular = lerp(kDieletricSpec.rgb, albedo, metallic);</span><br></pre></td></tr></table></figure>
+<p>现在完成了工作流差异处理，后续便不需要考虑此问题。之后调用<code>InitializedBRDFData()</code>将输入的数据整合，并预计算之后光照计算使用到的几个因子。</p>
+<h3 id="clearcoat-清漆">ClearCoat 清漆</h3>
+<p>ClearCoat材质用于实现基础层+清漆层的双层材质效果，例如车漆、打蜡木地板和镀膜材料等。基础层由通用的PBR算法实现，清漆层由ClearCoatPBR算法实现，最后将两种材质效果混合即可。其实现步骤和通用PBR基本相似：</p>
+<ul>
+<li>ClearCoatBRDF参数准备</li>
+<li>间接光计算</li>
+<li>直接光计算</li>
+</ul>
+<p>在具体实现上还有一些差异，在PBR流程解析完成后会独立出来说一下。</p>
+<h3 id="shadowmask">shadowMask</h3>
+<p>新增了shadowMask属性，用作阴影蒙版，用来剔除不想要的阴影。为了版本兼容，Unity做了以下分支判断：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">half4 <span class="title function_">CalculateShadowMask</span><span class="params">(InputData inputData)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="meta">#<span class="keyword">if</span> defined(SHADOWS_SHADOWMASK) &amp;&amp; defined(LIGHTMAP_ON)</span></span><br><span class="line">    half4 shadowMask = inputData.shadowMask;</span><br><span class="line">    <span class="meta">#<span class="keyword">elif</span> !defined (LIGHTMAP_ON)</span></span><br><span class="line">    half4 shadowMask = unity_ProbesOcclusion;</span><br><span class="line">    <span class="meta">#<span class="keyword">else</span></span></span><br><span class="line">    half4 shadowMask = half4(<span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>);</span><br><span class="line">    <span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> shadowMask;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="ssao">SSAO</h3>
+<p>Unity封装了要给aoFactor里面包含了间接光ao和直接光ao，间接光ao就是正常的ssao实现。对于直接光ao，可以进行设置，看起来像是为了调试才加进来的。</p>
+<h3 id="混合bakegi和实时阴影">混合BakeGI和实时阴影</h3>
+<p>使用函数<code>MixRealtimeAndBakedGI</code>函数来混和全局光照和阴影，此时还并没有应用AO，AO在后续计算中。</p>
+<h2 id="pbr光照计算">PBR光照计算</h2>
+<p>然后就来到了重要部分，PBR光照。光照由四部分组成，直接光漫反射、直接光高光反射、间接光（GI）漫反射和间接光（GI）高光反射</p>
+<h3 id="间接光源计算">间接光源计算</h3>
+<p>间接光通过函数<code>GlobalIllumination()</code>计算，分为漫反射和高光反射两部分。</p>
+<h4 id="漫反射">漫反射</h4>
+<p>漫反射颜色bakedGI通过采样光照贴图LightMap或球谐函数SH而来，Unity提供了相关宏SAMPLE_GI，其返回值直接用作漫反射颜色。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// PBRForwardPass.hlsl</span></span><br><span class="line"><span class="meta">#<span class="keyword">if</span> defined(DYNAMICLIGHTMAP_ON)</span></span><br><span class="line">    inputData.bakedGI = SAMPLE_GI(input.staticLightmapUV, input.dynamicLightmapUV.xy, input.sh, inputData.normalWS);</span><br><span class="line"><span class="meta">#<span class="keyword">else</span></span></span><br><span class="line">    inputData.bakedGI = SAMPLE_GI(input.staticLightmapUV, input.sh, inputData.normalWS);</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">// GlobalIllumination.hlsl - GlobalIllumination</span></span><br><span class="line">half3 indirctDiffuse = bakeGI;</span><br></pre></td></tr></table></figure>
+<h4 id="高光反射">高光反射</h4>
+<p>高光反射是通过IBL实现的，是标准做法，通过粗糙度roughness取计算要采样CubeMap的MipLevel然后采样对应贴图得到环境光颜色值，然后在根据高光反照率计算得到最终值。</p>
+<p>通过粗糙度得到MipLevel有一套自己的规则，通过函数<code>PerceptualRoughtnessToMipmapLevel()</code>实现。因为CubeMap可能使用了HDR，所以在得到环境光颜色值要考虑到解码。最后再与遮蔽因子occlusion相乘，但实际上在流程中这里函数的occlusion传入的都是1.0，再后面计算出高光反射率之后又做了一次遮光的乘法，所以生效的应该是最后做的那次。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ImageBasedLighting.hlsl</span></span><br><span class="line">real <span class="title function_">PerceptualRoughnessToMipmapLevel</span><span class="params">(real perceptualRoughtness, uint maxMipLevel)</span></span><br><span class="line">&#123;</span><br><span class="line">    perceptualRoughtness = perceptualRoughtness * (<span class="number">1.7</span> - <span class="number">0.7</span> * perceptualRoughtness);</span><br><span class="line">    <span class="keyword">return</span> perceptualRoughtness * maxMipLevel;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// GlobalIllumination.hlsl</span></span><br><span class="line">half3 <span class="title function_">GlossyEnvironmentReflection</span><span class="params">(half3 reflectVector, half perceptualRoughness, half occlusion)</span></span><br><span class="line">&#123;</span><br><span class="line">    ...</span><br><span class="line">    half4 encodedIrradiance = half4(SAMPLE_TEXTURECUBE_LOD(unity_SpecCube0, samplerunity_SpecCube0, reflectVector, mip));</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">return</span> irradiance * occlusion;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>高光反照率通过衰减surfaceReducion和由fresnelTerm决定的遮罩一同决定，衰减是一条随粗糙度变化的曲线，遮罩是由菲涅尔值插值高光颜色specular和掠射颜色grazingTerm。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// BRDF.hlsl</span></span><br><span class="line"><span class="comment">// Computes the specular term for EnvironmentBRDF</span></span><br><span class="line">half3 <span class="title function_">EnvironmentBRDFSpecular</span><span class="params">(BRDFData brdfData, half fresnelTerm)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">float</span> surfaceReduction = <span class="number">1.0</span> / (brdfData.roughness2 + <span class="number">1.0</span>);</span><br><span class="line">    <span class="keyword">return</span> half3(surfaceReduction * lerp(brdfData.specular, brdfData.grazingTerm, fresnelTerm));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="主光源计算">主光源计算</h3>
+<p>我们继续来看主光源计算，主光光照使用的<code>LightingPhysicallyBased()</code>函数实现。主光作为精确光源，我们按照精确光源的渲染方程走。</p>
+<h4 id="主光漫反射">主光漫反射</h4>
+<p>在BIRP中，主光漫反射使用的是DisneyBRDF中的漫反射光照模型。而在URP中，主光漫反射使用的是LambertBRDF光照模型，效果会稍逊一些，特别是掠射角随着粗糙度会有明暗边的细节丢失。Unity这样做可能是为了节省性能。</p>
+<p><span class="math display">\[
+BRDF_{Lambert} = \frac{C_{diffuse}}{\PI}
+\]</span></p>
+<p>代码中直接直接使用了brdfDiffuse，至于分母去哪了，我们后面会提到。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">half3 brdf = brdfData.diffuse;</span><br></pre></td></tr></table></figure>
+<h4 id="主光高光反射">主光高光反射</h4>
+<p>游戏界中主流的高光反射BRDF模型是基于微平面理论的Microfacet
+Cook-Torrance
+BRDF。Unity中也是使用了此模型来实现高光反射，在<code>DirectBRDFSpecular</code>函数中实现，反射率被提到了函数外在<code>LightingPhysicallyBased</code>函数中：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">half <span class="title function_">DirectBRDFSpecular</span><span class="params">(BRDFData brdfData, half3 normalWS, half3 lightDirectionWS, half3 viewDirectionWS)</span></span><br><span class="line">&#123;</span><br><span class="line">    float3 lightDirectionWSFloat3 = float3(lightDirectionWS);</span><br><span class="line">    float3 halfDir = SafeNormalize(lightDirectionWSFloat3 + float3(viewDirectionWS));</span><br><span class="line"></span><br><span class="line">    <span class="type">float</span> NoH = saturate(dot(float3(normalWS), halfDir));</span><br><span class="line">    half LoH = half(saturate(dot(lightDirectionWSFloat3, halfDir)));</span><br><span class="line"></span><br><span class="line">    <span class="type">float</span> d = NoH * NoH * brdfData.roughness2MinusOne + <span class="number">1.00001f</span>;</span><br><span class="line"></span><br><span class="line">    half LoH2 = LoH * LoH;</span><br><span class="line">    half specularTerm = brdfData.roughness2 / ((d*d) * max(<span class="number">0.1</span>h, LoH2) * brdfData.normalizationTerm);</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">if</span> defined (SHADER_API_MOBILE) || defined (SHADER_API_SWITCH)</span></span><br><span class="line">    specularTerm = specularTerm - HALF_MIN;</span><br><span class="line">    specularTerm = clamp(specularTerm, <span class="number">0.0</span>, <span class="number">100.0</span>);</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> specularTerm;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// LightingPhysicallyBased()</span></span><br><span class="line">half3 brdf += brdfData.specular * DirectBRDFSpecular(...);</span><br></pre></td></tr></table></figure>
+<p>高光反射方程如下，其中G项有时与分母的矫正因子合并被称为V项：</p>
+<p>$$</p>
+<p>f_{spec} = = </p>
+<p>$$</p>
+<p>在Unity实现中，D项使用了常用的GGX，其具有更好的高光拖尾：</p>
+<p><span class="math display">\[
+D_{GGX}=\frac{roughness^2}
+{\PI ((roughness^2-1)(n \dot h)^2 + 1)^2}
+\]</span></p>
+<p>而对于V项和F项，Unity又做了一些自己的拟合，具体可以看看<a
+target="_blank" rel="noopener" href="https://community.arm.com/cfs-file/__key/communityserver-blogs-components-weblogfiles/00-00-00-20-66/siggraph2015_2D00_mmg_2D00_renaldas_2D00_notes.pdf">这篇pdf</a>。这里简单说一下过程：</p>
+<p>首先其对比了 Smith GGX 和 KSK
+两种模型，KSK虽然更简单但其未将粗糙参数考虑在内。于是Unity将两者拟合得到SKSm模型：</p>
+<p><span class="math display">\[
+V_{Smith} = \frac{1}{
+    ((N \cdot L)(1-k)+k)((N \cdot V)(1-k)+k)
+}
+//
+V_{SKS} = \frac{1}{(L \cdot H)(L \cdot H)}
+//
+V_{SKSm} = \frac{1}{
+    (L \cdot H)^2 (1-roughness^2) + roughness^2
+}
+\]</span></p>
+<p>对于F项，Unity在被C.
+Schüler提出的拟合启发后，决定将高光颜色（折射率）brdfSpecular提出高光BRDF的计算，在最后做乘法运算。在使用LoH对F项也做了拟合之后，Unity将两者公式变为：</p>
+<p><span class="math display">\[
+V \cdot F = \frac{(1-L\codt H)^5}{(L \codt
+H)^2(1-roughness^2)+roughness^2}
+\]</span></p>
+<p>然后，Unity又寻找了一个形状近似的模型来进一步简化计算，得到最终使用的公式：</p>
+<p><span class="math display">\[
+V \cdot F _{approx} = \frac{1}{(L \cdot H)^2 (roughness + 0.5)}
+\]</span></p>
+<p>这样处理下来，Unity在URP中实现的PBR效果相比BIRP肯定有所下降，但这也是为了性能考虑把。最终的高光BRDF为：</p>
+<p><span class="math display">\[
+BRDF_{spec} = \frac{roughness^2}{
+    4 \PI ((N \cdot H)^2 (roughness^2 - 1) + 1)^2 \cdot (L \cdot H)^2
+(roughness+ 0.5)
+} \cdot brdfSpecular
+\]</span></p>
+<p>对于一开始说到的漫反射分母中的 <span
+class="math inline">\(\PI\)</span>
+去哪里了，现在我们终于可以尝试解答一下了。在Unity使用的高光反射模型中，最终公式分母也包含了
+<span
+class="math inline">\(\PI\)</span>，只是和漫发射相同，其并未在代码中出现。而且渲染方程，或者反射方式其本身也并不具有<span
+class="math inline">\(\PI\)</span>相关常数项。所以我们只能猜测，一种可能是，因为其为常数因子，所以Unity为了节省运算省掉了。</p>
+<p>其他部分，Unity也是正常按照渲染方程计算的，只是为了性能做了很多拟合，牺牲了质量。</p>
+<h3 id="额外光源计算">额外光源计算</h3>
+<p>Unity中的光源有两种类型，像素光源和顶点光源，两者进行光照计算时的对象不同。所以，除去主光源外，还需要分两者情况考虑额外光源。</p>
+<h4 id="逐像素光源">逐像素光源</h4>
+<p>额外的逐像素光源与主光源的光照算法相同，所以一般游戏会限制像素光源的数量来降低性能消耗。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">LIGHT_LOOP_BEGIN(pixelLightCount)</span><br><span class="line">    Light light = GetAdditionalLight(lightIndex, inputData, shadowMask, aoFactor);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (IsMatchingLightLayer(light.layerMask, meshRenderingLayers))</span><br><span class="line">    &#123;</span><br><span class="line">        lightingData.additionalLightsColor += LightingPhysicallyBased(...);</span><br><span class="line">    &#125;</span><br><span class="line">LIGHT_LOOP_END</span><br></pre></td></tr></table></figure>
+<h4 id="逐顶点光源">逐顶点光源</h4>
+<p>顶点光源计算在顶点着色器中实现，实现非常简单，只做Lambert处理即可。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">half3 <span class="title function_">VertexLighting</span><span class="params">(float3 positionWS, half3 normalWS)</span></span><br><span class="line">&#123;</span><br><span class="line">    half3 vertexLightColor = half3(<span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>);</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> _ADDITIONAL_LIGHTS_VERTEX</span></span><br><span class="line">    uint lightsCount = GetAdditionalLightsCount();</span><br><span class="line">    LIGHT_LOOP_BEGIN(lightsCount)</span><br><span class="line">        Light light = GetAdditionalLight(lightIndex, positionWS);</span><br><span class="line">        half3 lightColor = light.color * light.distanceAttenuation;</span><br><span class="line">        vertexLightColor += LightingLambert(lightColor, light.direction, normalWS);</span><br><span class="line">    LIGHT_LOOP_END</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> vertexLightColor;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="clearcoatpbr光照计算">ClearCoatPBR光照计算</h2>
+<p>清漆PBR计算和普通PBR在流程上是同时计算的，也由<code>LightingPhysicallyBased</code>函数执行。</p>
+<p>待续-----------------</p>
+<h2 id="final-color">Final Color</h2>
+<p>最后，Unity使用<code>CalculateLightingColor</code>函数对上述提到的光照做最终处理，集成在一个函数的好处就是方便调试各光照效果。函数只要将所有光照做和，便能得到最终的光照效果。</p>
+<p>至此，光照整个流程就算走完了。因为Unity版本更新很快，也在对URP等管线做调整，如果有遗留，后续再进行补充。</p>
+<h2 id="参考资料">参考资料</h2>
+<p><a
+target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/371395846">URP管线PBR源码剖析</a></p>
+<p><a
+target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/60977923">【基于物理的渲染（PBR）白皮书】（三）迪士尼原则的BRDF与BSDF相关总结</a></p>
+<p><a target="_blank" rel="noopener" href="https://community.arm.com/c/e/40">Optimizing PBR for
+Mobile</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Unity/" rel="tag"># Unity</a>
+              <a href="/tags/PBR/" rel="tag"># PBR</a>
+              <a href="/tags/SRP/" rel="tag"># SRP</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2024/11/14/Game%20Development/URP-Fur/" rel="prev" title="URP Fur Rendering">
+                  <i class="fa fa-angle-left"></i> URP Fur Rendering
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2024/11/17/LearnOpenGL/SSAO/" rel="next" title="LearnOpenGL - SSAO">
+                  LearnOpenGL - SSAO <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Rigel Aster</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+
+</body>
+</html>

@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha256-5eIC48iZUHmSlSUz9XtjRyK2mzQkHScZY1WdMaoz74E=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"rigelaster.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.21.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"always","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="学习SSR技术原理">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Screen Space Reflection For Beginners">
+<meta property="og:url" content="https://rigelaster.github.io/2024/11/29/Game%20Development/ScreenSpaceReflection/index.html">
+<meta property="og:site_name" content="Rigel&#39;s Blog">
+<meta property="og:description" content="学习SSR技术原理">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://rigelaster.github.io/2024/11/29/Game%20Development/ScreenSpaceReflection/images/ScreenSpaceReflection/final.gif">
+<meta property="og:image" content="https://rigelaster.github.io/2024/11/29/Game%20Development/ScreenSpaceReflection/images/ScreenSpaceReflection/ray-marching-01.gif">
+<meta property="og:image" content="https://rigelaster.github.io/2024/11/29/Game%20Development/ScreenSpaceReflection/images/ScreenSpaceReflection/normal-in-SSR.gif">
+<meta property="og:image" content="https://rigelaster.github.io/2024/11/29/Game%20Development/ScreenSpaceReflection/images/ScreenSpaceReflection/position-transformations.gif">
+<meta property="og:image" content="https://rigelaster.github.io/2024/11/29/Game%20Development/ScreenSpaceReflection/images/ScreenSpaceReflection/reflected-uv-coordinates.gif">
+<meta property="og:image" content="https://rigelaster.github.io/2024/11/29/Game%20Development/ScreenSpaceReflection/images/ScreenSpaceReflection/SSR-thickness-01.png">
+<meta property="og:image" content="https://rigelaster.github.io/2024/11/29/Game%20Development/ScreenSpaceReflection/images/ScreenSpaceReflection/SSR-thickness-02.png">
+<meta property="og:image" content="https://rigelaster.github.io/2024/11/29/Game%20Development/ScreenSpaceReflection/images/ScreenSpaceReflection/from-view-to-screen.png">
+<meta property="og:image" content="https://rigelaster.github.io/2024/11/29/Game%20Development/ScreenSpaceReflection/images/ScreenSpaceReflection/from-view-to-screen.png">
+<meta property="og:image" content="https://rigelaster.github.io/2024/11/29/Game%20Development/ScreenSpaceReflection/images/ScreenSpaceReflection/from-view-to-screen.png">
+<meta property="og:image" content="https://rigelaster.github.io/2024/11/29/Game%20Development/ScreenSpaceReflection/images/ScreenSpaceReflection/ray-marching-02.gif">
+<meta property="og:image" content="https://rigelaster.github.io/2024/11/29/Game%20Development/ScreenSpaceReflection/images/ScreenSpaceReflection/ray-marching-03.gif">
+<meta property="og:image" content="https://rigelaster.github.io/2024/11/29/Game%20Development/ScreenSpaceReflection/images/ScreenSpaceReflection/specular-map.gif">
+<meta property="og:image" content="https://rigelaster.github.io/2024/11/29/Game%20Development/ScreenSpaceReflection/images/ScreenSpaceReflection/scene-color.png">
+<meta property="og:image" content="https://rigelaster.github.io/2024/11/29/Game%20Development/ScreenSpaceReflection/images/ScreenSpaceReflection/reflected-scene-colors.gif">
+<meta property="og:image" content="https://rigelaster.github.io/2024/11/29/Game%20Development/ScreenSpaceReflection/images/ScreenSpaceReflection/blurred-reflected-scene-colors.png">
+<meta property="article:published_time" content="2024-11-29T02:23:36.000Z">
+<meta property="article:modified_time" content="2024-11-29T11:48:50.948Z">
+<meta property="article:author" content="Rigel Aster">
+<meta property="article:tag" content="SSR">
+<meta property="article:tag" content="Real-time Rendering">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://rigelaster.github.io/2024/11/29/Game%20Development/ScreenSpaceReflection/images/ScreenSpaceReflection/final.gif">
+
+
+<link rel="canonical" href="https://rigelaster.github.io/2024/11/29/Game%20Development/ScreenSpaceReflection/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"https://rigelaster.github.io/2024/11/29/Game%20Development/ScreenSpaceReflection/","path":"2024/11/29/Game Development/ScreenSpaceReflection/","title":"Screen Space Reflection For Beginners"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Screen Space Reflection For Beginners | Rigel's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Rigel's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#screen-space-reflection-ssr"><span class="nav-number">2.</span> <span class="nav-text">Screen Space Reflection (SSR)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ray-marching"><span class="nav-number">3.</span> <span class="nav-text">Ray Marching</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#vertex-positions"><span class="nav-number">3.1.</span> <span class="nav-text">Vertex Positions</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#vertex-normals"><span class="nav-number">3.2.</span> <span class="nav-text">Vertex Normals</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#position-transformations"><span class="nav-number">4.</span> <span class="nav-text">Position Transformations</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#reflected-uv-coordinates"><span class="nav-number">5.</span> <span class="nav-text">Reflected UV Coordinates</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#first-pass"><span class="nav-number">6.</span> <span class="nav-text">First pass</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#second-pass"><span class="nav-number">7.</span> <span class="nav-text">Second pass</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#visibility"><span class="nav-number">8.</span> <span class="nav-text">Visibility</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#specular-map"><span class="nav-number">9.</span> <span class="nav-text">Specular Map</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#scene-colors"><span class="nav-number">10.</span> <span class="nav-text">Scene Colors</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#reflected-scene-colors"><span class="nav-number">11.</span> <span class="nav-text">Reflected Scene Colors</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#blurred-reflected-scene-colors"><span class="nav-number">12.</span> <span class="nav-text">Blurred Reflected Scene
+Colors</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#reflections"><span class="nav-number">13.</span> <span class="nav-text">Reflections</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%BA%90%E6%96%87%E4%BB%B6"><span class="nav-number">14.</span> <span class="nav-text">源文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">15.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Rigel Aster"
+      src="/uploads/avatar.png">
+  <p class="site-author-name" itemprop="name">Rigel Aster</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">39</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://www.zhihu.com/people/ming-zi-13-35" title="Zhihu → https:&#x2F;&#x2F;www.zhihu.com&#x2F;people&#x2F;ming-zi-13-35" rel="noopener me" target="_blank"><i class="fab fa-zhihu fa-fw"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:remingzi7@gmail.com" title="E-Mail → mailto:remingzi7@gmail.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://github.com/MingZI-7" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;MingZI-7" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i></a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://rigelaster.github.io/2024/11/29/Game%20Development/ScreenSpaceReflection/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar.png">
+      <meta itemprop="name" content="Rigel Aster">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Rigel's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Screen Space Reflection For Beginners | Rigel's Blog">
+      <meta itemprop="description" content="学习SSR技术原理">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Screen Space Reflection For Beginners
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+      
+
+      <time title="Created: 2024-11-29 10:23:36 / Modified: 19:48:50" itemprop="dateCreated datePublished" datetime="2024-11-29T10:23:36+08:00">2024-11-29</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Realtime-Rendering/" itemprop="url" rel="index"><span itemprop="name">Realtime Rendering</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+            <div class="post-description">学习SSR技术原理</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="前言">前言</h2>
+<p>本文绝大多数内容源自文章<a
+target="_blank" rel="noopener" href="https://lettier.github.io/3d-game-shaders-for-beginners/screen-space-reflection.html">Screen
+Space
+Reflection</a>，进行部分内容的翻译，学习SSR技术。文章结构上进行了微调。</p>
+<h2 id="screen-space-reflection-ssr">Screen Space Reflection (SSR)</h2>
+<p><img src="./images/ScreenSpaceReflection/final.gif"></p>
+<p>给场景添加反射效果绝对是一笔不错的买卖，湿润和具有光泽的表面会让场景更加生动。</p>
+<p><a
+target="_blank" rel="noopener" href="https://lettier.github.io/3d-game-shaders-for-beginners/lighting.html">灯光章节</a>，我们曾模拟过光源的反射。回想一下，光源高光是使用光线反射方向计算的。与之类似，SSR可以模拟场景中的其他物体的反射。不是来自光源的光线反射到相机上，而是来自场景中某物体的光线反射到相机上。</p>
+<p>SSR的原理是将屏幕图像反射到其自身上。（可能有些抽象，不过之后会理解的。）可以将其与cube
+mapping对比来理解，在cube
+mapping中，光线在场景中某点反射到了包围盒的内部；在SSR中，光线从屏幕出发，经过反射回到屏幕的某处，这样就是从自身反射到自身。基于此原理，通常情况下SSR效果不错，但也会有失效的情况。</p>
+<h2 id="ray-marching">Ray Marching</h2>
+<p>SSR使用ray marching技术决定每个片段的反射结果，ray
+marching(中文一般成为光线步进)是通过扩展或收缩某些向量的长度或大小，以探测或采样某些空间信息的过程。</p>
+<table>
+<tbody>
+<tr>
+<td>Intuitively, a light ray hits some point in the scene, bounces off,
+travels in the opposite direction of the reflected position vector,
+bounces off the current fragment, travels in the opposite direction of
+the position vector, and hits the camera lens allowing you to see the
+color of some point in the scene reflected in the current fragment.</td>
+</tr>
+</tbody>
+</table>
+<p>SSR就是逆向追踪这样的光线路径的过程，它尝试去寻找光线被反射然后打中当前片段的反射点。在每次迭代中，算法沿着反射光线对场景的位置或深度进行采样，每次都会检查光线是否与场景几何相交。如果相交，那么场景中那个位置就是当前片段反射的潜在候选。</p>
+<p>理想情况下，会有一些分析方法来精确的确定第一个交点，此交点是当前片段中唯一有效的反射点。由于不知道交点在何处（如果存在的话），只能从反射光线的底部开始反向寻找，或者说调用某种算法进行检查。每次调用都会检查是否击中目标，如果击中目标，就可以进一步精确交点位置。</p>
+<p><img src="./images/ScreenSpaceReflection/ray-marching-01.gif"></p>
+<p>如上图所示，ray
+marching被用于计算每个片段的反射点。顶点法线是绿色箭头，位置向量是蓝色箭头，在view
+space 中进行的反射ray marching是红色箭头。</p>
+<h3 id="vertex-positions">Vertex Positions</h3>
+<p>与SSAO类似，需要视角空间中的顶点位置。细节请查看<a
+target="_blank" rel="noopener" href="https://lettier.github.io/3d-game-shaders-for-beginners/ssao.html#vertex-positions">SSAO</a>章节。</p>
+<h3 id="vertex-normals">Vertex Normals</h3>
+<p>计算反射需要视角空间的顶点法线，细节也请查看[SSAO]章节。</p>
+<p><img src="./images/ScreenSpaceReflection/normal-in-SSR.gif"></p>
+<p>上图中可以看到，使用到的法线并非顶点法线，需要注意。</p>
+<h2 id="position-transformations">Position Transformations</h2>
+<p><img src="./images/ScreenSpaceReflection/position-transformations.gif"></p>
+<p>正如SSAO，SSR会在视角空间(view space)和屏幕空间(screen
+space)中间来回切换，需要相机的投影矩阵将点从视角空间变换到裁剪空间。然后再从裁剪空间变换到UV空间，在此可以从场景中采样顶点或片段位置信息，这个位置是距离屏幕最近的位置。这便是SSR中的屏幕空间部分，因为“屏幕”是一个纹理UV映射在屏幕形状的矩形上。</p>
+<h2 id="reflected-uv-coordinates">Reflected UV Coordinates</h2>
+<p>SSR有多种实现方法，示例代码开始自计算每个屏幕片段的反射UV坐标。当然也可以不这样，而是直接计算场景反射点的最终颜色。</p>
+<p>回想一下，屏幕只是一个映射到矩形上的2D纹理。了解到这一点之后，就会明白示例代码不需要场景的最终渲染结果来计算反射，可以只计算屏幕像素使用到的反射UV坐标。计算出的UV坐标可以存到帧缓存中，然后在后续渲染场景时使用。</p>
+<p><img src="./images/ScreenSpaceReflection/reflected-uv-coordinates.gif"></p>
+<p>如上图所示，可以看到即使还没有渲染场景，通过反射UV坐标就可以感受到场景最终渲染出的模样。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">uniform mat4 lensProjection;</span><br><span class="line"></span><br><span class="line">uniform sampler2D positionTexture;</span><br><span class="line">uniform sampler2D normalTexture;</span><br></pre></td></tr></table></figure>
+<p>现在需要的是相机的投影矩阵，和视角空间中插值后的顶点位置、法线。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">float</span> maxDistance = <span class="number">15</span>;</span><br><span class="line"><span class="type">float</span> resolution = <span class="number">0.3</span>;</span><br><span class="line"><span class="type">int</span> steps = <span class="number">10</span>;</span><br><span class="line"><span class="type">float</span> thickness = <span class="number">0.5</span>;</span><br></pre></td></tr></table></figure>
+<p>和其他效果一样，SSR有一些需要调整的参数，根据场景的复杂度找到合适的参数值。当反射复杂的几何形状时，调出来一个自然的SSR还是有些困难的。代码中的参数具有以下含义：</p>
+<ul>
+<li>maxDistance：片段反射的最远距离；</li>
+<li>resolution：决定了在第一个通道进行光线步进时跳过片元的多少，第一个通道的目标是找到位于场景几何内部或后方的点。需要了解当其值为0时，没有反射效果；当其值为1时，会逐片元的进行光线步进。resolution值是1，且有一个较大的maxDistance时，FPS会降低。</li>
+<li>steps：决定了第二个通道进行迭代的次数，第二个通道目标是明确反射光线和场景几何的精确交点。</li>
+<li>thickness：控制反射命中与不命中的界限。理想情况下，希望光线遇到被相机捕获的位置和深度（就是相机看到的表面）时可以立即停止步进，此点就是光线的精确反射点。但是，现实不可能做到这么精确，所以使用thickness来调整这个界限，值越小，反射点就越精准。</li>
+</ul>
+<p>当thickness增大时，就会出现很多噪点，如下两幅对比图：</p>
+<p><img src="./images/ScreenSpaceReflection/SSR-thickness-01.png"></p>
+<p><img src="./images/ScreenSpaceReflection/SSR-thickness-02.png"></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">vec2 texSize = textureSize(positionTexture, <span class="number">0</span>).xy;</span><br><span class="line">vec2 texCoord = gl_FragCoord.xy / texSize;</span><br><span class="line"></span><br><span class="line">vec4 positionFrom = texture(positionTexture, texCoord);</span><br><span class="line">vec3 unitPositionFrom = normalize(positionFrom.xyz);</span><br><span class="line">vec3 normal = normalize(texture(normalTexture, texCoord).xyz);</span><br><span class="line">vec3 pivot = normalize(reflect(unitPositionFrom, normal))</span><br></pre></td></tr></table></figure>
+<p>需要拿到的是当前片元的位置、法线以及反射后的向量。代码中变量含义如下：</p>
+<ul>
+<li>positionFrom: a vector from the camera position to the current
+fragment position;</li>
+<li>normal: a vector pointing in the direction of the interpolated
+vertex normal for current fragment;</li>
+<li>pivot: reflection ray or vector pointing in the reflected direction
+of the positionFrom vector;</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">vec4 startView = vec4(positionFrom.xyz + (pivot * <span class="number">0</span>), <span class="number">1</span>);</span><br><span class="line">vec4 endView = vec4(positionFrom.xyz + (pivot * maxDistance), <span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">vec4 startFrag = startView;</span><br><span class="line">    startFrag = lensProjection * startFrag;</span><br><span class="line">    startFrag.xyz /= startFrag.w;</span><br><span class="line">    startFrag.xy = startFrag.xy * <span class="number">0.5</span> + <span class="number">0.5</span>;</span><br><span class="line">    startFrag.xy *= texSize;</span><br><span class="line"></span><br><span class="line">vec4 endFrag = endView;</span><br><span class="line">    endFrag      = lensProjection * endFrag;</span><br><span class="line">    endFrag.xyz /= endFrag.w;</span><br><span class="line">    endFrag.xy   = endFrag.xy * <span class="number">0.5</span> + <span class="number">0.5</span>;</span><br><span class="line">    endFrag.xy  *= texSize;</span><br></pre></td></tr></table></figure>
+<p>将这些像素的起点和终点从视角空间变换到屏幕空间，这些点就是片段位置对应的屏幕像素位置了。现在知道了光线在屏幕上的起点和终点，就可以沿着它的方向在屏幕空间进行步进。可以将其想象成在屏幕上画一条线，沿着这条线采样存储在帧缓存中的片元顶点位置。</p>
+<p><img src="./images/ScreenSpaceReflection/from-view-to-screen.png"></p>
+<p>需要注意的是，虽然可以在视角空间沿着这个线进行采样，但是可能会存在对帧缓存的过采样或者缺失对某些点的采样。回想一下，位置帧缓存纹理的大小和形状与屏幕相同。每个屏幕片段或像素对应于相机捕获的某个位置，反射光线在视角空间中行进很长的一段距离可能对应的只在屏幕空间行进了几个像素。所以，在视角空间行进是低效的，可能会采样相同的像素多次。通过在屏幕空间中行进，可以更有效的对光线覆盖的片元或像素进行采样。</p>
+<p><img src="./images/ScreenSpaceReflection/from-view-to-screen.png"></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">vec2 frag = startFrag.xy;</span><br><span class="line">    uv.xy = frag/texSize;</span><br><span class="line"></span><br><span class="line"><span class="type">float</span> deltaX = endFrag.x - startFrag.x;</span><br><span class="line"><span class="type">float</span> deltaY = endFrag.y - startFrag.y;</span><br><span class="line"></span><br><span class="line"><span class="type">float</span> useX = <span class="built_in">abs</span>(deltaX) &gt;= <span class="built_in">abs</span>(deltaY) ? <span class="number">1</span> : <span class="number">0</span>;</span><br><span class="line"><span class="type">float</span> delta = mix(<span class="built_in">abs</span>(deltaY), <span class="built_in">abs</span>(deltaX), useX) * clamp(resolution, <span class="number">0</span>, <span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">vec2 increment = vec2(deltaX, deltaY) / max(delta, <span class="number">0.001</span>);</span><br></pre></td></tr></table></figure>
+<p>第一个通道从反射光线的起始片段位置开始，并分别计算X和Y方向上的起始和终点UV坐标差值。由于反射光线可能更接近水平或竖直中的某一方向，所以需要使用差值较大的轴来确定步进幅度。再结合前文设定的<code>resolution</code>，就可以确定步进的长度<code>increment</code>。可以用实数代入以下看看：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">startFrag  = ( <span class="number">1</span>,  <span class="number">4</span>)</span><br><span class="line">endFrag    = (<span class="number">10</span>, <span class="number">14</span>)</span><br><span class="line"></span><br><span class="line">deltaX     = (<span class="number">10</span> - <span class="number">1</span>) = <span class="number">9</span></span><br><span class="line">deltaY     = (<span class="number">14</span> - <span class="number">4</span>) = <span class="number">10</span></span><br><span class="line"></span><br><span class="line">resolution = <span class="number">0.5</span></span><br><span class="line"></span><br><span class="line">delta      = <span class="number">10</span> * <span class="number">0.5</span> = <span class="number">5</span></span><br><span class="line"></span><br><span class="line">increment  = (deltaX, deltaY) / delta</span><br><span class="line">           = (     <span class="number">9</span>,     <span class="number">10</span>) / <span class="number">5</span></span><br><span class="line">           = ( <span class="number">9</span> / <span class="number">5</span>,      <span class="number">2</span>)</span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">float</span> search0 = <span class="number">0</span>;</span><br><span class="line"><span class="type">float</span> search1 = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">current position x = (start x) * (<span class="number">1</span> - search1) + (end x) * search1;</span><br><span class="line">current position y = (start y) * (<span class="number">1</span> - search1) + (end y) * search1;</span><br></pre></td></tr></table></figure>
+<p>然后，我们继续。从起始片元步进到结束片元，使用线性插值。<code>search1</code>从0到1，当值为0时，当前位置是起始片元；当值为1时，当前位置为结束片元。<code>search0</code>用于记录上一个未与场景几何相交的位置，会在第二个通道用来精确定位交点。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> hit0 = <span class="number">0</span>;</span><br><span class="line"><span class="type">int</span> hit1 = <span class="number">0</span>;</span><br></pre></td></tr></table></figure>
+<p><code>hit0</code>用来表明第一个通道是否有交点；<code>hit1</code>用来表明第二个通道是否有交点。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">float</span> viewDistance = startView.y;</span><br><span class="line"><span class="type">float</span> depth = thickness;</span><br></pre></td></tr></table></figure>
+<p><code>viewDistance</code>用于表示在视角空间内光线行进到的当前位置距离相机有多远。需要注意的是此处代码<code>.y</code>只适用于Panda3D，其他引擎有自己的定义。如果使用的是深度缓存，那么<code>viewDistance</code>就是z深度值。<code>depth</code>值表示的是视角空间中光线行进到的当前点与场景点之间距离相机的距离差距，它表明了点在场景前面或后面多远处。</p>
+<h2 id="first-pass">First pass</h2>
+<p>终于，可以开始我们的第一个pass了。它运行在基于<code>delta</code>的循环中，循环结束代表着在线段上的行进完成了。</p>
+<p><img src="./images/ScreenSpaceReflection/from-view-to-screen.png"></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span>(i = <span class="number">0</span>; i &lt; <span class="type">int</span>(delta); ++i)</span><br><span class="line">&#123;</span><br><span class="line">    frag += increment;</span><br><span class="line">    uv.xy = frag / texSize;</span><br><span class="line">    positionTo = texture(positionTexture, uv.xy);</span><br><span class="line"></span><br><span class="line">    search1 = mix((frag.y - startFrag.y)/deltaY, (frag.x - startFrag.x)/deltaX, useX);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Incorrect</span></span><br><span class="line">    <span class="comment">// viewDistance = mix(startView.y, endView.y, search1);</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// Correct</span></span><br><span class="line">    viewDistance = (startView * endView.y) / mix(endView.y, startView.y, search1);</span><br><span class="line"></span><br><span class="line">    depth = viewDistance - positionTo.y;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(depth &gt; <span class="number">0</span> &amp;&amp; depth &lt; thickness)&#123;</span><br><span class="line">        hit0 = <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">        search0 = search1;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>在循环内进行步进，更新片段位置，然后使用此位置来采样帧缓存中的位置纹理得到此时的场景位置。然后计算当前行进的百分比<code>search1</code>，我们需要此值来在视角空间内进行插值。</p>
+<p>但在进行插值之间我们需要了解，<code>search1</code>是投影后的插值因子，不可以用于直接对投影前的内容进行线性插值，需要使用到<strong>透视正确的插值（perspecive-correct
+interpolation）</strong>。具体原因请看此文章<a
+target="_blank" rel="noopener" href="https://www.comp.nus.edu.sg/~lowkl/publications/lowk_persp_interp_techrep.pdf">Perspective-Correct
+Interpolation</a>。</p>
+<p>了解之后便可以使用<code>search1</code>插值得到<code>viewDistance</code>，其表示当前点在视角空间内相对相机的距离，<code>depth</code>便可以顺便求出。</p>
+<p>在得到<code>depth</code>之后，就来到了检查节点。如果<code>depth</code>位于0和<code>thickness</code>之间，表示此时发生了hit，需要把<code>hit0</code>值为1然后离开第一个通道；如果没有，表示此时发生了miss，需要把<code>search0</code>置为<code>search1</code>，然后继续循环。</p>
+<p>至此，完成了第一个pass。将<code>search1</code>设置为最后一次miss和最后一次hit的中间位置；如果没有发生hit，此时search1就是无意义的。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">search1 = search0 + ((search1 - search0)/<span class="number">2</span>);</span><br></pre></td></tr></table></figure>
+<h2 id="second-pass">Second pass</h2>
+<p>随后，开始第二个pass。如果在前一个pass中没有发生hit，直接跳过第二pass。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">steps *= hit0;</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span>(i = <span class="number">0</span>; i &lt; steps; ++i)&#123;</span><br><span class="line">    frag = mix(startFrag.xy, endFrag.xy, search1);</span><br><span class="line">    uv.xy = frag/texSize;</span><br><span class="line">    positionTo = texture(positionTexture, uv.xy);</span><br><span class="line"></span><br><span class="line">    viewDistance = (startView.y * endView.y) / mix(endView.y, startView.y, search1);</span><br><span class="line">    depth = viewDistance - positionTo.y;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(depth &gt; <span class="number">0</span> &amp;&amp; depth &lt; thickness)&#123;</span><br><span class="line">        hit1 = <span class="number">1</span>;</span><br><span class="line">        search1 = search0 + (search1 - search0) / <span class="number">2</span>;</span><br><span class="line">    &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">        <span class="type">float</span> temp = search1;</span><br><span class="line">        search1 = search1 + (search1 - search0) / <span class="number">2</span>;</span><br><span class="line">        search0 = temp;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>和之前的pass思路类似，只不过这次通过二分法做了<code>steps</code>次来找寻两者之间更精确的解。</p>
+<h2 id="visibility">Visibility</h2>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">float</span> visibility = hit1 * positionTo.w;</span><br></pre></td></tr></table></figure>
+<p>在输出反射UV坐标之前，还需要进行可视性检查确定<code>visibility</code>。如果在second
+pass中没有发生hit，<code>visibility</code>的值就是0；如果被反射场景位置处的alpha或<code>w</code>值为0，<code>visibility</code>也应当是0；需要注意，如果<code>w</code>是0，代表在此处没有场景位置信息。</p>
+<p><img src="./images/ScreenSpaceReflection/ray-marching-02.gif"></p>
+<p>有一种情况SSR会失效，就是当反射光线大致方向指向相机时。如果指向相机的反射光线击中某物体表面，那么大概率那个交点是相机看不到的背面。为了处理这种失效情况，需要根据反射向量指向相机的程度来淡出反射。如果反射向量直接指向与位置矢量相反的方向，则可见性降为0，任何其他方向能见度大于0。记得在做点乘运算时将矢量归一化。那么，上述代码就变成了这样：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">float</span> visibility = hit1 * positionTo.w</span><br><span class="line">                        * (<span class="number">1</span> - max(dot(-unitPositionFrom, pivot), <span class="number">0</span>));</span><br></pre></td></tr></table></figure>
+<p>沿着反射光线步进采样场景位置时，希望找到反射光线第一次与场景几何相交的确切点，但很遗憾是做不到的。但是，可以通过“交点越远，反射越淡”的规则来弥补一下。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">float</span> visibility = hit1 * positionTo.w</span><br><span class="line">                        * (<span class="number">1</span> - max(dot(-unitPositionFrom, pivot), <span class="number">0</span>))</span><br><span class="line">                        * (<span class="number">1</span> - clamp(depth / thickness, <span class="number">0</span>, <span class="number">1</span>));</span><br></pre></td></tr></table></figure>
+<p>此时反射会在<code>maxDistance</code>处突然消失，为了解决此问题，可以根据反射点离初始起点的距离逐渐淡出。于是：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">float</span> visibility = hit1 * positionTo.w</span><br><span class="line">                        * (<span class="number">1</span> - max(dot(-unitPositionFrom, pivot), <span class="number">0</span>))</span><br><span class="line">                        * (<span class="number">1</span> - clamp(depth / thickness, <span class="number">0</span>, <span class="number">1</span>))</span><br><span class="line">                        * (<span class="number">1</span> - clamp(length(positionTo - positionFrom)/ maxDistance, <span class="number">0</span>, <span class="number">1</span>));</span><br></pre></td></tr></table></figure>
+<p>还有一种极限情况是，反射UV坐标超出范围，发生在光线步进时离开相机视锥体的情况下。此时也要将<code>visibility</code>置为0：</p>
+<p><img src="./images/ScreenSpaceReflection/ray-marching-03.gif"></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">float</span> visibility = hit1 * positionTo.w</span><br><span class="line">                        * (<span class="number">1</span> - max(dot(-unitPositionFrom, pivot), <span class="number">0</span>))</span><br><span class="line">                        * (<span class="number">1</span> - clamp(depth / thickness, <span class="number">0</span>, <span class="number">1</span>))</span><br><span class="line">                        * (<span class="number">1</span> - clamp(length(positionTo - positionFrom)/ maxDistance, <span class="number">0</span>, <span class="number">1</span>))</span><br><span class="line">                        * (uv.x &lt; <span class="number">0</span> || uv.x &gt; <span class="number">1</span> ? <span class="number">0</span> : <span class="number">1</span>)</span><br><span class="line">                        * (uv.y &lt; <span class="number">0</span> || uv.y &gt; <span class="number">1</span> ? <span class="number">0</span> : <span class="number">1</span>);</span><br></pre></td></tr></table></figure>
+<p>最后将<code>visibility</code>存储在BA通道中，并输出:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">visibility = clamp(visibility, <span class="number">0</span>, <span class="number">1</span>);</span><br><span class="line">uv.ba = vec2(visibility);</span><br><span class="line"></span><br><span class="line">fragColor = uv;</span><br></pre></td></tr></table></figure>
+<h2 id="specular-map">Specular Map</h2>
+<p><img src="./images/ScreenSpaceReflection/specular-map.gif"></p>
+<p>除了反射UV坐标之外，还需要一张高光贴图。示例代码展示了通过片段的材质高光属性创建的高光贴图：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> MAX_SHININESS 127.75</span></span><br><span class="line"></span><br><span class="line">uniform <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">    vec3 specular;</span><br><span class="line">    <span class="type">float</span> shininess;</span><br><span class="line">&#125; p3d_Material;</span><br><span class="line"></span><br><span class="line">out vec4 fragColor;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">main</span><span class="params">()</span>&#123;</span><br><span class="line">    fragColor = vec4(p3d_Material.specular, clamp(p3d_Material.shininess / MAX_SHININESS, <span class="number">0</span>, <span class="number">1</span>));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上述高光片段着色器非常简单，根据片段的材质，它可以将高光信息输出为颜色，将shininess输出到alpha通道。在Blender中，最大的镜面硬度或亮度是511。当从Blender导出到Panda3D时，511导出为127.75。可以在[0,1]范围内随意调整shininess值，让它满足你的实际需求即可。</p>
+<p>示例代码是从材质的高光属性生成的高光贴图，也可以通过其他方法。例如，可以在GIMP中创建一个，然后将其作为纹理附加到3D模型上。比如，宝箱上只有闪亮的支架会反射环境，就可以将支架土城灰色，宝箱其余部分涂成黑色。（笔者也还不懂什么是GIMP，应该是一个DCC软件吧。）</p>
+<h2 id="scene-colors">Scene Colors</h2>
+<p><img src="./images/ScreenSpaceReflection/scene-color.png"></p>
+<p>想要被反射的场景需要渲染，并将其存储在framebuffer纹理中。上图就是一个普通的，没有任何反射的场景。</p>
+<h2 id="reflected-scene-colors">Reflected Scene Colors</h2>
+<p><img src="./images/ScreenSpaceReflection/reflected-scene-colors.gif"></p>
+<p>上图就是存储于帧缓存纹理中的反射颜色。而且，反射UV坐标也知道，绘制反射便很简单。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">uniform sampler2D unTexture;</span><br><span class="line">uniform sampler2D colorTexture;</span><br><span class="line"></span><br><span class="line">vec2 texSize = textureSize(uvTexture, <span class="number">0</span>).xy;</span><br><span class="line">vec2 texCoord = gl_FragCoord.xy / texSize;</span><br><span class="line"></span><br><span class="line">vec4 uv = texture(uvTexture, texCoord);</span><br><span class="line">vec4 color = texture(colorTexture, uv.xy);</span><br><span class="line"></span><br><span class="line"><span class="type">float</span> alpha = clamp(uv.b, <span class="number">0</span>, <span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">fragColor = vec4(mix(vec3(<span class="number">0</span>), color.rgb, alpha), alpha);</span><br></pre></td></tr></table></figure>
+<h2 id="blurred-reflected-scene-colors">Blurred Reflected Scene
+Colors</h2>
+<p><img src="./images/ScreenSpaceReflection/blurred-reflected-scene-colors.png"></p>
+<p>也可以对反射的场景颜色进行模糊，然后存储在framebuffer的纹理中。有关模糊的详细信息请参考SSAO章节。经过模糊的反射可以用于较为粗糙的表面，这些表面更倾向于漫反射或模糊的镜面反射。</p>
+<h2 id="reflections">Reflections</h2>
+<p>完成最终的反射，需要之前得到的纹理，the reflected colors, the blurred
+reflected colors, the specular map。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">uniform sampler2D colorTexture;</span><br><span class="line">uniform sampler2D colorBlurTexture;</span><br><span class="line">uniform sampler2D specularTexture;</span><br><span class="line"></span><br><span class="line"><span class="comment">// ...</span></span><br><span class="line"></span><br><span class="line">vec4 specular = texture(specularTexture, texCoord);</span><br><span class="line">vec4 color = texture(colorTexture, texCoord);</span><br><span class="line">vec4 colorBlur = texture(colorBlurTexture, texCoord);</span><br></pre></td></tr></table></figure>
+<p>将高光值从rgb映射到灰度值，如果得到的高光值无效就抛弃当前片段。然后可以通过得到的高光值控制反射的强度，这样可以通过调整材质的高光来调整反射强度。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">float</span> specularAmount = dot(specular.rgb, vec3(<span class="number">1</span>)) / <span class="number">3</span>;</span><br><span class="line"><span class="keyword">if</span>(specularAmount &lt;= <span class="number">0</span>) &#123;fragColor = vec4(<span class="number">0</span>); <span class="keyword">return</span>;&#125;</span><br></pre></td></tr></table></figure>
+<p>通过<code>roughness</code>值来控制反射贴图的模糊程度，值越大越粗糙。前文中，将<code>shininess</code>值存储到了贴图的alpha通道，使用它就可以得到<code>roughness</code>。然后，在一般反射和模糊过的反射之间插值即可。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">float</span> roughness = <span class="number">1</span> - min(specular.a, <span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">fragColor = mix(color, colorBlur, roughness) * specularAmount;</span><br></pre></td></tr></table></figure>
+<h2 id="源文件">源文件</h2>
+<p>请查阅原文章</p>
+<h2 id="参考资料">参考资料</h2>
+<p><a
+target="_blank" rel="noopener" href="https://lettier.github.io/3d-game-shaders-for-beginners/screen-space-reflection.html">Screen
+Space Reflection (SSR)</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/SSR/" rel="tag"># SSR</a>
+              <a href="/tags/Real-time-Rendering/" rel="tag"># Real-time Rendering</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2024/11/17/LearnOpenGL/SSAO/" rel="prev" title="LearnOpenGL - SSAO">
+                  <i class="fa fa-angle-left"></i> LearnOpenGL - SSAO
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Rigel Aster</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+
+</body>
+</html>

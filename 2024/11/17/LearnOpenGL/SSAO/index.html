@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha256-5eIC48iZUHmSlSUz9XtjRyK2mzQkHScZY1WdMaoz74E=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"rigelaster.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.21.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"always","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="本文为LearnOpenGL-Advanced Lighting-SSAO篇，作为如今已经普遍使用的技术，我们通过此篇文章学习实现原理。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LearnOpenGL - SSAO">
+<meta property="og:url" content="https://rigelaster.github.io/2024/11/17/LearnOpenGL/SSAO/index.html">
+<meta property="og:site_name" content="Rigel&#39;s Blog">
+<meta property="og:description" content="本文为LearnOpenGL-Advanced Lighting-SSAO篇，作为如今已经普遍使用的技术，我们通过此篇文章学习实现原理。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://rigelaster.github.io/images/LearnOpenGL/SSAO/ssao_example.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/LearnOpenGL/SSAO/ssao_crysis_circle.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/LearnOpenGL/SSAO/ssao_banding_noise.jpg">
+<meta property="og:image" content="https://rigelaster.github.io/images/LearnOpenGL/SSAO/ssao_crysis.jpg">
+<meta property="og:image" content="https://rigelaster.github.io/images/LearnOpenGL/SSAO/ssao_hemisphere.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/LearnOpenGL/SSAO/ssao_overview.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/LearnOpenGL/SSAO/ssao_hemisphere.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/LearnOpenGL/SSAO/ssao_kernel_weight.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/LearnOpenGL/SSAO/ssao_range_check.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/LearnOpenGL/SSAO/ssao_smoothstep.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/LearnOpenGL/SSAO/ssao_without_blur.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/LearnOpenGL/SSAO/ssao.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/LearnOpenGL/SSAO/ssao_final.png">
+<meta property="article:published_time" content="2024-11-17T09:44:14.000Z">
+<meta property="article:modified_time" content="2024-11-18T15:38:09.573Z">
+<meta property="article:author" content="Rigel Aster">
+<meta property="article:tag" content="OpenGL">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://rigelaster.github.io/images/LearnOpenGL/SSAO/ssao_example.png">
+
+
+<link rel="canonical" href="https://rigelaster.github.io/2024/11/17/LearnOpenGL/SSAO/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"https://rigelaster.github.io/2024/11/17/LearnOpenGL/SSAO/","path":"2024/11/17/LearnOpenGL/SSAO/","title":"LearnOpenGL - SSAO"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>LearnOpenGL - SSAO | Rigel's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Rigel's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8A%80%E6%9C%AF%E5%8F%91%E5%B1%95%E5%8F%8A%E5%8E%9F%E7%90%86"><span class="nav-number">1.</span> <span class="nav-text">技术发展及原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sample-buffers"><span class="nav-number">2.</span> <span class="nav-text">Sample buffers</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#normal-oriented-hemisphere"><span class="nav-number">3.</span> <span class="nav-text">Normal-oriented hemisphere</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#random-kernel-rotations"><span class="nav-number">4.</span> <span class="nav-text">Random kernel rotations</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#the-ssao-shader"><span class="nav-number">5.</span> <span class="nav-text">The SSAO shader</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ambient-occlusion-blur"><span class="nav-number">6.</span> <span class="nav-text">Ambient occlusion blur</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#applying-ambient-occlusion"><span class="nav-number">7.</span> <span class="nav-text">Applying ambient occlusion</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B5%84%E6%96%99%E9%93%BE%E6%8E%A5"><span class="nav-number">8.</span> <span class="nav-text">资料链接</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Rigel Aster"
+      src="/uploads/avatar.png">
+  <p class="site-author-name" itemprop="name">Rigel Aster</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">39</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://www.zhihu.com/people/ming-zi-13-35" title="Zhihu → https:&#x2F;&#x2F;www.zhihu.com&#x2F;people&#x2F;ming-zi-13-35" rel="noopener me" target="_blank"><i class="fab fa-zhihu fa-fw"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:remingzi7@gmail.com" title="E-Mail → mailto:remingzi7@gmail.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://github.com/MingZI-7" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;MingZI-7" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i></a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://rigelaster.github.io/2024/11/17/LearnOpenGL/SSAO/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar.png">
+      <meta itemprop="name" content="Rigel Aster">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Rigel's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="LearnOpenGL - SSAO | Rigel's Blog">
+      <meta itemprop="description" content="本文为LearnOpenGL-Advanced Lighting-SSAO篇，作为如今已经普遍使用的技术，我们通过此篇文章学习实现原理。">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          LearnOpenGL - SSAO
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2024-11-17 17:44:14" itemprop="dateCreated datePublished" datetime="2024-11-17T17:44:14+08:00">2024-11-17</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2024-11-18 23:38:09" itemprop="dateModified" datetime="2024-11-18T23:38:09+08:00">2024-11-18</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Real-time-Rendering/" itemprop="url" rel="index"><span itemprop="name">Real-time Rendering</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+            <div class="post-description">本文为LearnOpenGL-Advanced Lighting-SSAO篇，作为如今已经普遍使用的技术，我们通过此篇文章学习实现原理。</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h3 id="技术发展及原理">技术发展及原理</h3>
+<p>我们曾在基础光照章节简单接触过环境光(ambient
+lighting)的话题，环境光照是我们加入场景总体光照的一个固定光照常量，被用来模拟光的<strong>散射(Scattering)</strong>。在现实中，光会以不同的强度向四面八方散射，所以场景的间接光照部分在空间上也应该有不同的强度分布。有一种间接光照的模拟技术被称为<strong>环境光遮罩(ambient
+occlusion)</strong>，它通过降低褶皱、孔洞和相互之间非常靠近的墙面的亮度来尝试模拟间接光照。这些位置很大程度会被周围的几何体遮挡，从而有很少的光线逸出，所以会显得暗。</p>
+<p>下面是一组有无环境光遮罩的对比图，注意观察两者光照的明暗部分：</p>
+<p><img src="/images/LearnOpenGL/SSAO/ssao_example.png"></p>
+<p>尽管不是一个令人难以置信的效果，但是使用了环境遮罩的图片感觉更加真实一些，它会给整体环境一个深度感。</p>
+<p>环境光遮蔽技术在计算量上是昂贵的，他需要将周围的几何体都考虑在内。我们可以使空间中一点发出大量的光线来确定其遮罩程度，但在实时渲染中这显然是个难题。在2007年，Crytek公司公布了<strong>屏幕空间环境光遮蔽技术(screen-space
+ambient occlusion,
+SSAO)</strong>，并将技术应用于其作品孤岛危机上。此技术使用场景的屏幕空间深度缓存，代替真正的几何体数据，去决定物体遮罩程度。与实际意义上的环境遮罩相比，这种方法速度非常快，并且结果是合理的，使其成为模拟实时环境光遮罩的标准。</p>
+<p>SSAO技术背后的技术原理非常简单：对于铺屏四边形(Screen-filled
+Quad)的每一个片段(fragment)，我们都会基于片段周围的深度值计算一个<strong>遮罩因子(occlusion
+factor)</strong>。之后，遮罩因子会被用于降低或者抵消此片段的环境光分量。这个遮罩因子是通过使用球型采样核心(sphere
+sample
+kernel)，采样片段周围的多个深度值并与当前片段深度值进行比较得到的。高于片段深度值的样本数量，决定了遮罩因子。采样示意图如下：</p>
+<p><img src="/images/LearnOpenGL/SSAO/ssao_crysis_circle.png"></p>
+<p>图中，几何体内灰色的样本深度都是高于当前片段深度值的，会增大遮蔽因子；几何体内的样本数量越多，片段获得的环境光照也就越少。</p>
+<p>显而易见，此技术渲染的质量和精度依赖于我们在周围采样的样本数量。如果样本数量过低，渲染精度会急剧下降，会出现一个被称为<strong>条带(banding)</strong>的走样；如果样本数量过高，会丢失性能。我们可以将随机性引入到采样核心当中，依此来降低样本数量。对于每个片段随机旋转采样核心，我们可以通过较低的样本数量得到一个较高质量的结果。但是这样做也是有代价的，因为随机性会引入一个明显的<strong>噪声模式(noise
+pattern)</strong>，必须通过模糊结果来进行修复。下面是一组图例（John
+Chapman的佛像），展示了条带走样和噪声：</p>
+<p><img src="/images/LearnOpenGL/SSAO/ssao_banding_noise.jpg"></p>
+<p>如你所见，尽管少量的采样会造成SSAO产生banding走样，但是随后引入的随机性会完全消除走样。</p>
+<p>Crytek公司开发的SSAO技术拥有一个特定的视觉风格。其采样核心为球形，对于平整的墙面，核心的采样有一半位于几何体内，造成墙面看看去灰蒙蒙的。下图展示了孤岛危机采用但是SSAO，其清晰展示了这种灰蒙蒙的感觉：</p>
+<p><img src="/images/LearnOpenGL/SSAO/ssao_crysis.jpg"></p>
+<p>因此，我们不会使用球形采样核心，而是使用表面法线位于的半球面采样核心(hemisphere
+sample kernel)。如下图：</p>
+<p><img src="/images/LearnOpenGL/SSAO/ssao_hemisphere.png"></p>
+<p>通过在<strong>法向半球体(normal-oriented
+hemisphere)</strong>周围采样，不考虑几何体内部，这样便会消除灰蒙蒙的感觉，从而产生更真实的效果。这个SSAO的教程将会基于法向半球体和John
+Chapman出色的<a
+target="_blank" rel="noopener" href="http://john-chapman-graphics.blogspot.nl/2013/01/ssao-tutorial.html">SSAO教程</a>。</p>
+<h3 id="sample-buffers">Sample buffers</h3>
+<p>因为SSAO需要一些方法去决定片段的遮罩因子，所以需要物体的几何信息。对于每个片段，我们需要以下数据：</p>
+<ul>
+<li>A per-fragment <strong>position</strong> vector.</li>
+<li>A per-fragment <strong>normal</strong> vector.</li>
+<li>A per-fragment <strong>albedo</strong> color.</li>
+<li>A <strong>sample kernel</strong>.</li>
+<li>A per-fragment <strong>random rotation</strong> vector used to
+rotate the sample kernel.</li>
+</ul>
+<p>使用一个逐片段的视角空间位置坐标，我们可以围绕片段的视角空间表面法线旋转半球体采样核心，并使用此核心以不同偏移去采样位置缓冲贴图。对于每个样本，我们将其深度与当前片段位置贴图中存储的深度进行比较，来确定遮挡的数量。最后得到的遮罩因子，被用于限制最终的环境光分量。通过加入逐片段的旋转矢量，我们可以显著减少需要的样本数量，这部分在之后可以很快看到。</p>
+<p><img src="/images/LearnOpenGL/SSAO/ssao_overview.png"></p>
+<blockquote>
+<p>In this chapter we're going to implement SSAO on top of a slightly
+simplified version of the deferred renderer from the deferred shading
+chapter. If you're not sure what deferred shading is, be sure to first
+read up on that.</p>
+</blockquote>
+<p>因为SSAO是一个屏幕空间技术，遮罩是从可视视角计算的，所以可以在视角空间实现此算法。因此，顶点着色器提供的<code>FragPos</code>和<code>Normal</code>都被转换到了视角空间（通过视角矩阵）。</p>
+<blockquote>
+<p>从深度值重建位置向量也是可能的，可以使用Matt Pettineo在它的<a
+target="_blank" rel="noopener" href="https://mynameismjp.wordpress.com/2010/09/05/position-from-depth-3/">博客</a>中描述的方法。这样的话就需要在着色器中做一些额外计算，但是可以节省G-buffer中存储位置数据的空间。本文只制作了更简单的实例，并未使用此方法。</p>
+</blockquote>
+<p><code>gPosition</code>颜色缓冲贴图的设置如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">glGenTextures(<span class="number">1</span>, &amp;gPosition);</span><br><span class="line">glBindTexture(GL_TEXTURE_2D, gPosition);</span><br><span class="line">glTexImage2D(GL_TEXTURE_2D, <span class="number">0</span>, GL_RGBA16F, SCR_WIDTH, SCR_HEIGHT, <span class="number">0</span>, GL_RGBA, GL_FLOAT, <span class="literal">NULL</span>);</span><br><span class="line">glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);</span><br><span class="line">glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);</span><br><span class="line">glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);</span><br><span class="line">glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);</span><br></pre></td></tr></table></figure>
+<p>这给我们了一个线性深度纹理，我们可以用它来对每一个核心样本获取深度值。注意我们把线性深度值存储为了浮点数据；这样从0.1到50.0范围深度值都不会被限制在[0.0,
+1.0]之间了。如果你不用浮点值存储这些深度数据，确保你首先将值除以FAR来标准化它们，再存储到gPositionDepth纹理中，并在以后的着色器中用相似的方法重建它们。同样需要注意的是GL_CLAMP_TO_EDGE的纹理封装方法。这保证了我们不会不小心采样到在屏幕空间中纹理默认坐标区域之外的深度值。</p>
+<p>接下来我们需要真正的半球采样核心和一些方法来随机旋转它。</p>
+<h3 id="normal-oriented-hemisphere">Normal-oriented hemisphere</h3>
+<p>我们需要去生成一系列围绕表面法线的采样点，正如之前讨论的那样，这些采样点在半球内。在每个表面法线方向生成采样核心显然是困难和不合理的，因此我们在<strong>切线空间(tangent
+space)</strong>上生成采样核心，使用法线作为正z轴。如下图：</p>
+<p><img src="/images/LearnOpenGL/SSAO/ssao_hemisphere.png" width="400"></p>
+<p>想象以下我们拥有一个单位半球，我们可以通过以下方式获得一个最大64采样点的采样核心：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::uniform_real_distribution&lt;<span class="type">float</span>&gt; <span class="title function_">randomFloats</span><span class="params">(<span class="number">0.0</span>, <span class="number">1.0</span>)</span>; <span class="comment">// random floats between [0.0, 1.0]</span></span><br><span class="line"><span class="built_in">std</span>::default_random_engine generator;</span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">vector</span>&lt;glm::vec3&gt; ssaoKernel;</span><br><span class="line"><span class="keyword">for</span>(<span class="type">unsigned</span> <span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">64</span>; ++i)</span><br><span class="line">&#123;</span><br><span class="line">    glm::vec3 <span class="title function_">sample</span><span class="params">(</span></span><br><span class="line"><span class="params">        randomFloats(generator) * <span class="number">2.0</span> - <span class="number">1.0</span>,</span></span><br><span class="line"><span class="params">        randomFloats(generator) * <span class="number">2.0</span> - <span class="number">1.0</span>,</span></span><br><span class="line"><span class="params">        randomFloats(generator)</span></span><br><span class="line"><span class="params">    )</span>;</span><br><span class="line">    sample = glm::normalize(sample);</span><br><span class="line">    sample *= randomFloats(generator);</span><br><span class="line">    ssaoKernel.push_back(sample);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>现在，采样核心生成的所有采样点都是随机分布的，但是我们想让接近实际片段的采样点拥有更大的权重。可以使用一个加速插值函数(accelerating
+interpolation)来做到：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">float</span> scale = (<span class="type">float</span>)i / <span class="number">64.0</span>;</span><br><span class="line">scale = lerp(<span class="number">0.1f</span>, <span class="number">1.0f</span>, scale * scale);</span><br><span class="line">sample *= scale;</span><br><span class="line">ssaoKernel.push_back(sample);</span><br></pre></td></tr></table></figure>
+<p><img src="/images/LearnOpenGL/SSAO/ssao_kernel_weight.png"></p>
+<p>每一个采样点都被用于偏移视角空间的像素位置，然后采样。如前文所说，我们确实需要大量的采样点来得到真实的结果，但是这样会造成性能问题。但是，如果我们逐片元的引入半随机的旋转或噪音，就可以显著降低需要的采样数量。</p>
+<h3 id="random-kernel-rotations">Random kernel rotations</h3>
+<p>我们可以为场景中的每个片段生成一个随机旋转向量，但是那样会占用大量存储空间。所以，更好的方法是创建一个小的随机旋转向量纹理平铺在屏幕上。我们创建一个4x4朝向切线空间表面法线的随机旋转向量数组：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">vector</span>&lt;glm::vec3&gt; ssaoNoise;</span><br><span class="line"><span class="keyword">for</span>(<span class="type">unsigned</span> <span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">16</span>; i++)</span><br><span class="line">&#123;</span><br><span class="line">    glm::vec3 <span class="title function_">noise</span><span class="params">(</span></span><br><span class="line"><span class="params">        randomFloats(generator) * <span class="number">2.0</span> - <span class="number">1.0</span>,</span></span><br><span class="line"><span class="params">        randomFloats(generator) * <span class="number">2.0</span> - <span class="number">1.0</span>,</span></span><br><span class="line"><span class="params">        <span class="number">0.0f</span>)</span>;</span><br><span class="line">    ssaoNoise.push_back(noise);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>由于采样核心是沿着正z方向在切线空间内旋转，我们设定z分量为0.0。接下来创建一个包含随机旋转向量的4x4纹理；记得设定它的封装方式为<code>GL_REPEAT</code>，从而保证它合适地平铺在屏幕上。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">unsigned</span> <span class="type">int</span> noiseTexture;</span><br><span class="line">glGenTextures(<span class="number">1</span>, &amp;noiseTexture);</span><br><span class="line">glBindTexture(GL_TEXTURE_2D, noiseTexture);</span><br><span class="line">glTexImage2D(GL_TEXTURE_2D, <span class="number">0</span>, GL_RGBA16F, <span class="number">4</span>, <span class="number">4</span>, <span class="number">0</span>, GL_RGB, GL_FLOAT, &amp;ssaoNoise[<span class="number">0</span>]);</span><br><span class="line">glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);</span><br><span class="line">glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);</span><br><span class="line">glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);</span><br><span class="line">glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);</span><br></pre></td></tr></table></figure>
+<h3 id="the-ssao-shader">The SSAO shader</h3>
+<p>SSAO着色器在一个2D铺屏四边形上运行，为每个片段计算遮罩值。因为需要去存储SSAO阶段的结果，所以我们要创建另外一个帧缓存：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">unsigned</span> <span class="type">int</span> ssaoFBO;</span><br><span class="line">glGenFramebuffers(<span class="number">1</span>, &amp;ssaoFBO);</span><br><span class="line">glBindFramebuffer(GL_FRAMEBUFFER, ssaoFBO);</span><br><span class="line"></span><br><span class="line"><span class="type">unsigned</span> <span class="type">int</span> ssaoColorBuffer;</span><br><span class="line">glGenTextures(<span class="number">1</span>, &amp;ssaoColorBuffer);</span><br><span class="line">glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);</span><br><span class="line">glTexImage2D(GL_TEXTURE_2D, <span class="number">0</span>, GL_RED, SCR_WIDTH, SCR_HEIGHT, <span class="number">0</span>, GL_RED, GL_FLOAT, <span class="literal">NULL</span>);</span><br><span class="line">glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);</span><br><span class="line">glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);</span><br><span class="line"></span><br><span class="line">glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ssaoColorBuffer, <span class="number">0</span>);</span><br></pre></td></tr></table></figure>
+<p>因为环境光遮罩的结果只是一个灰度值，所以我们只需要贴图的R通道，所以颜色缓冲内部格式被设置为<code>GL_RED</code>。</p>
+<p>完整的渲染SSAO的流程大概如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// geometry pass: render stuff into G-buffer</span></span><br><span class="line">glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);</span><br><span class="line">    [...]</span><br><span class="line">glBindFramebuffer(GL_FRAMEBUFFER, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// use G-buffer to render SSAO texture</span></span><br><span class="line">glBindFramebuffer(GL_FRAMEBUFFER, ssaoFBO);</span><br><span class="line">    glClear(GL_COLOR_BUFFER_BIT);</span><br><span class="line">    glActiveTexture(GL_TEXTURE0);</span><br><span class="line">    glBindTexture(GL_TEXTURE_2D, gPosition);</span><br><span class="line">    glActiveTexture(GL_TEXTURE1);</span><br><span class="line">    glBindTexture(GL_TEXTURE_2D, gNormal);</span><br><span class="line">    glActiveTexture(GL_TEXTURE2);</span><br><span class="line">    glBindTexture(GL_TEXTURE_2D, noiseTexture);</span><br><span class="line">    shaderSSAO.use();</span><br><span class="line">    SendKernelSamplesToShader();</span><br><span class="line">    shaderSSAO.setMat4(<span class="string">&quot;projection&quot;</span>, projection);</span><br><span class="line">    RenderQuad();</span><br><span class="line">glBindFramebuffer(GL_FRAMEBUFFER, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// lighting pass: render scene lighting</span></span><br><span class="line">glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);</span><br><span class="line">shaderLightingPass.use();</span><br><span class="line">[...]</span><br><span class="line">glActiveTexture(GL_TEXTURE3);</span><br><span class="line">glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);</span><br><span class="line">[...]</span><br><span class="line">RenderQuad();</span><br></pre></td></tr></table></figure>
+<p>shaderSSAO着色器将G-buffer相关的纹理、噪声纹理和法向半球采样核心作为输入：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#version 330 core</span></span><br><span class="line">out <span class="type">float</span> FragColor;</span><br><span class="line"></span><br><span class="line">in vec2 TexCoords;</span><br><span class="line"></span><br><span class="line">uniform sampler2D gPosition;</span><br><span class="line">uniform sampler2D gNormal;</span><br><span class="line">uniform sampler2D texNoise;</span><br><span class="line"></span><br><span class="line">uniform vec3 samples[<span class="number">64</span>];</span><br><span class="line">uniform mat4 projection;</span><br><span class="line"></span><br><span class="line"><span class="comment">// tile noise texture over screen, based on screen dimensions divided by noise size</span></span><br><span class="line"><span class="type">const</span> vec2 noiseScale = vec2(<span class="number">800.0</span>/<span class="number">4.0</span>, <span class="number">600.0</span>/<span class="number">4</span>/<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    [...]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>注意，这里有一个<code>noiseScale</code>变量。我们想要将噪声纹理平铺(tile)在屏幕上，但是由于<code>TexCoords</code>的取值在0.0和1.0之间，<code>texNoise</code>纹理将不会平铺。所以我们将通过屏幕分辨率除以噪声纹理大小的方式计算<code>TexCoords</code>的缩放大小，并在之后提取相关输入向量的时候使用。另外，有了<code>fragPos</code>和<code>normal</code>向量，我们就可以创建TBN矩阵将向量从切线空间转换到视角空间。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">vec3 fragPos = texture(gPosition, TexCoords).xyz;</span><br><span class="line">vec3 normal = texture(gNormal, TexCoords).rgb;</span><br><span class="line">vec3 randomVec = texture(texNoise, TexCoords * noiseScale).xyz;</span><br><span class="line"></span><br><span class="line">vec3 tangent = normalize(randomVec - normal * dot(randomVec, normal));</span><br><span class="line">vec3 bitangent = cross(normal, tangent);</span><br><span class="line">mat3 TBN = mat3(tangent, bitangent, normal);</span><br></pre></td></tr></table></figure>
+<p>使用<strong>Gramm-Schmidt
+process</strong>可以创建一个正交基底，每次都基于randomVec的值进行略微倾斜。需要注意的是，因为我们使用了随机向量来构建tangent
+vector，所以并不需要使TBN矩阵真正贴合模型表面。因此，也不需要逐顶点的切线（和副切线）向量。</p>
+<p>接下来，我们遍历每个核心采样点，将其变换到视角空间。然后，根据当前片段位置，叠加去采样深度值。这样，就可以比较采样点的视角空间深度值和当前片段的视角空间深度值。我们来逐步讨论这个问题：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">float</span> occlusion = <span class="number">0.0</span>;</span><br><span class="line"><span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; kernelSize; ++i)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// get sample position</span></span><br><span class="line">    vec3 samplePos = TBN * samples[i]; <span class="comment">// from tangent to view-space</span></span><br><span class="line">    samplePos = fragPos + samplePos * radius;</span><br><span class="line">    [...]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>此处的<code>kernelSize</code>和<code>radius</code>是用于微调效果的变量，在案例中使用的值分别为64和0.5。对于每次迭代，我们先将各自的采样点转换到视角空间，然后在视角空间将偏移采样作用于片段位置上，并通过将偏移样本乘以半径来增加（或减少）SSAO的有效采样半径。</p>
+<p>接下来，我们要将sample变换到屏幕空间，这样我们就可以对sample的位置或深度进行采样，就好像我们直接将其位置渲染到屏幕上一样（真没看懂这半句话）。由于采样顶点数据(vector)当前处于视图空间，我们将首先将其变换到NDC，随后将NDC映射到[0.0,
+1.0]范围对位置贴图进行采样：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">vec4 offset = vec4(samplePos, <span class="number">1.0</span>);</span><br><span class="line">offset = projection * offset; <span class="comment">// from view to clip-space</span></span><br><span class="line">offset.xyz /= offset.w; <span class="comment">// perspective divide</span></span><br><span class="line">offset.xyz = offset.xyz * <span class="number">0.5</span> + <span class="number">0.5</span>; <span class="comment">// transform to range 0.0 - 1.0</span></span><br><span class="line"></span><br><span class="line"><span class="type">float</span> sampleDepth = texture(gPosition, offset.xy).z;</span><br></pre></td></tr></table></figure>
+<p>最后便可以对sample的深度值与存储的深度值大小，更新遮罩因子：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">occlusion += (sampleDepth &gt;= samplePos.z + bias ? <span class="number">1.0</span> : <span class="number">0.0</span>);</span><br></pre></td></tr></table></figure>
+<p>我们在这里为原始片段深度添加了一个偏移bias（在本例中被设定为0.025）。虽然偏移bias并不是必要的，但是它有助于微调SSAO的视觉效果，并解决因为场景复杂度而出现的acne走样。</p>
+<p>至此，我们还没有完全完成SSAO，还剩一个小问题。当一个靠近表面边缘的片段计算遮罩因子时，可能会将表面后方很远处的深度值也考虑在内。这些深度值本不应被考虑在内，会对遮罩因子造成影响。为了解决此问题，我们可以引入边缘检测，如下图（由John
+Chapman提供）：</p>
+<p><img src="/images/LearnOpenGL/SSAO/ssao_range_check.png"></p>
+<p>引入一个范围检测从而保证只当被检测深度值在取样半径内时影响遮罩因子，故而将代码最后一样换为：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">float</span> rangeCheck = smoothstep(<span class="number">0.0</span>, <span class="number">1.0</span>, radius/<span class="built_in">abs</span>(fragPos.z - sampleDepth));</span><br><span class="line">occlusion += (sampleDepth &gt;= samplePos.z + bias ? <span class="number">1.0</span> : <span class="number">0.0</span>) * rangeCheck;</span><br></pre></td></tr></table></figure>
+<p>这里我们使用了 GLSL 的 smoothstep 函数，如果深度差取值在 radius
+之内，它们的值会光滑地根据下面这个曲线插值在0.0到1.0之间：</p>
+<p><img src="/images/LearnOpenGL/SSAO/ssao_smoothstep.png"></p>
+<p>如果我们使用hard cut-off range
+check，当深度值在radius之外就移除其对遮罩因子的贡献，就将会在边缘检测使用的地方看见一个明显的（很难看）的边缘。</p>
+<p>最后，需要将遮罩贡献根据核心大小标准化，并输出结果。我们用1.0减去遮罩因子，以便直接使用遮罩因子去缩放环境光照分量。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">occlusion = <span class="number">1.0</span> - (occlusion / kernelSize);</span><br><span class="line">FragColor = occlusion;</span><br></pre></td></tr></table></figure>
+<p>如果我们最喜欢的背包模型正在小睡，ssaoShader会产生以下纹理：</p>
+<p><img src="/images/LearnOpenGL/SSAO/ssao_without_blur.png"></p>
+<p>可见，ssao给了场景很强的深度感。仅通过ssao就可以清除了解，模型是躺在地板上的，而不是漂浮在空中。现在效果仍然看起来不是很完美，因为重复的纹理噪声在图中清晰可见。为了创建一个更光滑的环境光遮蔽效果，我们需要模糊环境遮罩纹理。</p>
+<h3 id="ambient-occlusion-blur">Ambient occlusion blur</h3>
+<p>我们想要在SSAO pass和lighting
+pass之间模糊SSAO贴图，所以让我们先创建另外一个帧缓存存储模糊结果：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">unsigned</span> <span class="type">int</span> ssaoBlurFBO, ssaoColorBufferBlur;</span><br><span class="line">glGenFramebuffers(<span class="number">1</span>, &amp;ssaoBlurFBO);</span><br><span class="line">glBindFramebuffer(GL_FRAMEBUFFER, ssaoBlurFBO);</span><br><span class="line">glGenTextures(<span class="number">1</span>, &amp;ssaoColorBufferBlur);</span><br><span class="line">glBindTexture(GL_TEXTURE_2D, ssaoColorBufferBlur);</span><br><span class="line">glTexImage2D(GL_TEXTURE_2D, <span class="number">0</span>, GL_RED, SCR_WIDTH, SCR_HEIGHT, <span class="number">0</span>, GL_RED, GL_FLOAT, <span class="literal">NULL</span>);</span><br><span class="line">glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);</span><br><span class="line">glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);</span><br><span class="line">glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ssaoColorBufferBlur, <span class="number">0</span>);</span><br></pre></td></tr></table></figure>
+<p>因为平铺的随机矢量贴图给了我们一个一致的随机性，我们可以利用这个属性来创建一个简单的模糊着色器：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#version 330 core</span></span><br><span class="line">out <span class="type">float</span> FragColor;</span><br><span class="line"></span><br><span class="line">in vec2 TexCoords;</span><br><span class="line"></span><br><span class="line">uniform sampler2D ssaoInput;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    vec2 texelSize = <span class="number">1.0</span> / vec2(textureSize(ssaoInput, <span class="number">0</span>));</span><br><span class="line">    <span class="type">float</span> result = <span class="number">0.0</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> x = <span class="number">-2</span>; x &lt; <span class="number">2</span>; ++x) </span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> y = <span class="number">-2</span>; y &lt; <span class="number">2</span>; ++y) </span><br><span class="line">        &#123;</span><br><span class="line">            vec2 offset = vec2(<span class="type">float</span>(x), <span class="type">float</span>(y)) * texelSize;</span><br><span class="line">            result += texture(ssaoInput, TexCoords + offset).r;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    FragColor = result / (<span class="number">4.0</span> * <span class="number">4.0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里我们遍历了周围在-2.0和2.0之间的SSAO纹理单元(Texel)，采样与噪声纹理维度相同数量的SSAO纹理。我们通过使用返回vec2纹理维度的textureSize函数，根据纹理单元的真实大小偏移了每一个纹理坐标。我们平均所得的结果，获得一个简单但是有效的模糊效果。这就完成了，一个包含逐片段环境遮蔽数据的纹理，在光照处理阶段中可以直接使用。</p>
+<p><img src="/images/LearnOpenGL/SSAO/ssao.png"></p>
+<h3 id="applying-ambient-occlusion">Applying ambient occlusion</h3>
+<p>应用遮蔽因子到光照方程中极其简单：我们要做的只是将逐片段环境遮蔽因子乘到光照的环境分量上。如果我们使用上个教程中的Blinn-Phong延迟光照着色器并做出一点修改，我们将会得到下面这个片段着色器：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#version 330 core</span></span><br><span class="line">out vec4 FragColor;</span><br><span class="line">  </span><br><span class="line">in vec2 TexCoords;</span><br><span class="line"></span><br><span class="line">uniform sampler2D gPosition;</span><br><span class="line">uniform sampler2D gNormal;</span><br><span class="line">uniform sampler2D gAlbedo;</span><br><span class="line">uniform sampler2D ssao;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">Light</span> &#123;</span></span><br><span class="line">    vec3 Position;</span><br><span class="line">    vec3 Color;</span><br><span class="line">    </span><br><span class="line">    <span class="type">float</span> Linear;</span><br><span class="line">    <span class="type">float</span> Quadratic;</span><br><span class="line">    <span class="type">float</span> Radius;</span><br><span class="line">&#125;;</span><br><span class="line">uniform Light light;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">&#123;             </span><br><span class="line">    <span class="comment">// retrieve data from gbuffer</span></span><br><span class="line">    vec3 FragPos = texture(gPosition, TexCoords).rgb;</span><br><span class="line">    vec3 Normal = texture(gNormal, TexCoords).rgb;</span><br><span class="line">    vec3 Diffuse = texture(gAlbedo, TexCoords).rgb;</span><br><span class="line">    <span class="type">float</span> AmbientOcclusion = texture(ssao, TexCoords).r;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// blinn-phong (in view-space)</span></span><br><span class="line">    vec3 ambient = vec3(<span class="number">0.3</span> * Diffuse * AmbientOcclusion); <span class="comment">// here we add occlusion factor</span></span><br><span class="line">    vec3 lighting  = ambient; </span><br><span class="line">    vec3 viewDir  = normalize(-FragPos); <span class="comment">// viewpos is (0.0.0) in view-space</span></span><br><span class="line">    <span class="comment">// diffuse</span></span><br><span class="line">    vec3 lightDir = normalize(light.Position - FragPos);</span><br><span class="line">    vec3 diffuse = max(dot(Normal, lightDir), <span class="number">0.0</span>) * Diffuse * light.Color;</span><br><span class="line">    <span class="comment">// specular</span></span><br><span class="line">    vec3 halfwayDir = normalize(lightDir + viewDir);  </span><br><span class="line">    <span class="type">float</span> spec = <span class="built_in">pow</span>(max(dot(Normal, halfwayDir), <span class="number">0.0</span>), <span class="number">8.0</span>);</span><br><span class="line">    vec3 specular = light.Color * spec;</span><br><span class="line">    <span class="comment">// attenuation</span></span><br><span class="line">    <span class="type">float</span> dist = length(light.Position - FragPos);</span><br><span class="line">    <span class="type">float</span> attenuation = <span class="number">1.0</span> / (<span class="number">1.0</span> + light.Linear * dist + light.Quadratic * dist * dist);</span><br><span class="line">    diffuse  *= attenuation;</span><br><span class="line">    specular *= attenuation;</span><br><span class="line">    lighting += diffuse + specular;</span><br><span class="line"></span><br><span class="line">    FragColor = vec4(lighting, <span class="number">1.0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>除去使用了视角空间，我们做的事情只有使用环境管遮罩AO乘以场景的环境光分量。在场景中放置一盏蓝光，我们可以得到如下结果：</p>
+<p><img src="/images/LearnOpenGL/SSAO/ssao_final.png"></p>
+<p>屏幕空间环境光遮蔽是一个可高度自定义的效果，它的效果很大程度上依赖于我们根据场景类型调整它的参数。对所有类型的场景并不存在什么完美的参数组合方式。一些场景只在小半径情况下工作，又有些场景会需要更大的半径和更大的样本数量才能看起来更真实。当前这个演示用了64个样本，属于比较多的了，你可以调调更小的核心大小从而获得更好的结果。</p>
+<h3 id="资料链接">资料链接</h3>
+<p><a target="_blank" rel="noopener" href="https://learnopengl.com/Advanced-Lighting/SSAO">LearnOpenGL
+- SSAO</a></p>
+<p><a
+target="_blank" rel="noopener" href="http://john-chapman-graphics.blogspot.nl/2013/01/ssao-tutorial.html">SSAO
+Tutorial</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/OpenGL/" rel="tag"># OpenGL</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2024/11/16/UnityEngine/URP-PBR%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0/" rel="prev" title="URP-PBR源码学习">
+                  <i class="fa fa-angle-left"></i> URP-PBR源码学习
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2024/11/29/Game%20Development/ScreenSpaceReflection/" rel="next" title="Screen Space Reflection For Beginners">
+                  Screen Space Reflection For Beginners <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Rigel Aster</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+
+</body>
+</html>
