@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha256-5eIC48iZUHmSlSUz9XtjRyK2mzQkHScZY1WdMaoz74E=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"rigelaster.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.21.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"always","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="本章关注SRP Batches及其他渲染时的优化技术。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LearnSRP - Draw Calls">
+<meta property="og:url" content="https://rigelaster.github.io/2024/12/11/LearnSRP/Draw%20Calls/index.html">
+<meta property="og:site_name" content="Rigel&#39;s Blog">
+<meta property="og:description" content="本章关注SRP Batches及其他渲染时的优化技术。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://rigelaster.github.io/images/LearnSRP/Draw%20Calls/scene-01.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/LearnSRP/Draw%20Calls/unity-tips-01.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/LearnSRP/Draw%20Calls/unity-tips-02.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/LearnSRP/Draw%20Calls/framedebugger-01.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/LearnSRP/Draw%20Calls/scene-02.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/LearnSRP/Draw%20Calls/framedebugger-02.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/LearnSRP/Draw%20Calls/framedebugger-03.png">
+<meta property="og:image" content="https://rigelaster.github.io/images/LearnSRP/Draw%20Calls/framedebugger-04.png">
+<meta property="article:published_time" content="2024-12-11T13:08:10.000Z">
+<meta property="article:modified_time" content="2024-12-12T04:03:57.823Z">
+<meta property="article:author" content="Rigel Aster">
+<meta property="article:tag" content="Unity">
+<meta property="article:tag" content="SRP">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://rigelaster.github.io/images/LearnSRP/Draw%20Calls/scene-01.png">
+
+
+<link rel="canonical" href="https://rigelaster.github.io/2024/12/11/LearnSRP/Draw%20Calls/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"https://rigelaster.github.io/2024/12/11/LearnSRP/Draw%20Calls/","path":"2024/12/11/LearnSRP/Draw Calls/","title":"LearnSRP - Draw Calls"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>LearnSRP - Draw Calls | Rigel's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Rigel's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#shaders"><span class="nav-number">2.</span> <span class="nav-text">Shaders</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#batching"><span class="nav-number">3.</span> <span class="nav-text">Batching</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#srp-batcher"><span class="nav-number">3.1.</span> <span class="nav-text">SRP Batcher</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#many-colors"><span class="nav-number">3.2.</span> <span class="nav-text">Many Colors</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#gpu-instancing"><span class="nav-number">3.3.</span> <span class="nav-text">GPU Instancing</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#drawing-many-instanced-meshes"><span class="nav-number">3.4.</span> <span class="nav-text">Drawing Many Instanced
+Meshes</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#dynamic-batching"><span class="nav-number">3.5.</span> <span class="nav-text">Dynamic Batching</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">4.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Rigel Aster"
+      src="/uploads/avatar.png">
+  <p class="site-author-name" itemprop="name">Rigel Aster</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">42</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">24</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://www.zhihu.com/people/ming-zi-13-35" title="Zhihu → https:&#x2F;&#x2F;www.zhihu.com&#x2F;people&#x2F;ming-zi-13-35" rel="noopener me" target="_blank"><i class="fab fa-zhihu fa-fw"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:remingzi7@gmail.com" title="E-Mail → mailto:remingzi7@gmail.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://github.com/MingZI-7" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;MingZI-7" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i></a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://rigelaster.github.io/2024/12/11/LearnSRP/Draw%20Calls/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar.png">
+      <meta itemprop="name" content="Rigel Aster">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Rigel's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="LearnSRP - Draw Calls | Rigel's Blog">
+      <meta itemprop="description" content="本章关注SRP Batches及其他渲染时的优化技术。">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          LearnSRP - Draw Calls
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2024-12-11 21:08:10" itemprop="dateCreated datePublished" datetime="2024-12-11T21:08:10+08:00">2024-12-11</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2024-12-12 12:03:57" itemprop="dateModified" datetime="2024-12-12T12:03:57+08:00">2024-12-12</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Unity-SRP/" itemprop="url" rel="index"><span itemprop="name">Unity SRP</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+            <div class="post-description">本章关注SRP Batches及其他渲染时的优化技术。</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="前言">前言</h2>
+<p>本章是Learn
+SRP系列第二篇，原文还包括了Shader编写，但本文着重于高效的渲染物体(drawing
+multiple objects efficiently)。</p>
+<h2 id="shaders">Shaders</h2>
+<p>在渲染物体时，CPU需要告诉GPU渲染什么以及如何渲染。渲染的对象通常为mesh，如何渲染则通过shader来定义，其是一组GPU指令。除去mesh，shader还需要额外的信息来执行渲染，包括物体的变换矩阵(transformation
+matrices)和材质属性(material properties)。</p>
+<p>本节的其他部分请参考原文献，不做展开。</p>
+<h2 id="batching">Batching</h2>
+<p>每一次draw
+call指令都会使CPU和GPU进行数据交流。如果大量的数据需要被传输给GPU，这一过程就会花费大量时间，而且CPU在传输数据时会影响到其他事情的处理。两者都会造成帧率的降低。目前我们的渲染方式很直接：每个对象都会调用draw
+call指令。虽然我们最终发送的数据很少，但这是最糟糕的调用方式。</p>
+<p>为了展示技术效果，先在场景中摆放49个sphere，它们使用到了四个材质：red，green，yellow，blue。此时渲染这些物体需要49个draw
+call，每个sphere都会调用一次。</p>
+<p><img src="/images/LearnSRP/Draw Calls/scene-01.png" width="400"></p>
+<h3 id="srp-batcher">SRP Batcher</h3>
+<p>Unity的Batching是combining draw
+calls的过程，用于减少CPU和GPU之间的通信时间。使用此技术最简单的方法就是其启用着色器的SRP
+batcher选项，但其只对compatible
+shaders生效，需要对前面的Unlit着色器进行一些修改。但是如何判断一个着色器是不是compatible
+shaders呢？Unity在Inspector中给了提示。如下图：</p>
+<p><img src="/images/LearnSRP/Draw Calls/unity-tips-01.png" ></p>
+<p>SRP batches技术不会直接减少draw
+call的数量，而是让他们变得更加高效。它将材质的属性存储在GPU中，避免每次draw
+call都要传输。如此，既减少了必须通信的数据量，也减少了CPU在每个draw
+call中必须完成的工作。但是，这只有在着色器遵循严格统一的数据结构时才有效。</p>
+<p>所有材质属性都必须在特定的缓冲区中声明，而不是在全局级别。具体来说就是将属性声明在<code>cbuffer</code>块中，命名为UnityPerMaterial。写起来类似于结构体声明，但必须以分号结尾。其通过将属性存放在一个特定的常量内存缓冲区(constant
+memory buffer)，但是其仍然可以全局访问。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cbuffer UnityPerMaterial&#123;</span><br><span class="line">    float4 _BaseColor;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>但是常量缓存并不是全部平台都支持（像是OpenGL ES
+2.0），于是需要使用Core RP
+Library提供的<code>CBUFFER_START</code>和<code>CBUFFER_END</code>宏。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">CBUFFER_START(UnityPerMaterial)</span><br><span class="line">    float4 _BaseColor;</span><br><span class="line">CBUFFER_END</span><br></pre></td></tr></table></figure>
+<p>除去<code>UnityPerMaterial</code>，Unity还提供了<code>UnityPerDraw</code>缓存来区别不同用途，顾名思义。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">CBUFFER_START(UnityPerDraw)</span><br><span class="line">    float4x4 unity_ObjectToWorld;</span><br><span class="line">    float4x4 unity_WorldToObject;</span><br><span class="line">    real4 unity_WorldTransformParams;</span><br><span class="line">CBUFFER_END</span><br></pre></td></tr></table></figure>
+<p><img src="/images/LearnSRP/Draw Calls/unity-tips-02.png"></p>
+<p>在着色器符合规范之后，需要开启SRP batcher，通过将
+<code>GraphicSettings.useScriptabeRenderPipelineBatching</code> 设置为
+true 。在开启之后，49个sphere的渲染在Frame Debugger中就显示为了一个SPR
+Batch：</p>
+<p><img src="/images/LearnSRP/Draw Calls/framedebugger-01.png"></p>
+<h3 id="many-colors">Many Colors</h3>
+<p>上面我们使用了四个Material，但是只用了一个batch。SPR
+Batcher生效之后，所有是数据都被一次性缓存在GPU中，每次draw
+call只需要包含一个offset来定位正确的数据位置。此方法的唯一限制是每个Material的内存布局必须是相同的，上文中，我们材质使用的都是相同的着色器。Unity不会对材质的内存布局进行比较，只会批量绘制使用相同着色器变体(shader
+variant)的draw call。</p>
+<p>如果我们想要一些不同的颜色，这很容易实现。但是如果我们想要每个球体都有自己的颜色，就需要创建更多的Material。如果可以为每个对象设置颜色，那就方便多了。默认情况下，这是不可能的，但可以通过创建自定义组件类型来支持它。创建<code>PerObjectMaterialProperties</code>，作为一个例子，将其放在Custom
+RP下的示例文件夹中。</p>
+<p>我们的想法是，每个物体都会挂载<code>PerObjectMaterialProperties</code>脚本，其拥有一些着色器的属性设置。</p>
+<figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"></span><br><span class="line">[<span class="meta">DisallowMultipleComponent</span>]</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">PerObjectMaterialProperties</span> : <span class="title">MoniBehaviour</span>&#123;</span><br><span class="line">    <span class="keyword">static</span> <span class="built_in">int</span> baseColorId = Shader.PropertyToID(<span class="string">&quot;_BaseColor&quot;</span>);</span><br><span class="line"></span><br><span class="line">    [<span class="meta">SerializeField</span>]</span><br><span class="line">    Color baseColor = Color.white;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>通过<code>MaterialPropertyBlock</code>来设置逐物体的材质属性，我们只需要一个实例复用即可。</p>
+<figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> MaterialPropertyBlock block;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">OnValidate</span>()</span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(block == <span class="literal">null</span>)&#123;</span><br><span class="line">        block = <span class="keyword">new</span> MaterialPropertyBlock();</span><br><span class="line">    &#125;</span><br><span class="line">    block.SetColor(baseColorId, baseColor);</span><br><span class="line">    GetComponent&lt;Renderer&gt;().SetPropertyBlock(block);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>将此脚本挂载至场景中的7个sphere，分别赋予不同颜色。此时，SRP
+bathcer被打断，这7个sphere分别使用一个通常的draw call。</p>
+<p><img src="/images/LearnSRP/Draw Calls/scene-02.png" width="400"></p>
+<p><img src="/images/LearnSRP/Draw Calls/framedebugger-02.png"></p>
+<h3 id="gpu-instancing">GPU Instancing</h3>
+<p>GPU Instancing是另外一种整合draw
+call的方法，它可以处理逐对象的材质属性。其通过整合具有相同mesh的对象，使用一次draw
+call来绘制。CPU会收集所有对象的变换和材质属性，将其放入数组中，然后发送给GPU。GPU会遍历数组，并按顺序渲染它们。</p>
+<p>因为GPU
+Instacing需要的数据是以数组形式提供的，目前的着色器并不支持。要做的第一步就是通过添加指令<code>#pragma multi_compile_instancing</code>。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">pragma</span> multi_compile_instancing</span></span><br><span class="line"><span class="meta">#<span class="keyword">pragma</span> vertex UnlitPassVertex</span></span><br><span class="line"><span class="meta">#<span class="keyword">pragma</span> fragment UnlitPassFragment</span></span><br></pre></td></tr></table></figure>
+<p>如此，Unity会生成两个着色器变体，一个支持GPU
+instancing，一个不支持，还会在Insptactor面板上提供切换的开关。GPU
+instancing正常工作需要知道当前被渲染物体的索引值index，此值通过顶点数据(vertex
+data)提供。<code>UnityInstancing.hlsl</code>提供了一些宏定义使索引值使用变的简单些，将其加入顶点数据结构即可。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">Attributes</span>&#123;</span></span><br><span class="line">    float3 positionOS : POSITION;</span><br><span class="line">    UNITY_VERTEX_INPUT_INSTANCE_ID</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">float4 <span class="title function_">UnlitPassVertex</span><span class="params">(Attributes input)</span>: SV_POSITION &#123;</span><br><span class="line">    UNITY_SETUP_INSTANCE_ID(input);</span><br><span class="line">    float3 positionWS = TransformObjectToWorld(input.positionOS);</span><br><span class="line">    <span class="keyword">return</span> TransformWorldToHClip(positionWS);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>尽管SPR batcher的优先级更高，渲染结果没什么不同，GPU
+intancing理论上来说已经可以运行了。但是，此时我们还不支持逐实例(per-instance)的材质属性。需要对代码做出以下改变：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//CBUFFER_START(UnityPerMaterial)</span></span><br><span class="line"><span class="comment">//    float4 _BaseColor;</span></span><br><span class="line"><span class="comment">//CBUFFER_END</span></span><br><span class="line"></span><br><span class="line">UNITY_INSTANCING_BUFFER_START(UnityPerMaterial)</span><br><span class="line">    UNITY_DEFINE_INSTANCED_PROP(float4, _BaseColor);</span><br><span class="line">UNITY_INSTANCING_BUFFER_END(UnityPerMaterial)</span><br></pre></td></tr></table></figure>
+<p>当GPU
+instancing使用时，还需要让实例索引在片元着色器UnlitPassFragment中可用。依旧使用到了宏：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">Varyings</span>&#123;</span></span><br><span class="line">    float4 positionCS : SV_POSITION:</span><br><span class="line">    UNITY_VERTEX_INPUT_INSTANCE_ID</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Varyings <span class="title function_">UnlitPassVertex</span><span class="params">(Attributes input)</span>&#123;</span><br><span class="line">    Varyings output;</span><br><span class="line">    UNITY_SETUP_INSTANCE_ID(input);</span><br><span class="line">    UNITY_TRANSFER_INSTANCE_ID(input, output);</span><br><span class="line">    [...]</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">float4 <span class="title function_">UnlitPassFragment</span><span class="params">(Varyings input)</span>:SV_TARGET&#123;</span><br><span class="line">    UNITY_SETUP_INSTANCE_ID(input);</span><br><span class="line">    <span class="keyword">return</span> UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _BaseColor);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><img src="/images/LearnSRP/Draw Calls/framedebugger-03.png"></p>
+<p>可以看到Unity将14个（为了对比增加了一些球体）sphere进行了一些合批处理，降低了draw
+call的数量。<strong>GPU
+Instancing只对使用相同材质的物体生效</strong>，我们在14个球中使用了4个不同材质。因为脚本存在设置颜色，我们可以使用同一材质，使其进一步进行合批处理。可以看到它们都变成了一个draw
+call：</p>
+<p><img src="/images/LearnSRP/Draw Calls/framedebugger-04.png"></p>
+<p>需要注意的是，batch size是有限制的，根据目标平台而定。</p>
+<h3 id="drawing-many-instanced-meshes">Drawing Many Instanced
+Meshes</h3>
+<p>请阅读原文</p>
+<h3 id="dynamic-batching">Dynamic Batching</h3>
+<p>动态合批(dynamic batching)也是用来降低draw
+call的一种方法。是一种老技术，其将使用同一材质的小型mesh整合称为一个整体mesh，然后再进行渲染。此方法也不适用于逐物体(per-object)材质属性的情况。</p>
+<p>此方法只适用于小型mesh(顶点数较少)，通常境况下，GPU
+intancing比动态批处理更高效。相同的还有静态批处理，工作原理相同，但是会被提前标记为静态对象。这种处理的特点是，需要更大的内存和存储空间。</p>
+<h2 id="参考资料">参考资料</h2>
+<p><a
+target="_blank" rel="noopener" href="https://catlikecoding.com/unity/tutorials/custom-srp/draw-calls/">Catlike
+Coding - Draw Calls</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Unity/" rel="tag"># Unity</a>
+              <a href="/tags/SRP/" rel="tag"># SRP</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2024/11/29/Game%20Development/ScreenSpaceReflectionForBeginners/" rel="prev" title="Screen Space Reflection For Beginners">
+                  <i class="fa fa-angle-left"></i> Screen Space Reflection For Beginners
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2024/12/12/Unity/Optimizing%20draw%20calls/" rel="next" title="Optimizing draw calls">
+                  Optimizing draw calls <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Rigel Aster</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+
+</body>
+</html>

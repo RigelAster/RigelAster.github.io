@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha256-5eIC48iZUHmSlSUz9XtjRyK2mzQkHScZY1WdMaoz74E=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"rigelaster.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.21.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"always","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="读一读Unity提供的的draw call优化相关文档。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Optimizing draw calls">
+<meta property="og:url" content="https://rigelaster.github.io/2024/12/12/Unity/Optimizing%20draw%20calls/index.html">
+<meta property="og:site_name" content="Rigel&#39;s Blog">
+<meta property="og:description" content="读一读Unity提供的的draw call优化相关文档。">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-12-12T06:22:44.000Z">
+<meta property="article:modified_time" content="2024-12-12T10:22:51.679Z">
+<meta property="article:author" content="Rigel Aster">
+<meta property="article:tag" content="Unity">
+<meta property="article:tag" content="Draw Calls">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://rigelaster.github.io/2024/12/12/Unity/Optimizing%20draw%20calls/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"https://rigelaster.github.io/2024/12/12/Unity/Optimizing%20draw%20calls/","path":"2024/12/12/Unity/Optimizing draw calls/","title":"Optimizing draw calls"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Optimizing draw calls | Rigel's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Rigel's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#optimizing-draw-calls"><span class="nav-number">1.</span> <span class="nav-text">Optimizing draw calls</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#optimization-priority"><span class="nav-number">1.1.</span> <span class="nav-text">Optimization priority</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#gpu-instancing"><span class="nav-number">2.</span> <span class="nav-text">GPU instancing</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#requirements-and-compatibility"><span class="nav-number">2.1.</span> <span class="nav-text">Requirements and
+compatibility</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#platform-compatibility"><span class="nav-number">2.1.1.</span> <span class="nav-text">Platform compatibility</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#render-pipeline-compatibility"><span class="nav-number">2.1.2.</span> <span class="nav-text">Render pipeline
+compatibility</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#srp-batcher"><span class="nav-number">2.1.3.</span> <span class="nav-text">SRP Batcher</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#using-gpu-instancing"><span class="nav-number">2.2.</span> <span class="nav-text">Using GPU instancing</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#performance-implications"><span class="nav-number">2.3.</span> <span class="nav-text">Performance implications</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#draw-call-batcing"><span class="nav-number">3.</span> <span class="nav-text">Draw call batcing</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#requirements-and-compatibility-1"><span class="nav-number">3.1.</span> <span class="nav-text">Requirements and
+compatibility</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#using-draw-call-batching"><span class="nav-number">3.2.</span> <span class="nav-text">Using draw call batching</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#batching-static-gameobjects"><span class="nav-number">3.3.</span> <span class="nav-text">Batching static GameObjects</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#performance-implications-1"><span class="nav-number">3.3.1.</span> <span class="nav-text">Performance implications</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#batching-moving-gameobjects"><span class="nav-number">3.4.</span> <span class="nav-text">Batching moving GameObjects</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#limitations"><span class="nav-number">3.4.1.</span> <span class="nav-text">Limitations</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">4.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Rigel Aster"
+      src="/uploads/avatar.png">
+  <p class="site-author-name" itemprop="name">Rigel Aster</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">42</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">24</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://www.zhihu.com/people/ming-zi-13-35" title="Zhihu → https:&#x2F;&#x2F;www.zhihu.com&#x2F;people&#x2F;ming-zi-13-35" rel="noopener me" target="_blank"><i class="fab fa-zhihu fa-fw"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:remingzi7@gmail.com" title="E-Mail → mailto:remingzi7@gmail.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://github.com/MingZI-7" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;MingZI-7" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i></a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://rigelaster.github.io/2024/12/12/Unity/Optimizing%20draw%20calls/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar.png">
+      <meta itemprop="name" content="Rigel Aster">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Rigel's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Optimizing draw calls | Rigel's Blog">
+      <meta itemprop="description" content="读一读Unity提供的的draw call优化相关文档。">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Optimizing draw calls
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+      
+
+      <time title="Created: 2024-12-12 14:22:44 / Modified: 18:22:51" itemprop="dateCreated datePublished" datetime="2024-12-12T14:22:44+08:00">2024-12-12</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Unity/" itemprop="url" rel="index"><span itemprop="name">Unity</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+            <div class="post-description">读一读Unity提供的的draw call优化相关文档。</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="optimizing-draw-calls">Optimizing draw calls</h2>
+<p>Unity向图形API发出draw
+calls指令来在屏幕上绘制几何图形，指令告诉图形API绘制什么以及如何绘制。每个draw
+call都包括了图形API在屏幕上绘制所需的所有信息，利于纹理、着色器和缓冲区相关信息。draw
+call调用是资源密集型的(resource intensive)，但通常调用draw
+call所需的准备工作比draw call本身更占用资源。</p>
+<p>为了调用draw call，CPU需要先准备资源(sets up
+resources)并改变GPU内部设置(internal
+settings)，这些设置被统称为渲染状态(render
+state)。改变渲染状态，例如切换到不同的材质，通常是图形API执行的最耗费资源的操作。</p>
+<p>由于渲染状态的改变是资源密集型的，所以对其进行优化是非常重要的。优化渲染状态改变的最主要方法就是减低其次数，有以下两种方法：</p>
+<ul>
+<li><p><strong>Reduce the total number of draw calls.</strong> draw
+call此处减少之后，draw call之间渲染状态的改变也会随之减少。</p></li>
+<li><p><strong>Organize draw calls in a way that reduces the number of
+changes of the render state.</strong>
+如果图形API可以使用相同的渲染状态去执行多个draw calls，就可以将这些draw
+calls当作一组，而不需要去执行多种渲染状态之间的切换。</p></li>
+</ul>
+<p>draw
+calls和渲染状态改变的优化，对应用有许多好处。最主要的，它可以提升帧率，除此之外还有：</p>
+<ul>
+<li><p>Reduces the amount of electricity your application requires.
+减少电量消耗和设备发热。</p></li>
+<li><p>Improves maintainability of future development on you
+application. 增加应用的可维护性，方便后续扩展。</p></li>
+</ul>
+<p>在Unity有几种方式可以用来进行优化，降低draw
+call数量和渲染状态的改变。每种方法都有最优的使用场景，如下：</p>
+<ul>
+<li><p><strong>GPU instancing</strong>: Render multiple copies of the
+same mesh at the same time.
+GPU实例对于需要大量绘制的几何非常合适，例如树木和草。</p></li>
+<li><p><strong>Draw call batching</strong>: Combine meshes to reduce
+draw calls. Unity提供了以下类型的内置批处理： -- <strong>static
+batching</strong>:
+预先将静态(被标记为static)物体的mesh整合。Unity将被整合的mesh传输给GPU，但是被整合的子mesh会独立进行渲染。Unity任然可以对mesh进行独立裁剪，但是由于数据的状态并不会改变，所以每个draw
+call的资源消耗会变少。 -- <strong>dynamic batching</strong>:
+在CPU端变换mesh的顶点，成组后的顶点使用相同的设置(groups vertices that
+share the same configuration)，通过一个draw
+call调用便可渲染。如果顶点存储了相同数量和类型的属性，则它们共享相同的配置。例如，位置和法线。</p></li>
+<li><p><strong>Manully combining meshes</strong>:
+通过使用<code>Mesh.CombineMeshes</code>函数，手动将多个mesh合并为一个mesh。Unity会使用一个draw
+call来渲染合并后的mesh。</p></li>
+<li><p><strong>SRP Batcher</strong>:
+如果项目使用SRP，在物体具有同一shader变体时，可以使用 SRP Batcher
+来减少Unity准备和调用draw call所需的CPU时间，</p></li>
+</ul>
+<h3 id="optimization-priority">Optimization priority</h3>
+<p>你可以在同一场景中使用多种draw
+call优化方案，但是应注意Unity会根据优先级来确定具体的使用方案。通常情况下，如果一个物体使用了超过一种draw
+call优化方案，Unity会选择优先级最高的那个。但是，这里有一种情况除外，即SRP
+Batcher。当使用SRP Batcher时，Unity也会对符合SRP
+Batcher规范的物体(GameObjects that are SRP Batcher
+compatible)支持静态合批。Unity依据以下优先级来调用draw
+call优化方案：</p>
+<ul>
+<li><p>SRP Batcher and static batching</p></li>
+<li><p>GPU instancing</p></li>
+<li><p>Dynamic batching</p></li>
+</ul>
+<p>如果将一个物体标记为静态合批而且Unity成功进行合批操作，Unity就会关闭此物体的GPU
+instancing功能。此状况发生时，Unity会在Inspector面板展示警告。其他同理。</p>
+<h2 id="gpu-instancing">GPU instancing</h2>
+<p>GPU instancing是一种draw call的优化方案，其在一个draw
+call中渲染使用<strong>相同mesh和material</strong>的物体的多个副本。每一个副本被称为实例(instance)。这在渲染同一场景出现很多次物体时非常有帮助，例如树木和草地。</p>
+<p>GPU instancing可以在一个draw
+call内渲染相同mesh很多次，为了增加多样性以及降低重复性，实例之间可以拥有不同的属性，例如Color和Scale。渲染了多个实例的draw
+call在Frame
+Debugger中会被标记为<code>Render Mesh(instanced)</code>。</p>
+<h3 id="requirements-and-compatibility">Requirements and
+compatibility</h3>
+<p>本小节包含关于平台、渲染管线和SRP Batcher与GPU
+instancing之间的兼容性。</p>
+<h4 id="platform-compatibility">Platform compatibility</h4>
+<p>GPU instancing在几乎所有平台都是可用的，除了WebGL 1.0。</p>
+<h4 id="render-pipeline-compatibility">Render pipeline
+compatibility</h4>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>BIRP</th>
+<th>URP</th>
+<th>HDRP</th>
+<th>SRP</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GPU instancing</td>
+<td>yes</td>
+<td>yes(1)</td>
+<td>yes(1)</td>
+<td>yes(1)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Notes</strong>:</p>
+<ol type="1">
+<li>Only if the shader isn't compatible with the SRP Batcher.</li>
+</ol>
+<h4 id="srp-batcher">SRP Batcher</h4>
+<p><strong>GPU instancing 和 SRP Batcher
+并不兼容。</strong>如果项目使用了SRP Batcher，但是你想使用GPU
+instancing渲染物体，可以使用以下方法：</p>
+<ul>
+<li><p>Use Graphics.RenderMeshInstanced.
+这个api绕过GameObjects的使用，使用指定参数直接在屏幕上绘制网格。</p></li>
+<li><p>Manually remove SRP Batcher compatibility.</p></li>
+</ul>
+<h3 id="using-gpu-instancing">Using GPU instancing</h3>
+<p><strong>Unity uses GPU instancing for GameObjects that share the same
+mesh and material.</strong> 实例化mesh和material需要符合以下要求：</p>
+<ul>
+<li><p>The material's shader must support GPU instancing.</p></li>
+<li><p>The mesh must come from one of the following sources, grouped by
+behavior: -- MeshRenderer组件或者Graphics.RenderMesh函数调用。 --
+Graphics.RenderMeshInstanced 或者
+Graphics.RenderMeshIndirect函数调用。</p></li>
+</ul>
+<h3 id="performance-implications">Performance implications</h3>
+<p>使用GPU instancing不能有效处理低顶点数量的网格(low number of
+vertices)，因为GPU不能充分利用资源来工作。这种处理效果低下，会对性能产生不利影响。不同GPU效率低下的阈值不同，一般情况下，不要对少于256个顶点的网格使用GPU
+instancing。</p>
+<p>如果你想多次渲染一个低顶点数的网格，最好的做法是创建一个包含所有网格信息的缓冲区，并是哟个它来绘制网格。</p>
+<h2 id="draw-call-batcing">Draw call batcing</h2>
+<p>GPU instancing是一种draw
+call的优化方案，其将mesh整合使Unity能用更少的draw
+call来进行渲染。可进一步分为以下两种方案：Static batching 和 Dynamic
+batching。但是，其也有一些缺点。静态合批会产生内存和存储开销，而动态合批会产生额外的CPU开销。</p>
+<h3 id="requirements-and-compatibility-1">Requirements and
+compatibility</h3>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>BIRP</th>
+<th>URP</th>
+<th>HDRP</th>
+<th>SRP</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Static Batching</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>----------------</td>
+<td>----</td>
+<td>---</td>
+<td>----</td>
+<td>---</td>
+</tr>
+<tr>
+<td>Dynamic Batching</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>No</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>----------------</td>
+<td>----</td>
+<td>---</td>
+<td>----</td>
+<td>---</td>
+</tr>
+</tbody>
+</table>
+<h3 id="using-draw-call-batching">Using draw call batching</h3>
+<h3 id="batching-static-gameobjects">Batching static GameObjects</h3>
+<p>Static batching通过将静态mesh整合来减少draw
+call数量。其将整合的mesh变换到世界空间，构建一个共享的 vertex buffer 和
+index buffer。之后Unity执行一个单独的draw
+call使用整合的mesh来一次性渲染所有物体。Static batching可以显著减少draw
+call的调用数量。因为静态合批不会再CPU端执行顶点变换，所以 static
+batching 比 dynamic batching 更加高效。</p>
+<h4 id="performance-implications-1">Performance implications</h4>
+<p>使用静态合批需要额外的CPU存储空间去存储整合过后的几何体。如果物体们使用了相同的mesh，Unity会对每一个物体都创建拷贝，然后将拷贝整合。这意味着，相同的mesh在整合的mesh中会多次出现。不管是使用编辑器还是运行时API来为静态合批提供数据，Unity都会执行上述操作。</p>
+<p>如果想要保持较小的内存占用，可能不得不牺牲渲染性能来避免某些物体进行静态合批。例如，在茂密的森林环境将树木标记为静态可能会对内存产生严重影响。</p>
+<p>注：静态批处理的定点数量有上限，每个静态处理批次最多包含64000顶点。如果超出限制，Unity会再额外创建一个静态批次。</p>
+<h3 id="batching-moving-gameobjects">Batching moving GameObjects</h3>
+<p>动态合批对meshes和dynamiclly generated
+geometries处理并不相同，更多信息请参考文章<a
+target="_blank" rel="noopener" href="https://docs.unity3d.com/6000.0/Documentation/Manual/dynamic-batching-meshes.html">Dynamic
+batching for meshes</a>和<a
+target="_blank" rel="noopener" href="https://docs.unity3d.com/6000.0/Documentation/Manual/dynamic-batching-meshes.html#dynamic-batching-dynamic-geometry">Dynamic
+batching for dynamically generated geometries</a></p>
+<p>注：对网格的动态批处理被设计为优化低端设备的性能。在现代硬件上，动态批处理在CPU上所做的工作可能大于一个draw
+call的开销。</p>
+<h4 id="limitations">Limitations</h4>
+<h2 id="参考资料">参考资料</h2>
+<p><a
+target="_blank" rel="noopener" href="https://docs.unity3d.com/2022.3/Documentation/Manual/optimizing-draw-calls.html">Optimizing
+draw calls</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Unity/" rel="tag"># Unity</a>
+              <a href="/tags/Draw-Calls/" rel="tag"># Draw Calls</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2024/12/11/LearnSRP/Draw%20Calls/" rel="prev" title="LearnSRP - Draw Calls">
+                  <i class="fa fa-angle-left"></i> LearnSRP - Draw Calls
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2024/12/19/Translations/Introduction%20to%20Decal%20Rendering/" rel="next" title="Introduction to Decal Rendering">
+                  Introduction to Decal Rendering <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Rigel Aster</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+
+</body>
+</html>
