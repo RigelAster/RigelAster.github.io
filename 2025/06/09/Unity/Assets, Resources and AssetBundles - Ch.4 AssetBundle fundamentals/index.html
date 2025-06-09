@@ -1,0 +1,414 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Assets, Resources and AssetBundles - Ch.4 AssetBundle fundamentals | Rigel's Blog</title><meta name="author" content="Rigel Aster"><meta name="copyright" content="Rigel Aster"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="阅读 Unity Learn 提供的《Assets, Resources and AssetBundles》一文，翻译一些重要内容，顺便做一些笔记。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Assets, Resources and AssetBundles - Ch.4 AssetBundle fundamentals">
+<meta property="og:url" content="https://rigelaster.github.io/2025/06/09/Unity/Assets,%20Resources%20and%20AssetBundles%20-%20Ch.4%20AssetBundle%20fundamentals/index.html">
+<meta property="og:site_name" content="Rigel&#39;s Blog">
+<meta property="og:description" content="阅读 Unity Learn 提供的《Assets, Resources and AssetBundles》一文，翻译一些重要内容，顺便做一些笔记。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://unity-connect-prd.storage.googleapis.com/20190130/f2a6f87c-5842-4acb-b220-2d7917e1f29f_ab1.jpg">
+<meta property="article:published_time" content="2025-06-09T02:48:40.000Z">
+<meta property="article:modified_time" content="2025-06-09T08:00:23.884Z">
+<meta property="article:author" content="Rigel Aster">
+<meta property="article:tag" content="Unity">
+<meta property="article:tag" content="AssetBundle">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://unity-connect-prd.storage.googleapis.com/20190130/f2a6f87c-5842-4acb-b220-2d7917e1f29f_ab1.jpg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Assets, Resources and AssetBundles - Ch.4 AssetBundle fundamentals",
+  "url": "https://rigelaster.github.io/2025/06/09/Unity/Assets,%20Resources%20and%20AssetBundles%20-%20Ch.4%20AssetBundle%20fundamentals/",
+  "image": "https://unity-connect-prd.storage.googleapis.com/20190130/f2a6f87c-5842-4acb-b220-2d7917e1f29f_ab1.jpg",
+  "datePublished": "2025-06-09T02:48:40.000Z",
+  "dateModified": "2025-06-09T08:00:23.884Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Rigel Aster",
+      "url": "https://rigelaster.github.io/"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://rigelaster.github.io/2025/06/09/Unity/Assets,%20Resources%20and%20AssetBundles%20-%20Ch.4%20AssetBundle%20fundamentals/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"未找到符合您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Assets, Resources and AssetBundles - Ch.4 AssetBundle fundamentals',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 6.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/uploads/avatar-2.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">44</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">26</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">8</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> 文章</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></li></ul></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> 娱乐</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(https://unity-connect-prd.storage.googleapis.com/20190130/f2a6f87c-5842-4acb-b220-2d7917e1f29f_ab1.jpg);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Rigel's Blog</span></a><a class="nav-page-title" href="/"><span class="site-name">Assets, Resources and AssetBundles - Ch.4 AssetBundle fundamentals</span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> 文章</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></li></ul></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> 娱乐</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">Assets, Resources and AssetBundles - Ch.4 AssetBundle fundamentals</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-06-09T02:48:40.000Z" title="发表于 2025-06-09 10:48:40">2025-06-09</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-06-09T08:00:23.884Z" title="更新于 2025-06-09 16:00:23">2025-06-09</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Unity/">Unity</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><p>原文链接：https://learn.unity.com/tutorial/assets-resources-and-assetbundles</p>
+<p>读前须知：这是一篇在<code>Unity 2017.3</code>语境下所写的文章，目前已被标记为<code>deprecated</code>。官方更推荐使用新推出的<code>Addressables</code>系统，但是本文所蕴含的知识应该不会过时吧，一下为原文提示：</p>
+<blockquote>
+<p><strong>PLEASE NOTE: this tutorial has now been deprecated. We now
+recommend using Addressables for your projects and will be providing
+more documentation and tutorials on this feature soon. In the meantime
+please refer to the</strong> <a
+target="_blank" rel="noopener" href="https://docs.unity3d.com/Packages/com.unity.addressables@0.3/manual/AddressableAssetsGettingStarted.html"><strong>Unity
+manual</strong></a></p>
+</blockquote>
+<p>提示：本教程中提到的<code>Objects</code>与<code>Assets</code>与Unity所提供API使用的命名约定不同。在本教程中被称为<code>Objects</code>的数据，在Unity
+APIs中被称为<code>Assets</code>，例如
+<code>AssetBundle.LoadAsset</code>和<code>Resources.UnloadUnusedAssets</code>。在本教程中被称为<code>Assets</code>的文件，则很少会被暴露在公共APIs中。</p>
+<blockquote>
+<p><em>Note:</em> This guide's terms for <em>Objects</em> and
+<em>Assets</em> differ from Unity's public API naming conventions.</p>
+<p>The data this guide calls <em>Objects</em> are called <em>Assets</em>
+in many public Unity APIs, such as<a
+target="_blank" rel="noopener" href="http://docs.unity3d.com/ScriptReference/AssetBundle.LoadAsset.html">AssetBundle.LoadAsset</a>
+and<a
+target="_blank" rel="noopener" href="http://docs.unity3d.com/ScriptReference/Resources.UnloadUnusedAssets.html">Resources.UnloadUnusedAssets</a>.
+The files this guide calls <em>Assets</em> are rarely exposed to any
+public APIs. When they are exposed, it is generally only in
+build-related code, such as<a
+target="_blank" rel="noopener" href="http://docs.unity3d.com/ScriptReference/AssetDatabase.html">AssetDatabase</a>
+and<a
+target="_blank" rel="noopener" href="http://docs.unity3d.com/ScriptReference/BuildPipeline.html">BuildPipeline</a>.
+In these cases, they are called <em>files</em> in public APIs.</p>
+</blockquote>
+<h2 id="assetbundle-fundamentals">AssetBundle fundamentals</h2>
+<p>本章讨论AssetBundles，介绍了构建AssetBundles的基本系统，以及用于与AssetBundle交互的核心API。特别地，还会讨论AssetBundles本身的加载、卸载，以及从AssetBundle中加载和卸载特定的Asset和Objects。</p>
+<h3 id="overview">Overview</h3>
+<p>AssetBundle系统提供了一种以存档格式存储一个或多个文件的方法，Unity可以对其进行索引和序列化。AssetBundles是Unity的主要工具，用于在安装后交付和更新非代码内容。这允许开发者提交更小的应用程序包，最小化运行时内存压力，并选择性地加载针对终端用户设备优化的内容。</p>
+<p>理解AssetBundles的工作方式对于为移动设备构建一个成功的Unity项目至关重要。有关AssetBundle内容的总体描述，请查看<a
+target="_blank" rel="noopener" href="https://docs.unity3d.com/Manual/AssetBundlesIntro.html">AssetBundle文档</a>。</p>
+<h3 id="assetbundle-layout">AssetBundle layout</h3>
+<p>总而言之，一个AssetBundle由两部分组成：头部和数据段（a header and
+data segment）。</p>
+<p>头部(header)包含有关AssetBundle的信息，例如它的标识符、压缩类型和清单。清单(manifest)是一个以对象名称为键的查找表。每个条目提供一个字节索引(a
+byte
+index)，指示在AssetBundle的数据段中可以找到给定对象的位置。在大多数平台上，这个查找表是作为平衡搜索树实现的。具体来说，Windows和OSX派生平台（包括iOS）使用红黑树。因此，构建清单所需的时间将随着AssetBundle中资产数量的增加而非线性(more
+than linearly)增加。</p>
+<p>数据段(data
+segment)包含通过在AssetBundle中序列化资产而生成的原始数据。如果将LZMA指定为压缩方案，则压缩所有序列化资产的完整字节数组。如果指定LZ4，则单独压缩不同资产的字节。如果不使用压缩，数据段将保留为原始字节流。</p>
+<p>在Unity
+5.3之前，Objects不能在AssetBundle中单独压缩。因此，如果5.3之前的Unity版本被指示从压缩的AssetBundle中读取一个或多个Objects，Unity必须解压缩整个AssetBundle。通常，Unity会缓存AssetBundle的解压缩副本，以提高对同一AssetBundle的后续加载请求的加载性能。</p>
+<h3 id="loading-assetbundles">Loading AssetBundles</h3>
+<p>AssetBundles可以通过四个不同的API加载，这四个API的行为取决于两个标准：</p>
+<ol type="1">
+<li>AssetBundle的压缩类型，是LZMA、LZ4或者uncompressed</li>
+<li>AssetBundle被加载的平台platform</li>
+</ol>
+<p>这四个API分别是：</p>
+<ul>
+<li>AssetBundle.LoadFromMemory(Async optional)</li>
+<li>AssetBundle.LoadFromFile(Async optional)</li>
+<li>UnityWebRequest's DownloadHandlerAssetBundle</li>
+<li>WWW.LoadFromCacheOrDownload(on Unity 5.6 or older)</li>
+</ul>
+<h4
+id="assetbundle.loadfrommemoryasync">AssetBundle.LoadFromMemory(Async)</h4>
+<p><strong>Unity的建议是不要使用此API</strong></p>
+<blockquote>
+<p><strong>Unity's recommendation is not to use this API.</strong></p>
+</blockquote>
+<p><a
+target="_blank" rel="noopener" href="https://docs.unity3d.com/ScriptReference/AssetBundle.LoadFromMemoryAsync.html">AssetBundle.LoadFromMemroyAsync</a>通过托管代码字节数组(a
+managed-code byte array, byte[] in
+C#)来加载AssetBundle。他总是将源数据从托管代码字节数组复制到新分配的、连续的本机内存块中。如果AssetBundle是LZMA
+compressed的，会在复制时解压缩。UnCompressed 和 LZ4-compressed
+的将被逐字复制。</p>
+<p>此API消耗的内存峰值至少是AssetBundle大小的两倍：一个拷贝在API创建的本机内存中，另一个拷贝在传递给API的托管字节数组中。因此，通过此API创建的AssetBundle加载的资产将在内存中复制三次：一次在托管代码字节数组中，一次在AssetBundle的本机内存副本中，第三次在GPU或系统内存中为资产本身的复制。</p>
+<p><em>Prior to Unity 5.3.3, this API was known as
+<strong>AssetBundle.CreateFromMemory</strong>. Its functionality has not
+changed.</em></p>
+<h4
+id="assetbundle.loadfromfileasync">AssetBundle.LoadFromFile(Async)</h4>
+<p><a
+target="_blank" rel="noopener" href="https://docs.unity3d.com/ScriptReference/AssetBundle.LoadFromFile.html">AssetBundle.LoadFromFile</a>是一个高效的API，用于从本地存储（如硬盘或SD卡）加载uncompressed
+或 LZ4-compressed AssetBundle。</p>
+<p>在 desktop standalone, console, mobile
+上，此API将只加载AssetBundle的头部，而将剩余的数据留在磁盘上。当加载方法（例如AssetBundle.Load）被调用或它们的InstanceIDs被解引用时，AssetBundle的Objects将按需加载。此场景中，不会消耗额外的内存。在Unity
+Editor中，API会将整个AssetBundle加载到内存中，就像从磁盘读取字节一样，AssetBundle.LoadFromMemoryAsync将被调用。如果项目是在Unity
+Editor调试的，此API可能会导致在加载AssetBundle期间出现内存峰值。这应该不会影响在设备上的性能，在采取补救措施之前，应该在设备上重新测试这些峰值。</p>
+<p><strong><em>Note:</em></strong> 在使用Unity
+5.3或更早版本的Android设备上，当尝试从Streaming
+Assets路径加载AssetBundles时，此API将失败。这个问题已经在Unity
+5.4中解决了。要了解更多细节，请参阅"Distribution - shipped with
+project"”一节。</p>
+<p><em>Prior to Unity 5.3, this API was known as
+<strong>AssetBundle.CreateFromFile</strong>. Its functionality has not
+been changed.</em></p>
+<h4 id="assetbundledownloadhandler">AssetBundleDownloadHandler</h4>
+<p><a
+target="_blank" rel="noopener" href="http://docs.unity3d.com/ScriptReference/Networking.UnityWebRequest.html">UnityWebRequest</a>
+API允许开发人员指定Unity应该如何处理下载的数据，并允许开发人员消除不必要的内存使用。使用UnityWebRequest下载AssetBundle最简单的方法是调用函数<a
+target="_blank" rel="noopener" href="http://docs.unity3d.com/ScriptReference/Networking.UnityWebRequest.GetAssetBundle.html">UnityWebRequest.GetAssetBundle</a>。</p>
+<p>本文中，我们专注于<a
+target="_blank" rel="noopener" href="http://docs.unity3d.com/ScriptReference/Networking.DownloadHandlerAssetBundle.html">DownloadHandlerAssetBundle</a>类。使用worker
+thread，它将下载的数据流式传输到固定大小的缓冲区中，然后根据下载处理程序的配置方式，将缓冲的数据转到临时存储或AssetBundle缓冲中。所有这些操作都在本机代码中进行，从而消除了扩展托管堆的风险。此外，这个下载处理程序不保留所有下载字节的本地代码副本，进一步减少下载AssetBundle的内存开销。</p>
+<p>LZMA-compressed AssetBundles 将在下载过程中解压缩，并使用 LZ4
+compression 进行缓存。此行为可以通过设置 <a
+target="_blank" rel="noopener" href="https://docs.unity3d.com/ScriptReference/Caching-compressionEnabled.html">Caching.CompressionEnabled</a>
+来调整。</p>
+<p>当下载完成后，Download Handler 的 assetBundle
+属性提供了对下载的AssetBundle的访问，就像<em>AssetBundle.LoadFromFile</em>在下载的AssetBundle上被调用。</p>
+<p>如果缓存信息提供给一个UnityWebRequest对象，并且请求的AssetBundle已经存在于Unity的缓存中，那么该AssetBundle将立即可用，这个API作用将于<em>AssetBundle.LoadFromFile</em>相同。</p>
+<p>在Unity5.6之前，UnityWebRequest系统使用一个固定的worker
+thread池和内部作业系统来防止过多的并发下载。thread池的大小是不可配置的。在Unity5.6中，这些保护措施已被移除，以适应更现代的硬件，并允许更快地访问HTTP响应代码和头部。</p>
+<h4 id="www.loadfromcacheordownload">WWW.LoadFromCacheOrDownload</h4>
+<p><em>Note: Beginning in Unity 2017.1,</em> <a
+target="_blank" rel="noopener" href="http://docs.unity3d.com/ScriptReference/WWW.LoadFromCacheOrDownload.html"><strong>WWW.LoadFromCacheOrDownload</strong></a>
+<em>simply wraps around UnityWebRequest. Accordingly, developers using
+Unity 2017.1 or higher should migrate to UnityWebRequest.</em>
+<strong>WWW.LoadFromCacheOrDownload</strong> <em>will be deprecated in a
+future release.</em></p>
+<p><em>The following information is applicable to Unity 5.6 or
+older.</em></p>
+<p>WWW.LoadFromCacheOrDownload
+是一个允许从远程服务器和本地存储加载对象的API。文件可以通过 file:// URL
+从本地存储加载。如果AssetBundle存在于Unity缓存中，这个API的行为和
+<em>AssetBundle.LoadFromFile</em> 相同。</p>
+<p>如果一个AssetBundle还没有被缓存，那么<em>WWW.LoadFromCacheOrDownload</em>将从源文件中读取AssetBundle。如果AssetBundle被压缩，它将使用worker
+thread解压缩并写入缓存。否则，它将通过worker
+thread直接写入缓存。一旦AssetBundle被缓存，<em>WWW.LoadFromCacheOrDownload</em>将从缓存、解压缩的AssetBundle中加载头部信息。然后此API的行为将与被AssetBundle.
+loadfromfile加载的<em>AssetBundle</em>相同。此缓存在<em>WWW.LoadFromCacheOrDownload</em>
+和<em>UnityWebRequest</em>之间共享。用一个API下载的任何AssetBundle也可以通过另一个API使用。</p>
+<p>当数据将被解压缩并通过固定大小的缓冲区写入缓存时，WWW对象将在本机内存中保留AssetBundle字节的完整副本。保存这个额外的AssetBundle副本是为了支持
+<a
+target="_blank" rel="noopener" href="http://docs.unity3d.com/ScriptReference/WWW-bytes.html">WWW.bytes</a>
+属性。</p>
+<p>由于在WWW对象中缓存AssetBundle字节的内存开销，AssetBundle应该保持小——最多几兆字节。有关AssetBundle大小的更多讨论，请参阅<strong>AssetBundle
+usage patterns</strong>章节中的<strong>Asset assignment
+strategies</strong> 部分。</p>
+<p>不像UnityWebRequest，每次调用这个API都会产生一个新的worker
+thread。因此，在内存有限的平台上，比如移动设备，一次只应该使用这个API下载一个AssetBundle，以避免内存峰值。在多次调用此API时，要小心创建过多的线程。如果需要下载超过5个AssetBundle，在脚本代码中创建并管理一个下载队列，以确保只有几个AssetBundle下载同时运行。</p>
+<h4 id="recommendations">Recommendations</h4>
+<p>一般来说，应尽可能使用<em>AssetBundle.LoadFromFile</em>。这个API在速度、磁盘使用和运行时内存使用方面是最高效的。</p>
+<p>对于必须下载或修补AssetBundles的项目，强烈建议在Unity
+5.3或更新版本的项目中使用UnityWebRequest，在Unity 5.2或更老版本使用
+<em>WWW.LoadFromCacheOrDownload</em>。正如<strong>Distribution</strong>部分所详述的那样，可以用项目安装程序中包含的Bundle来准备AssetBundle
+Cache。</p>
+<p>当使用 <em>UnityWebRequest</em> 或
+<em>WWW.LoadFromCacheOrDownload</em>
+时，确保下载器代码在加载AssetBundle后正确调用 <em>Dispose</em>
+函数。C#的using语句是确保<em>WWW</em>或<em>UnityWebRequest</em>被安全卸载的最方便的方法。</p>
+<h3 id="loading-assets-from-assetbundle">Loading Assets From
+AssetBundle</h3>
+<p>UnityEngine.Objects
+可以使用三个不同的API从AssetBundle加载，它们都有同步和异步的变体：</p>
+<ul>
+<li><a
+target="_blank" rel="noopener" href="https://docs.unity3d.com/ScriptReference/AssetBundle.LoadAsset.html">LoadAsset</a>
+LoadAssetAsync</li>
+<li><a
+target="_blank" rel="noopener" href="https://docs.unity3d.com/ScriptReference/AssetBundle.LoadAllAssets.html">LoadAllAssets</a>
+LoadAllAssetsAsync</li>
+<li><a
+target="_blank" rel="noopener" href="https://docs.unity3d.com/ScriptReference/AssetBundle.LoadAssetWithSubAssets.html">LoadAssetWithSubAssets</a>
+LoadAssetWithSubAssetsAsync</li>
+</ul>
+<p>这些API的同步版本总是比它们的异步版本快，至少快一帧。</p>
+<p>异步加载将每帧加载多个对象，受到时间片限制。有关更底层技术原因，参考
+<strong>Low-level loading details</strong> 一节。</p>
+<p><em>LoadAllAssets</em> 应该在加载多个独立 UnityEngine.Objects
+时使用。它只应该在需要加载AssetBundle中的大部分或所有对象时使用。相比于其他两个API，<em>LoadAllAssets</em>比多次单独调用
+<em>LoadAssets</em>要快一些。因此，如果需要加载的资产数量很大，但一次需要加载的资产少于66%，请考虑将AssetBundle拆分为多个较小的bundles，并使用
+<em>LoadAllAssets</em>。</p>
+<p><em>LoadAssetWithSubAssets</em>应该在加载包含多个嵌入对象的复合资产时使用，例如带有嵌入动画的FBX模型或带有多个嵌入精灵的精灵图集。如果需要加载的所有对象都来自同一个资产，但是与许多其他不相关的对象一起存储在AssetBundle中，那么使用这个API。</p>
+<p>对于其他场景，使用 <em>LoadAsset</em> 和
+<em>LoadAssetAsync</em>。</p>
+<h4 id="low-level-loading-details">Low-level loading details</h4>
+<p>UnityEngine.Object
+加载是在主线程之外执行的：对象数据通过工作线程(worker
+thread)从存储中读取。任何不涉及Unity系统线程敏感部分（脚本，图形）的内容将在工作线程上进行转换。例如，VBOs将从网格中创建，纹理将被解压，等等。</p>
+<p>从Unity
+5.3开始，对象加载已经并行化。多个对象在工作线程上被反序列化、处理和集成。当一个对象完成加载时，它的<em>Awake</em>回调将被调用，并且该对象将在下一帧期间对Unity引擎的其余部分可用。</p>
+<p>同步方法 <em>AssetBundle.Load</em>
+将暂停主线程，直到对象加载完成。它们还将对对象加载进行时间切片，以便对象集成占用的帧时间不会超过一定的毫秒数。
+毫秒数由<em>Application.backgroundLoadingPriority</em> 属性设置：</p>
+<ul>
+<li><em>ThreadPriority.High</em>: Maximum 50 milliseconds per frame</li>
+<li><em>ThreadPriority.Normal</em>: Maximum 10 milliseconds per
+frame</li>
+<li><em>ThreadPriority.BelowNormal</em>: Maximum 4 milliseconds per
+frame</li>
+<li><em>ThreadPriority.Low</em>: Maximum 2 milliseconds per frame.</li>
+</ul>
+<p>从Unity
+5.2开始，多个对象被加载，直到达到对象加载的帧时间限制。假设所有其他因素都相同，资产加载API的异步变体将总是比同步版本花费更长的时间来完成，因为在发出异步调用和对象对引擎可用之间的最小一帧延迟。</p>
+<h4 id="assetbundle-dependencies">AssetBundle dependencies</h4>
+<p>根据运行时环境，使用两个不同的API自动跟踪AssetBundles之间的依赖关系。在Unity
+Editor中，可以通过<a
+target="_blank" rel="noopener" href="http://docs.unity3d.com/ScriptReference/AssetDatabase.html">AssetDatabase</a>
+API查询AssetBundle的依赖关系。AssetBundle的分配和依赖可以通过<a
+target="_blank" rel="noopener" href="http://docs.unity3d.com/ScriptReference/AssetImporter.html">AssetImporter</a>
+API来访问和修改。运行时，Unity提供了一个可选API，通过基于ScriptableObject的<a
+target="_blank" rel="noopener" href="http://docs.unity3d.com/ScriptReference/AssetBundleManifest.html">AssetBundleManifest</a>
+API加载在AssetBundle构建过程中生成的依赖信息。</p>
+<p>当一个或多个UnityEngine.Objects引用一个或多个其他AssetBundle的UnityEngine.Objects时，其父AssetBundle便依赖于其他AssetBundle。有关对象间引用的更多信息，请查阅<strong>Assets,
+Objects and Serialization</strong>章节的 <strong>Inter-Object
+references</strong> 部分。如<strong>Serialization and
+instances</strong>部分所述，AssetBundle作为源数据的源，由AssetBundle中包含的每个对象的File
+GUID和Local ID标识。</p>
+<p>因为一个对象是在它的Instance ID第一次被解引用时被加载的，而Instance
+ID又是在它的AssetBundle被加载时被分配的，所以AssetBundle加载的顺序并不重要。相反，在加载对象本身之前加载包含对象依赖的所有AssetBundles是很重要的。Unity不会尝试在加载父AssetBundle时自动加载任何子AssetBundle。</p>
+<p><strong>Example：</strong></p>
+<p><img
+src="https://unity-connect-prd.storage.googleapis.com/20190130/f2a6f87c-5842-4acb-b220-2d7917e1f29f_ab1.jpg" /></p>
+<p>假设A材质引用了B纹理。A材质被打包进AssetBundle
+1，B纹理被打包进AssetBundle 2。在这个案例中，AssetBundle
+2必须在加载A材质之前被加载。</p>
+<p>这并不表示AssetBundle 2必须在AssetBundle
+1之前被加载，或B纹理必须从AssetBundle 2中显式加载。在从AssetBundle
+1中加载A材质之前，加载AssetBundle 2就足够了。</p>
+<p>但是，Unity不会在加载Asset Bundle 1时自动加载AssetBundle
+2。这一过程必须通过脚本代码自主实现。</p>
+<p>关于依赖的更过内容，请查阅 <a
+target="_blank" rel="noopener" href="https://docs.unity3d.com/Manual/AssetBundles-Dependencies.html">manual
+page</a> 。</p>
+<h4 id="assetbundle-manifests">AssetBundle manifests</h4>
+<p>当使用 <em>BuildPipeline.BuildAssetBundles</em> API
+执行AssetBundle构建管线时，Unity会序列化一个包含每个AssetBundle的依赖信息的对象。这些数据存储在一个单独的AssetBundle中，它包含一个<a
+target="_blank" rel="noopener" href="http://docs.unity3d.com/ScriptReference/AssetBundleManifest.html">AssetBundleManifest</a>
+类型的Object。</p>
+<p>这个资产将被存储在一个与AssetBundle被构建时的父目录名称相同的AssetBundle中。如果一个项目将AssetBundles构建到
+<em>(projectroot)/build/Client/</em>
+文件夹中，保存maifest的AssetBundle将被保存为<em>(projectroot)/build/Client/Client.manifest</em>
+。</p>
+<p>包含manifest的AssetBundle可以向其他AB一样被加载、缓存和卸载。</p>
+<p>AssetBundleManifest对象本身提供了<a
+target="_blank" rel="noopener" href="http://docs.unity3d.com/ScriptReference/AssetBundleManifest.GetAllAssetBundles.html">GetAllAssetBundles</a>
+API来列出所有与mainfest一同构建的AssetBundle，以及两个方法来查询特定AssetBundle的依赖关系：</p>
+<ul>
+<li><a
+target="_blank" rel="noopener" href="http://docs.unity3d.com/ScriptReference/AssetBundleManifest.GetAllDependencies.html">AssetBundleManifest.GetAllDependencies</a>
+returns all of an AssetBundle's hierarchical dependencies, which
+includes the dependencies of the AssetBundle's direct children, its
+children's children, etc.</li>
+<li><a
+target="_blank" rel="noopener" href="http://docs.unity3d.com/ScriptReference/AssetBundleManifest.GetDirectDependencies.html">AssetBundleManifest.GetDirectDependencies</a>
+returns only an AssetBundle's direct children</li>
+</ul>
+<p>注意，这两个API都会分配字符串数组。因此，它们应该只被谨慎使用，而不是在应用程序生命周期中对性能敏感的部分使用。</p>
+<h4 id="recommendations-1">Recommendations</h4>
+<p>在许多情况下，最好在玩家进入应用程序的性能关键区域（如主要游戏关卡或世界）之前加载尽可能多的所需对象。这在移动平台上尤其重要，因为在移动平台上访问本地存储很慢，并且在游戏时间加载和卸载对象的内存波动可能会触发垃圾收集器。</p>
+<p>对于那些必须在应用程序交互时加载和卸载对象的项目，请参阅
+<strong>AssetBundle usage patterns</strong> 步骤中的 <strong>Managing
+loaded assets</strong>
+一节，了解有关卸载Objects和AssetBundle的更多信息。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://rigelaster.github.io">Rigel Aster</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://rigelaster.github.io/2025/06/09/Unity/Assets,%20Resources%20and%20AssetBundles%20-%20Ch.4%20AssetBundle%20fundamentals/">https://rigelaster.github.io/2025/06/09/Unity/Assets,%20Resources%20and%20AssetBundles%20-%20Ch.4%20AssetBundle%20fundamentals/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="https://rigelaster.github.io" target="_blank">Rigel's Blog</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Unity/">Unity</a><a class="post-meta__tags" href="/tags/AssetBundle/">AssetBundle</a></div><div class="post-share"><div class="social-share" data-image="https://unity-connect-prd.storage.googleapis.com/20190130/f2a6f87c-5842-4acb-b220-2d7917e1f29f_ab1.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related full-width" href="/2025/06/09/Unity/Assets,%20Resources%20and%20AssetBundles%20-%20Ch.3%20The%20Resources%20folder/" title="Assets, Resources and AssetBundles - Ch.3 The Resources folder"><img class="cover" src="https://unity-connect-prd.storage.googleapis.com/20190130/f2a6f87c-5842-4acb-b220-2d7917e1f29f_ab1.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">Assets, Resources and AssetBundles - Ch.3 The Resources folder</div></div><div class="info-2"><div class="info-item-1">原文链接：https://learn.unity.com/tutorial/assets-resources-and-assetbundles 读前须知：这是一篇在Unity 2017.3语境下所写的文章，目前已被标记为deprecated。官方更推荐使用新推出的Addressables系统，但是本文所蕴含的知识应该不会过时吧，一下为原文提示：  PLEASE NOTE: this tutorial has now been deprecated. We now recommend using Addressables for your projects and will be providing more documentation and tutorials on this feature soon. In the meantime please refer to the...</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2025/06/09/Unity/Assets,%20Resources%20and%20AssetBundles%20-%20Ch.3%20The%20Resources%20folder/" title="Assets, Resources and AssetBundles - Ch.3 The Resources folder"><img class="cover" src="https://unity-connect-prd.storage.googleapis.com/20190130/f2a6f87c-5842-4acb-b220-2d7917e1f29f_ab1.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-06-09</div><div class="info-item-2">Assets, Resources and AssetBundles - Ch.3 The Resources folder</div></div><div class="info-2"><div class="info-item-1">原文链接：https://learn.unity.com/tutorial/assets-resources-and-assetbundles 读前须知：这是一篇在Unity 2017.3语境下所写的文章，目前已被标记为deprecated。官方更推荐使用新推出的Addressables系统，但是本文所蕴含的知识应该不会过时吧，一下为原文提示：  PLEASE NOTE: this tutorial has now been deprecated. We now recommend using Addressables for your projects and will be providing more documentation and tutorials on this feature soon. In the meantime please refer to the...</div></div></div></a><a class="pagination-related" href="/2025/06/05/Unity/Assets,%20Resources%20and%20AssetBundles%20-%20Ch.2%20Assets,%20Objects%20and%20serialization/" title="Assets, Resources and AssetBundles - Ch.2 Assets, Objects and serialization"><img class="cover" src="https://unity-connect-prd.storage.googleapis.com/20190130/f2a6f87c-5842-4acb-b220-2d7917e1f29f_ab1.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-06-05</div><div class="info-item-2">Assets, Resources and AssetBundles - Ch.2 Assets, Objects and serialization</div></div><div class="info-2"><div class="info-item-1">原文链接：https://learn.unity.com/tutorial/assets-resources-and-assetbundles 读前须知：这是一篇在Unity 2017.3语境下所写的文章，目前已被标记为deprecated。官方更推荐使用新推出的Addressables系统，但是本文所蕴含的知识应该不会过时吧，一下为原文提示：  PLEASE NOTE: this tutorial has now been deprecated. We now recommend using Addressables for your projects and will be providing more documentation and tutorials on this feature soon. In the meantime please refer to the...</div></div></div></a><a class="pagination-related" href="/2021/12/08/Game%20Development/Compute%20Shader%20%E7%BB%98%E5%88%B6%20Mandelbrot%20Fractal%20%E5%9B%BE%E6%A1%88/" title="Compute Shader 绘制 Mandelbrot Fractal 图案"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2021-12-08</div><div class="info-item-2">Compute Shader 绘制 Mandelbrot Fractal 图案</div></div><div class="info-2"><div class="info-item-1">前言 文章仅针对unity compute shader，通过案例来学习其基本用法。由于知识浅薄，仅提供一些表层的知识，如发现错误，请指出，万分感谢。 参考案例来自reddit中的一篇文章，参考资料的第一个链接可以看原文，源码也可以在他的文章中找到链接。 文章重点在于compute shader 的使用，因此Mandelbrot Fractal 只做简单介绍。 unity compute shader 基础 根据unity的官方文档，compute shader 与其他shader一样，属于项目的资源文件（asset files），以.compute为文件扩展名。一般情况下使用HLSL语言编写（其他情况请参考官方文档），在unity中需要与C#脚本配合使用。 在unity中通过右键菜单 Create-&gt;Shader-&gt;Compute Shader 来创建出.compute文件，被创建的文件中自带以下代码： 1234567891011121314// Each #kernel tells which function to compile;...</div></div></div></a><a class="pagination-related" href="/2024/11/14/Game%20Development/URP-Fur/" title="URP Fur Rendering"><img class="cover" src="https://image.rigelaster.ink/PicGo/Fur-Shell-02.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2024-11-14</div><div class="info-item-2">URP Fur Rendering</div></div><div class="info-2"><div class="info-item-1">前言 绒毛渲染是毛发渲染中的一部分，属于短毛类。绒毛通常拥有柔软丰富的外轮廓，其上的光影也表较柔和，但是巨量的毛发代表着极高的复杂性和庞大的计算量。在实时渲染领域有一些成熟的方案兼具了表现及性能，最常见的就是Shell-based Fur方案。 Shell-based Fur...</div></div></div></a><a class="pagination-related" href="/2024/10/25/Game%20Development/Unity%E4%B8%ADLinearEyeDepth%20Linear01Depth%E6%8E%A8%E5%AF%BC/" title="Unity中LinearEyeDepth Linear01Depth推导"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2024-10-25</div><div class="info-item-2">Unity中LinearEyeDepth Linear01Depth推导</div></div><div class="info-2"><div class="info-item-1">前言 Unity开发中会利用深度缓存做很多事情，了解深度缓存的由来细节可以让开发过程更顺利，本文讨论不同平台下渲染管线中深度值的由来以及LinearEyeDepth Linear01Depth函数的输出值细节。 概念说明  \(f\) 远裁剪面到相机的距离，正值 \(n\) 近裁剪面到相机的距离，正值 \(z_{eye}\) 视角空间（view space）中坐标的z分量 \(z_{clip}\) 齐次裁剪空间（homogeneous clip space）中坐标的z分量 \(w_{clip}\) 齐次裁剪空间（homogeneous clip space）中坐标的w分量 \(z_{ndc}\) NDC空间中坐标的z分量 \(z_{depth}\) depth buffer中的深度值 \(z_{linear}\) 视角空间（view space）中顶点坐标在远近裁剪平面之间的线性值，近裁剪面处值为0，远裁剪面处值为1 \(z_{linear2}\)...</div></div></div></a><a class="pagination-related" href="/2024/10/25/Game%20Development/Unity%E4%BB%8E%E6%B7%B1%E5%BA%A6%E7%BC%93%E5%AD%98%E9%87%8D%E5%BB%BA%E4%B8%96%E7%95%8C%E5%9D%90%E6%A0%87/" title="Unity从深度缓存重建世界坐标"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2024-10-25</div><div class="info-item-2">Unity从深度缓存重建世界坐标</div></div><div class="info-2"><div class="info-item-1">前言 如今使用的游戏渲染技术中，有相当一部分技术有通过深度缓冲重建像素点世界坐标的需求。可以通过不同的方法来实现这一需求，下面我们来介绍几种常用的重建世界坐标方法及其原理。 通过NDC空间重建世界坐标（Unity URP 案例） Unity提供了一个重建世界坐标的URP案例，可以从这里入手分析一下，直接来看它的片元着色器： 123456789101112131415161718192021222324252627282930313233343536373839404142half4 frag(Varyings IN) : SV_Target&#123;    // To calculate the UV coordinates for sampling the depth buffer,    // divide the pixel location by the render target resolution    // _ScaledScreenParams.    float2 UV = IN.positionHCS.xy /...</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/uploads/avatar-2.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Rigel Aster</div><div class="author-info-description">这世间真是美好啊</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">44</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">26</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">8</div></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">Welcome to Rigel's cottage!</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#assetbundle-fundamentals"><span class="toc-number">1.</span> <span class="toc-text">AssetBundle fundamentals</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#overview"><span class="toc-number">1.1.</span> <span class="toc-text">Overview</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#assetbundle-layout"><span class="toc-number">1.2.</span> <span class="toc-text">AssetBundle layout</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#loading-assetbundles"><span class="toc-number">1.3.</span> <span class="toc-text">Loading AssetBundles</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#assetbundle.loadfrommemoryasync"><span class="toc-number">1.3.1.</span> <span class="toc-text">AssetBundle.LoadFromMemory(Async)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#assetbundle.loadfromfileasync"><span class="toc-number">1.3.2.</span> <span class="toc-text">AssetBundle.LoadFromFile(Async)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#assetbundledownloadhandler"><span class="toc-number">1.3.3.</span> <span class="toc-text">AssetBundleDownloadHandler</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#www.loadfromcacheordownload"><span class="toc-number">1.3.4.</span> <span class="toc-text">WWW.LoadFromCacheOrDownload</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#recommendations"><span class="toc-number">1.3.5.</span> <span class="toc-text">Recommendations</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#loading-assets-from-assetbundle"><span class="toc-number">1.4.</span> <span class="toc-text">Loading Assets From
+AssetBundle</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#low-level-loading-details"><span class="toc-number">1.4.1.</span> <span class="toc-text">Low-level loading details</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#assetbundle-dependencies"><span class="toc-number">1.4.2.</span> <span class="toc-text">AssetBundle dependencies</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#assetbundle-manifests"><span class="toc-number">1.4.3.</span> <span class="toc-text">AssetBundle manifests</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#recommendations-1"><span class="toc-number">1.4.4.</span> <span class="toc-text">Recommendations</span></a></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2025/06/09/Unity/Assets,%20Resources%20and%20AssetBundles%20-%20Ch.4%20AssetBundle%20fundamentals/" title="Assets, Resources and AssetBundles - Ch.4 AssetBundle fundamentals"><img src="https://unity-connect-prd.storage.googleapis.com/20190130/f2a6f87c-5842-4acb-b220-2d7917e1f29f_ab1.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Assets, Resources and AssetBundles - Ch.4 AssetBundle fundamentals"/></a><div class="content"><a class="title" href="/2025/06/09/Unity/Assets,%20Resources%20and%20AssetBundles%20-%20Ch.4%20AssetBundle%20fundamentals/" title="Assets, Resources and AssetBundles - Ch.4 AssetBundle fundamentals">Assets, Resources and AssetBundles - Ch.4 AssetBundle fundamentals</a><time datetime="2025-06-09T02:48:40.000Z" title="发表于 2025-06-09 10:48:40">2025-06-09</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/06/09/Unity/Assets,%20Resources%20and%20AssetBundles%20-%20Ch.3%20The%20Resources%20folder/" title="Assets, Resources and AssetBundles - Ch.3 The Resources folder"><img src="https://unity-connect-prd.storage.googleapis.com/20190130/f2a6f87c-5842-4acb-b220-2d7917e1f29f_ab1.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Assets, Resources and AssetBundles - Ch.3 The Resources folder"/></a><div class="content"><a class="title" href="/2025/06/09/Unity/Assets,%20Resources%20and%20AssetBundles%20-%20Ch.3%20The%20Resources%20folder/" title="Assets, Resources and AssetBundles - Ch.3 The Resources folder">Assets, Resources and AssetBundles - Ch.3 The Resources folder</a><time datetime="2025-06-09T01:51:40.000Z" title="发表于 2025-06-09 09:51:40">2025-06-09</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/06/05/Unity/Assets,%20Resources%20and%20AssetBundles%20-%20Ch.2%20Assets,%20Objects%20and%20serialization/" title="Assets, Resources and AssetBundles - Ch.2 Assets, Objects and serialization"><img src="https://unity-connect-prd.storage.googleapis.com/20190130/f2a6f87c-5842-4acb-b220-2d7917e1f29f_ab1.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Assets, Resources and AssetBundles - Ch.2 Assets, Objects and serialization"/></a><div class="content"><a class="title" href="/2025/06/05/Unity/Assets,%20Resources%20and%20AssetBundles%20-%20Ch.2%20Assets,%20Objects%20and%20serialization/" title="Assets, Resources and AssetBundles - Ch.2 Assets, Objects and serialization">Assets, Resources and AssetBundles - Ch.2 Assets, Objects and serialization</a><time datetime="2025-06-04T16:44:49.000Z" title="发表于 2025-06-05 00:44:49">2025-06-05</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/12/19/Translations/Introduction%20to%20Decal%20Rendering/" title="Introduction to Decal Rendering"><img src="https://image.rigelaster.ink/PicGo/decal-in-Half Life.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Introduction to Decal Rendering"/></a><div class="content"><a class="title" href="/2024/12/19/Translations/Introduction%20to%20Decal%20Rendering/" title="Introduction to Decal Rendering">Introduction to Decal Rendering</a><time datetime="2024-12-19T01:37:41.000Z" title="发表于 2024-12-19 09:37:41">2024-12-19</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/12/12/Unity/Optimizing%20draw%20calls/" title="Optimizing draw calls">Optimizing draw calls</a><time datetime="2024-12-12T06:22:44.000Z" title="发表于 2024-12-12 14:22:44">2024-12-12</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2019 - 2025 By Rigel Aster</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 6.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.3.5</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"></div><script defer="defer" id="fluttering_ribbon" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-fluttering-ribbon.min.js"></script><script id="click-heart" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/click-heart.min.js" async="async" mobile="false"></script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.js"></script><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/metingjs/dist/Meting.min.js"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div></body></html>
